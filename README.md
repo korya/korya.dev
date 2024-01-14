@@ -19,14 +19,37 @@ Facing issues? Check the [FAQ page](https://github.com/timlrx/tailwind-nextjs-st
 
 Feature request? Check the past discussions to see if it has been brought up previously. Otherwise, feel free to start a new discussion thread. All ideas are welcomed!
 
+## Variations
+
+**Note**: These are community contributed forks using different frameworks or with significant changes to the codebase - not officially supported.
+
+Astro alternative - [Tailwind Astro Template](https://github.com/wanoo21/tailwind-astro-starting-blog).
+
+Remix-run alternative - [Tailwind Remix-run Starter Blog Template](https://github.com/SangeetAgarwal/tailwind-remix-run-mdxjs-typescript-starter-blog).
+
+Internationalization support - [Template with i18n](https://tailwind-nextjs-starter-blog-i18n.vercel.app/) and [source code](https://github.com/PxlSyl/tailwind-nextjs-starter-blog-i18n/tree/main).
+
 ## Examples V2
 
 - [Demo Blog](https://tailwind-nextjs-starter-blog.vercel.app/) - this repo
 - [My personal blog](https://www.timlrx.com) - modified to auto-generate blog posts with dates
+- [Karhdo's Blog](https://karhdo.dev) - Karhdo's Blog - Karhdo's Coding Adventure ([source code](https://github.com/Karhdo/karhdo.dev))
 - [ben.codes blog](https://ben.codes) - Benoit's personal blog about software development ([source code](https://github.com/bendotcodes/bendotcodes))
 - [tsix blog](https://tsix.top) - A front-end engineer is used to record some knowledge points in work and study _中文_
 - [SOTO's Blog](https://www.atksoto.com/) - A more personalized personal website upgraded from V1 ([source code](https://github.com/acsoto/soto-blog-nextjs))
 - [Prabhu's Blog](https://prabhukirankonda.vercel.app) - Prabhu's Personal website with blog ([source code](https://github.com/prabhukiran8790/prabhukirankonda))
+- [Rabby Hasan's Blog](https://blog.rabbyhasan.com.bd/) - Rabby Hasan's personal blog about full stack development with cloud ([source code](https://github.com/rabbyalone/myblog))
+- [enscribe.dev](https://enscribe.dev) - enscribe's personal blog; cybersecurity shenanigans, frontend webdev, etc. ([source code](https://github.com/jktrn/enscribe.dev))
+- [dalelarroder.com](https://dalelarroder.com) - Dale Larroder's personal website upgraded from V1 ([source code](https://github.com/dlarroder/dalelarroder))
+- [thetalhatahir.com](https://www.thetalhatahir.com) - Talha Tahir's personal blog. Added article thumbnails, linkedIn card, Beautiful hero content, technology emoticons.
+- [hauhau.cn](https://www.hauhau.cn) - Homing's personal blog about the stuff he's learning ([source code](https://github.com/hominsu/blog))
+- [zS1m's Blog](https://contrails.space) - zS1m's personal blog for recording and sharing daily learning technical content ([source code](https://github.com/zS1m/nextjs-contrails))
+- [dariuszwozniak.net](https://dariuszwozniak.net/) - Software development blog
+- [Terminals.run](https://terminals.run) - Blog site for some thoughts and records for life and technology.
+- [markpitblado.me](https://markpitblado.me) - Mark's personal blog about the internet, privacy, and books ([source code](https://github.com/mark-pitblado/personal-website))
+- [francisaguilar.co blog](https://francisaguilar.co) - Francis Aguilar's personal blog that talks about tech, fitness, and personal development.
+- [Min71 Dev Blog](https://min71.dev) - Personal blog about Blockchain, Development and etc. ([source code](https://github.com/mingi3442/blog))
+- [Bryce Yu's Blog](https://earayu.github.io/) - Bryce Yu's personal Blog about distributed system, database, and web development. ([source code](https://github.com/earayu/earayu.github.io))
 
 Using the template? Feel free to create a PR and add your blog to this list.
 
@@ -54,7 +77,6 @@ Thanks to the community of users and contributors to the template! We are no lon
 - [bpiggin.com](https://www.bpiggin.com) - Ben Piggin's personal blog
 - [maqib.cn](https://maqib.cn) - A blog of Chinese front-end developers 狂奔小马的博客 ([源码](https://github.com/maqi1520/nextjs-tailwind-blog))
 - [ambilena.com](https://ambilena.com/) - Electronic Music Blog & imprint for upcoming musicians.
-- [dalelarroder.com](https://dalelarroder.com) - Dale Larroder's personal website and blog ([source code](https://github.com/dlarroder/dalelarroder))
 - [0xchai.io](https://0xchai.io) - Chai's personal blog
 - [techipedia](https://techipedia.vercel.app) - Simple blogging progressive web app with custom installation button and top progress bar
 - [reubence.com](https://reubence.com) - Reuben Rapose's Digital Garden
@@ -125,8 +147,8 @@ npx degit 'timlrx/tailwind-nextjs-starter-blog'
 3. Modify the content security policy in `next.config.js` if you want to use
    other analytics provider or a commenting solution other than giscus.
 4. Personalize `authors/default.md` (main author)
-5. Modify `projectsData.js`
-6. Modify `headerNavLinks.js` to customize navigation links
+5. Modify `projectsData.ts`
+6. Modify `headerNavLinks.ts` to customize navigation links
 7. Add blog posts
 8. Deploy on Vercel
 
@@ -134,6 +156,12 @@ npx degit 'timlrx/tailwind-nextjs-starter-blog'
 
 ```bash
 yarn
+```
+
+Please note, that if you are using Windows, you may need to run:
+
+```bash
+set PWD="$(pwd)"
 ```
 
 ## Development
@@ -235,18 +263,7 @@ See [Next.js on Netlify](https://docs.netlify.com/integrations/frameworks/next-j
 
 1. Add `output: 'export'` in `next.config.js`. See [static exports documentation](https://nextjs.org/docs/app/building-your-application/deploying/static-exports#configuration) for more information.
 2. Comment out `headers()` from `next.config.js`.
-3. Change `components/Image.tsx` to use a standard `<img>` tag instead of `next/image`:
-
-   ```ts
-   /* eslint-disable jsx-a11y/alt-text */
-   /* eslint-disable @next/next/no-img-element */
-   import NextImage, { ImageProps } from 'next/image'
-
-   // @ts-ignore
-   const Image = ({ ...rest }: ImageProps) => <img {...rest} />
-
-   export default Image
-   ```
+3. Add `unoptimized: true` to the `images` key in `next.config.js`:
 
    Alternatively, to continue using `next/image`, you can use an alternative image optimization provider such as Imgix, Cloudinary or Akamai. See [image optimization documentation](https://nextjs.org/docs/app/building-your-application/deploying/static-exports#image-optimization) for more details.
 
@@ -254,65 +271,13 @@ See [Next.js on Netlify](https://docs.netlify.com/integrations/frameworks/next-j
 5. Run `yarn build`. The generated static content is in the `out` folder.
 6. Deploy the `out` folder to your hosting service of choice or run `npx serve out` to view the website locally.
 
+**Note**: Deploying on Github pages require addition modifications to the base path. Please refer to the FAQ for more information.
+
 ## Frequently Asked Questions
 
-### How can I customize the `kbar` search?
-
-Add a `SearchProvider` component such as the one shown below and use it in place of the default `SearchProvider` component in `app/layout.tsx`.
-
-`defaultActions` are the initial list of actions.
-
-`onSearchDocumentsLoad` is a callback function that is called when the documents specified by `searchDocumentsPath` are loaded. Set `searchDocumentsPath` to `false` to disable the dynamically loaded search feature.
-
-```tsx
-'use client'
-
-import { KBarSearchProvider } from 'pliny/search/KBar'
-import { useRouter } from 'next/navigation'
-import { CoreContent } from 'pliny/utils/contentlayer'
-import { Blog } from 'contentlayer/generated'
-
-export const SearchProvider = ({ children }) => {
-  const router = useRouter()
-  return (
-    <KBarSearchProvider
-      kbarConfig={{
-        searchDocumentsPath: 'search.json',
-        defaultActions: [
-          {
-            id: 'homepage',
-            name: 'Homepage',
-            keywords: '',
-            shortcut: ['h', 'h'],
-            section: 'Home',
-            perform: () => router.push('/'),
-          },
-          {
-            id: 'projects',
-            name: 'Projects',
-            keywords: '',
-            shortcut: ['p'],
-            section: 'Home',
-            perform: () => router.push('/projects'),
-          },
-        ],
-        onSearchDocumentsLoad(json) {
-          return json.map((post: CoreContent<Blog>) => ({
-            id: post.path,
-            name: post.title,
-            keywords: post?.summary || '',
-            section: 'Blog',
-            subtitle: post.tags.join(', '),
-            perform: () => router.push(post.path),
-          }))
-        },
-      }}
-    >
-      {children}
-    </KBarSearchProvider>
-  )
-}
-```
+- [How can I add a custom MDX component?](/faq/custom-mdx-component.md)
+- [How can I customize the `kbar` search?](/faq/customize-kbar-search.md)
+- [How do I deploy on Github pages?](/faq/github-pages-deployment.md)
 
 ## Support
 
