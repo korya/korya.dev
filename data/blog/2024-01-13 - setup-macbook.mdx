@@ -1,0 +1,57 @@
+---
+title: 'Setting up a Mac in 2024'
+date: '2024-01-13'
+draft: false
+tags: ['howto', 'macbook', 'setup']
+---
+
+I had to reset my old mac from scratch today. Here I am going to document the steps to reproduce my environment.
+
+The main plan is as follows:
+1. Configure MacOs to my preferred defaults
+2. Install [Homebrew](https://brew.sh/)
+3. Install [Tailscale](https://tailscale.com/)
+4. Install my dotfiles from https://github.com/korya/dotfiles
+5. Install all required tools
+
+
+## Configure MacOS
+
+The only changes I make to the default settings are:
+
+- Trackpad:
+   * Enable `Tap to click`. I just cannot work with a trackpad when this option is
+      disabled. Pressing the trackpad make me feel weird.
+
+- Dock:
+  * Move the dock to the left. The real estate at the center of the screen is very
+     precious and hence, I try to free it up for the content that requires my
+     attention at this current moment. Dock is very useful and should be available
+     fast when needed. But not that important to be at the bottom of the screen.
+
+   * Turn on magnification effect on the Docker and set it to the mid level.
+
+   * Auto-hide the dock. I don't need to see it all the time.
+
+   * Clean it up. Remove all these stock apps from the dock. Keep Finder,
+      Launchpad, Safari (later will be replaced with Chrome) and Notes.
+
+In the past (over 5 years ago), I had some magic CLI commands for doing these
+changes. But it used to break with almost every major OS ugprade.
+
+It would be great to get these magic CLI commands for the latest MacOS. Need to check whether ChatGPT can help with that.
+
+## Install Homebrew
+
+Homebrew is my default package manager in MacOS.
+
+Follow the instructions at https://brew.sh/. At this moment, they are:
+
+```sh
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
+
+## Install Tailscale
+
+[Tailscale](https://tailscale.com/) is one of the best software I've discovered in the recent years. I've been using it for a very long time. I think that I've discovered it in some newsletter early on after they made their product available. I gave it a try and it just worked, and it just made my life so much easier. I recommend everyone to try it out. It is an amazing product that just works!
+
