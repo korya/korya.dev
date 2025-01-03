@@ -22,6 +22,10 @@ markup:
     # pygmentsCodefences: true
     # noClasses: false
 
+services:
+  googleAnalytics:
+    id: G-DXHD6BHKK1
+
 params:
   env: production # enable Google Analytics, opengraph, twitter cards and schema
   description: "A personal technical blog by korya: thoughts, reflections and notes"
