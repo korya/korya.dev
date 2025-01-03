@@ -6,24 +6,17 @@ Here are the setup details:
 
 ## Blog Engine
 
-The original code for the blog is taken from https://github.com/timlrx/tailwind-nextjs-starter-blog. The code is stored as-is in `original-main` branch. All my personal modifications (configuration and posts) are in `master` branch.
+The blog is statically generated using [Hugo](https://gohugo.io/). The theme is https://github.com/adityatelange/hugo-PaperMod.
 
-Current version is [`f141791` from Jan 7th, 2024](https://github.com/timlrx/tailwind-nextjs-starter-blog/tree/f14179100a5dc09d0b899ce3455b062a35d306b3).
-
-Uprading the blog:
-1. Checkout `original-main`
-2. Upgrade the code to the required version
-3. Checkout `master`
-4. Rebase it on top of the new `original-main`
-5. In case of conflicts, remove the original static assets:
-   ```sh
-   rm -rf ./public/static/images/* ./public/static/favicons/*
-   ```
+In the past, I used https://github.com/timlrx/tailwind-nextjs-starter-blog. But it eneded up being too fancy for my needs: steering my attention from the content to the look and feel. I've moved to a simpler solution hoping that it will help me to focus on the content.
 
 ## Blog Management
 
 Adding a post:
-1. Add new `mdx` file to `data/blog/` dir: `YYYY-MM-DD - <TITLE>.mdx`
+1. Add new `md` file to `content/posts/` dir: `YYYY-MM-DD - <TITLE>.md` using:
+   ```sh
+   hugo new content posts/YYYY-MM-DD - <TITLE>.md
+   ```
 2. Mark it as draft: `draft: true`
-3. Finish the contents
+3. Populate the contents
 4. Mark it as published: `draft: false`
