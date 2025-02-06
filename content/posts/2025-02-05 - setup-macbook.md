@@ -121,7 +121,7 @@ brew install coreutils binutils diffutils ed findutils moreutils \
   gawk gnu-indent gnu-sed gnu-tar gnu-which gnutls grep gzip gpg2 \
   watch wdiff gpatch m4 make cmake file-formula \
   bash bash-completion@2 less wget curl socat git openssh python \
-  rsync svn unzip tree rename jq just ag fzf zellij \
+  rsync svn unzip tree rename jq just ag fzf zellij gh \
   macvim nvim
 ```
 
