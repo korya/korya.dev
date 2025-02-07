@@ -64,6 +64,16 @@ The only changes I make to the default settings are:
   - Disable `Automatically rearrange Spaces based on most recent use`. I don't
       want to be distracted by the changes in the desktops order.
 
+- Input languages:
+  - Open `Keyboard` group then click `Edit` to the right of `Input Sources`:
+    - add Russian and Hebrew
+
+- Shortcuts:
+  - On the same screen, `Keyboard`, ensure that 🌐 is set to `Change Input Source`
+  - On the same screen, `Keyboard`, click `Keyboard Shortcuts`:
+    - In `Modifier Keys`, change Caps Lock to Escape
+    - In `Mission Control`, enable shortcuts for switching to Desktops: `^1`, `^2`, etc.
+
 Below are CLI commands suggested by ChatGPT (o3-mini-high):
 
 ```sh
