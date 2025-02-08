@@ -68,6 +68,9 @@ The only changes I make to the default settings are:
   - Open `Keyboard` group then click `Edit` to the right of `Input Sources`:
     - add Russian and Hebrew
 
+- Time format:
+  - In `Date & Time`, turn on `24-hour time` and `Show 24-hour time on Lock Screen`
+
 - Shortcuts:
   - On the same screen, `Keyboard`, ensure that 🌐 is set to `Change Input Source`
   - On the same screen, `Keyboard`, click `Keyboard Shortcuts`:
