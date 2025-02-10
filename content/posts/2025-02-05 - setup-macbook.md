@@ -234,8 +234,8 @@ Docker Desktop
 [Docker](https://www.docker.com/) is the easiest and the most reliable way to ship reproducible software:
 
 ```sh
-brew install --cask  docker
-brew install docker docker-credential-helper
+brew install --cask docker
+brew install docker-credential-helper
 ```
 
 ### IDEs
