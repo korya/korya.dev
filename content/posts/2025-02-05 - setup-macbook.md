@@ -135,7 +135,7 @@ brew install coreutils binutils diffutils ed findutils moreutils \
   watch wdiff gpatch m4 make cmake file-formula \
   bash bash-completion@2 less wget curl socat git openssh python \
   rsync svn unzip tree rename jq just ag fzf zellij gh \
-  macvim nvim
+  macvim nvim bat
 ```
 
 New tools:
@@ -148,7 +148,9 @@ New tools:
    There are infinite ways to use it. Read
    <https://github.com/junegunn/fzf?tab=readme-ov-file#examples> for some insights.
    The most essential use is the integration in your shell:
-- [zellij](https://github.com/zellij-org/zellij) is a modern alternative to GNU `screen` and `tmux`:
+- [zellij](https://github.com/zellij-org/zellij) is a modern alternative to GNU `screen` and `tmux`
+- [bat](https://github.com/sharkdp/bat) is a great substitution for `cat`
+   (make sure to add `alias cat=bat`)
 
 ## Install my dotfiles
 
