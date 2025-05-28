@@ -290,7 +290,7 @@ recently from LastPass and it is great!
 brew install --cask bitwarden
 ```
 
-## Install Tailscale
+### Install Tailscale
 
 [Tailscale](https://tailscale.com/) is one of the best software I've discovered
 in the recent years. I've been using it for a very long time. I think that I've
