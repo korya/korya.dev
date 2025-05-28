@@ -168,14 +168,6 @@ git pull origin master
 
 Unfortunately, all conflicts need to be resolved manually.
 
-## Install All Required Tools
-
-Install AWS CLI:
-
-```sh
-brew install awscli
-```
-
 ## Install Rerquired Tools
 
 ### Producivity Tools
@@ -229,6 +221,25 @@ Configure iTerm2:
    5. Select the file from *Downloads* folder
    6. Set the imported Default profile as default
    7. Delete the old default profile
+
+
+### Fancy (Nerd) Fonts
+
+Install [Nerd Fonts](https://github.com/ryanoasis/nerd-fonts) (used by LazyVim and OhMyZsh):
+
+```
+brew install font-hack-nerd-font
+```
+
+In iTerms' *Setting*:
+1. Update the Default profile:
+   1. Goto Profiles
+   2. Select the Default Profile
+   3. Goto Text tab
+   4. Select *Hack Nerd Font Mono*
+   5. Set size to 14
+2. Repeat the steps for *Hotkey Window* profile
+
 
 ### Docker
 
