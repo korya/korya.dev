@@ -1,0 +1,54 @@
+---
+const currentYear = new Date().getFullYear();
+---
+
+<footer class="footer">
+  <div class="footer-content">
+    <p class="copyright">
+      &copy; {currentYear} Tech Scrolls
+    </p>
+    <div class="links">
+      <a href="https://github.com/korya" target="_blank" rel="noopener noreferrer">GitHub</a>
+      <a href="https://twitter.com/korya_dev" target="_blank" rel="noopener noreferrer">Twitter</a>
+      <a href="/rss.xml">RSS</a>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    margin-top: auto;
+    border-top: 1px solid var(--color-border);
+    padding: var(--space-lg);
+  }
+
+  .footer-content {
+    max-width: var(--wide-width);
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+  }
+
+  .copyright {
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+  }
+
+  .links {
+    display: flex;
+    gap: var(--space-lg);
+  }
+
+  .links a {
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    text-decoration: none;
+  }
+
+  .links a:hover {
+    color: var(--color-accent);
+  }
+</style>

@@ -1,9 +1,9 @@
 ---
 title: 'Setting up a Mac in 2024'
-date: '2024-01-13'
+date: 2024-01-13
 draft: false
 tags: ['howto', 'macbook', 'setup']
-ShowToc: true
+toc: true
 ---
 
 I had to reset my old mac from scratch today. Here I am going to document the steps to reproduce my environment.

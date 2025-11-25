@@ -1,0 +1,144 @@
+---
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
+
+interface Props {
+  headings: Heading[];
+}
+
+const { headings } = Astro.props;
+
+// Filter to only h2 and h3
+const toc = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
+---
+
+{toc.length > 0 && (
+  <nav class="toc">
+    <button class="toc-toggle" aria-expanded="false" aria-controls="toc-list">
+      <span class="toc-title">Table of Contents</span>
+      <svg class="toc-chevron" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="6 9 12 15 18 9"></polyline>
+      </svg>
+    </button>
+    <ol id="toc-list" class="toc-list">
+      {(() => {
+        let h2Counter = 0;
+        let h3Counter = 0;
+        return toc.map((heading) => {
+          let number = '';
+          if (heading.depth === 2) {
+            h2Counter++;
+            h3Counter = 0;
+            number = `${h2Counter}.`;
+          } else if (heading.depth === 3) {
+            h3Counter++;
+            number = `${h2Counter}.${h3Counter}.`;
+          }
+          return (
+            <li class:list={['toc-item', `depth-${heading.depth}`]}>
+              <a href={`#${heading.slug}`} class="toc-link">
+                <span class="toc-number">{number}</span>
+                {heading.text}
+              </a>
+            </li>
+          );
+        });
+      })()}
+    </ol>
+  </nav>
+)}
+
+<script>
+  const toggle = document.querySelector('.toc-toggle');
+  const list = document.getElementById('toc-list');
+
+  toggle?.addEventListener('click', () => {
+    const isExpanded = toggle.getAttribute('aria-expanded') === 'true';
+    toggle.setAttribute('aria-expanded', String(!isExpanded));
+    list?.classList.toggle('expanded');
+  });
+</script>
+
+<style>
+  .toc {
+    margin-bottom: var(--space-xl);
+    background: var(--color-bg-elevated);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .toc-toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-md) var(--space-lg);
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+  }
+
+  .toc-toggle:hover {
+    background: var(--color-bg);
+  }
+
+  .toc-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-muted);
+  }
+
+  .toc-chevron {
+    color: var(--color-text-muted);
+    transition: transform 0.2s ease;
+  }
+
+  .toc-toggle[aria-expanded="true"] .toc-chevron {
+    transform: rotate(180deg);
+  }
+
+  .toc-list {
+    list-style: none;
+    padding: 0 var(--space-lg) var(--space-lg);
+    margin: 0;
+    display: none;
+  }
+
+  .toc-list.expanded {
+    display: block;
+  }
+
+  .toc-item {
+    margin-top: var(--space-xs);
+  }
+
+  .toc-item.depth-3 {
+    padding-left: var(--space-lg);
+  }
+
+  .toc-link {
+    color: var(--color-text);
+    text-decoration: none;
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    display: block;
+    padding: var(--space-xs) 0;
+  }
+
+  .toc-link:hover {
+    color: var(--color-accent);
+  }
+
+  .toc-number {
+    color: var(--color-text-muted);
+    margin-right: 0.5em;
+    font-variant-numeric: tabular-nums;
+  }
+</style>

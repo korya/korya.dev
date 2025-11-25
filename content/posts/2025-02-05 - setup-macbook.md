@@ -1,9 +1,9 @@
 ---
 title: 'Setting up a Mac in 2025'
-date: '2025-02-05'
+date: 2025-02-05
 draft: false
 tags: ['howto', 'macbook', 'setup']
-ShowToc: true
+toc: true
 ---
 
 It is the time to reset my MacBook again. Last time was in 2024: [Setting up a Mac in 2024](./2024-01-13---setup-macbook.md).

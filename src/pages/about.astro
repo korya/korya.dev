@@ -1,0 +1,45 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Figure from '../components/interactive/Figure.astro';
+import styles from '../styles/prose.module.css';
+---
+
+<BaseLayout title="About | Tech Scrolls">
+  <article class="about">
+    <h1 class="page-title">About</h1>
+
+    <Figure src="/profile.png" align="center" />
+
+    <div class={styles.prose}>
+      <p>
+        This is my personal blog containing my thoughts and some fragments of thoughts on tech topics.
+      </p>
+
+      <p>
+        The idea behind this blog is to reflect and structure the information in my head. Writing is one of the best ways to achieve that.
+      </p>
+
+      <p>
+        I will be glad if you find it useful or even better, inspiring.
+      </p>
+
+      <h2>Contact</h2>
+      <ul>
+        <li>Github: <a href="https://github.com/korya" target="_blank" rel="noopener noreferrer">@korya</a></li>
+        <li>Twitter: <a href="https://twitter.com/korya_dev" target="_blank" rel="noopener noreferrer">@korya_dev</a></li>
+      </ul>
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .about {
+    max-width: var(--content-width);
+  }
+
+  .page-title {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: var(--space-lg);
+  }
+</style>

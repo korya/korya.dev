@@ -1,0 +1,51 @@
+---
+interface Props {
+  src: string;
+  alt?: string;
+  caption?: string;
+  align?: 'left' | 'center' | 'right';
+}
+
+const { src, alt = '', caption, align = 'center' } = Astro.props;
+---
+
+<figure class:list={['figure', `align-${align}`]}>
+  <img src={src} alt={alt} loading="lazy" />
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>
+
+<style>
+  .figure {
+    margin: var(--space-lg) 0;
+  }
+
+  .figure img {
+    border-radius: 8px;
+  }
+
+  .align-center {
+    text-align: center;
+  }
+
+  .align-center img {
+    margin: 0 auto;
+  }
+
+  .align-left {
+    text-align: left;
+  }
+
+  .align-right {
+    text-align: right;
+  }
+
+  .align-right img {
+    margin-left: auto;
+  }
+
+  figcaption {
+    margin-top: var(--space-sm);
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+  }
+</style>

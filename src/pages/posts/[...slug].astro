@@ -1,0 +1,122 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import TableOfContents from '../../components/TableOfContents.astro';
+import Comments from '../../components/Comments.astro';
+import CodeCopyButton from '../../components/CodeCopyButton.astro';
+import BackToTop from '../../components/BackToTop.astro';
+import styles from '../../styles/prose.module.css';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('posts');
+  return posts
+    .filter((post) => !post.data.draft)
+    .map((post) => ({
+      params: { slug: post.slug },
+      props: post,
+    }));
+}
+
+const post = Astro.props;
+const { Content, headings } = await post.render();
+
+const formattedDate = post.data.date.toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+
+// Calculate reading time (roughly 200 words per minute)
+const words = post.body.split(/\s+/).length;
+const readingTime = Math.ceil(words / 200);
+---
+
+<BaseLayout title={`${post.data.title} | Tech Scrolls`} description={post.data.description}>
+  <article class="post">
+    <header class="post-header">
+      <h1 class="post-title">{post.data.title}</h1>
+      <div class="post-meta">
+        <time datetime={post.data.date.toISOString()}>{formattedDate}</time>
+        <span class="separator">·</span>
+        <span>{readingTime} min read</span>
+        {post.data.tags && post.data.tags.length > 0 && (
+          <>
+            <span class="separator">·</span>
+            <span class="tags">
+              {post.data.tags.map((tag: string) => (
+                <a href={`/tags/${tag}`} class="tag">#{tag}</a>
+              ))}
+            </span>
+          </>
+        )}
+      </div>
+    </header>
+
+    {post.data.toc && <TableOfContents headings={headings} />}
+
+    <div class={styles.prose} data-prose>
+      <Content />
+    </div>
+
+    <Comments />
+  </article>
+  <CodeCopyButton />
+  <BackToTop />
+</BaseLayout>
+
+<style>
+  .post {
+    max-width: var(--content-width);
+  }
+
+  .post-header {
+    margin-bottom: var(--space-xl);
+  }
+
+  .post-title {
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    margin: 0;
+  }
+
+  .post-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-top: var(--space-md);
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+  }
+
+  .separator {
+    color: var(--color-border);
+  }
+
+  .tags {
+    display: flex;
+    gap: var(--space-sm);
+  }
+
+  .tag {
+    color: var(--color-text-muted);
+    text-decoration: none;
+  }
+
+  .tag:hover {
+    color: var(--color-accent);
+  }
+</style>
+
+<script>
+  // Make all external links open in new tab with security attributes
+  document.querySelectorAll('[data-prose] a[href^="http"]').forEach((link) => {
+    const anchor = link as HTMLAnchorElement;
+    if (!anchor.href.includes('korya.dev')) {
+      anchor.setAttribute('target', '_blank');
+      anchor.setAttribute('rel', 'noopener noreferrer');
+    }
+  });
+</script>

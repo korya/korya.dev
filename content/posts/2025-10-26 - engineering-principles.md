@@ -1,8 +1,8 @@
 ---
 title: 'Engineering Principles'
-date: '2025-10-26'
+date: 2025-10-26
 draft: false
-ShowToc: false
+toc: false
 ---
 
 In the last year, I had the pleasure to work in multiple great teams. Each

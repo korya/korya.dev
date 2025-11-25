@@ -1,6 +1,6 @@
 ---
 title: 'Using NotebookLM for reading research papers'
-date: '2025-03-04'
+date: 2025-03-04
 draft: false
 tags: ['howto', 'tools', 'efficiency']
 ---

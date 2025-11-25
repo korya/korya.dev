@@ -1,0 +1,84 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const posts = await getCollection('posts');
+
+// Get all tags with their counts
+const tagCounts = posts
+  .filter((post) => !post.data.draft)
+  .flatMap((post) => post.data.tags || [])
+  .reduce((acc, tag) => {
+    acc[tag] = (acc[tag] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
+// Sort by count descending, then alphabetically
+const sortedTags = Object.entries(tagCounts)
+  .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+---
+
+<BaseLayout title="Tags | Tech Scrolls">
+  <section class="tags-page">
+    <h1 class="page-title">Tags</h1>
+    <div class="tag-list">
+      {sortedTags.map(([tag, count]) => (
+        <a href={`/tags/${tag}`} class="tag-link">
+          <span class="tag-name">#{tag}</span>
+          <span class="tag-count">{count}</span>
+        </a>
+      ))}
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .tags-page {
+    max-width: var(--content-width);
+  }
+
+  .page-title {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: var(--space-lg);
+  }
+
+  .tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+  }
+
+  .tag-link {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-sm) var(--space-md);
+    background: var(--color-bg-elevated);
+    border: 1px solid var(--color-border);
+    border-radius: 9999px;
+    text-decoration: none;
+    transition: border-color 0.15s ease, color 0.15s ease;
+  }
+
+  .tag-link:hover {
+    border-color: var(--color-accent);
+  }
+
+  .tag-name {
+    color: var(--color-text);
+    font-size: 0.9375rem;
+  }
+
+  .tag-link:hover .tag-name {
+    color: var(--color-accent);
+  }
+
+  .tag-count {
+    color: var(--color-text-muted);
+    font-size: 0.75rem;
+    background: var(--color-bg);
+    padding: 0.125rem 0.5rem;
+    border-radius: 9999px;
+  }
+</style>
