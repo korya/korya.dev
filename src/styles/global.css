@@ -114,10 +114,59 @@ pre {
   padding: var(--space-md);
   border-radius: 8px;
   background: var(--color-code-bg);
+  position: relative;
+}
+
+/* Code block language label */
+pre[data-language]::before {
+  content: attr(data-language);
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 0.25em 0.5em;
+  font-size: 0.75rem;
+  font-family: var(--font-sans);
+  color: var(--color-text-muted);
+  background: var(--color-bg-elevated);
+  border-radius: 0 8px 0 4px;
+  text-transform: lowercase;
+  opacity: 0.8;
 }
 
 pre code {
   background: none;
   padding: 0;
   border-radius: 0;
+}
+
+/* Heading anchor links */
+.heading-anchor {
+  position: absolute;
+  left: -1.5em;
+  width: 1.5em;
+  text-decoration: none;
+  color: var(--color-text-muted);
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  font-weight: 400;
+}
+
+.heading-anchor:hover {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+
+h2:hover .heading-anchor,
+h3:hover .heading-anchor,
+.heading-anchor:focus {
+  opacity: 1;
+}
+
+@media (max-width: 48rem) {
+  .heading-anchor {
+    position: static;
+    width: auto;
+    margin-right: 0.25em;
+    opacity: 0.5;
+  }
 }

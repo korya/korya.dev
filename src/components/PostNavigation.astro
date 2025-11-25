@@ -1,0 +1,97 @@
+---
+interface Props {
+  prevPost?: {
+    slug: string;
+    title: string;
+  };
+  nextPost?: {
+    slug: string;
+    title: string;
+  };
+}
+
+const { prevPost, nextPost } = Astro.props;
+---
+
+{(prevPost || nextPost) && (
+  <nav class="post-nav" aria-label="Post navigation">
+    <div class="post-nav-item prev">
+      {prevPost && (
+        <a href={`/posts/${prevPost.slug}`}>
+          <span class="post-nav-label">← Previous</span>
+          <span class="post-nav-title">{prevPost.title}</span>
+        </a>
+      )}
+    </div>
+    <div class="post-nav-item next">
+      {nextPost && (
+        <a href={`/posts/${nextPost.slug}`}>
+          <span class="post-nav-label">Next →</span>
+          <span class="post-nav-title">{nextPost.title}</span>
+        </a>
+      )}
+    </div>
+  </nav>
+)}
+
+<style>
+  .post-nav {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-lg);
+    margin-top: var(--space-xl);
+    padding-top: var(--space-xl);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .post-nav-item {
+    min-width: 0;
+  }
+
+  .post-nav-item.next {
+    text-align: right;
+  }
+
+  .post-nav-item a {
+    display: block;
+    text-decoration: none;
+    padding: var(--space-md);
+    border-radius: 8px;
+    transition: background 0.15s ease;
+  }
+
+  .post-nav-item a:hover {
+    background: var(--color-bg-elevated);
+    text-decoration: none;
+  }
+
+  .post-nav-label {
+    display: block;
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-xs);
+  }
+
+  .post-nav-title {
+    display: block;
+    color: var(--color-text);
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .post-nav-item a:hover .post-nav-title {
+    color: var(--color-accent);
+  }
+
+  @media (max-width: 30rem) {
+    .post-nav {
+      grid-template-columns: 1fr;
+    }
+
+    .post-nav-item.next {
+      text-align: left;
+    }
+  }
+</style>

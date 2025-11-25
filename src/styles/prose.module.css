@@ -19,6 +19,7 @@
   letter-spacing: -0.02em;
   line-height: 1.3;
   scroll-margin-top: var(--space-xl);
+  position: relative;
 }
 
 .prose h1 {

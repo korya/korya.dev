@@ -5,19 +5,31 @@ import TableOfContents from '../../components/TableOfContents.astro';
 import Comments from '../../components/Comments.astro';
 import CodeCopyButton from '../../components/CodeCopyButton.astro';
 import BackToTop from '../../components/BackToTop.astro';
+import PostNavigation from '../../components/PostNavigation.astro';
 import styles from '../../styles/prose.module.css';
 
 export async function getStaticPaths() {
   const posts = await getCollection('posts');
-  return posts
+  const publishedPosts = posts
     .filter((post) => !post.data.draft)
-    .map((post) => ({
+    .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+  return publishedPosts.map((post, index) => {
+    const prevPost = publishedPosts[index + 1];
+    const nextPost = publishedPosts[index - 1];
+
+    return {
       params: { slug: post.slug },
-      props: post,
-    }));
+      props: {
+        post,
+        prevPost: prevPost ? { slug: prevPost.slug, title: prevPost.data.title } : undefined,
+        nextPost: nextPost ? { slug: nextPost.slug, title: nextPost.data.title } : undefined,
+      },
+    };
+  });
 }
 
-const post = Astro.props;
+const { post, prevPost, nextPost } = Astro.props;
 const { Content, headings } = await post.render();
 
 const formattedDate = post.data.date.toLocaleDateString('en-US', {
@@ -57,6 +69,8 @@ const readingTime = Math.ceil(words / 200);
     <div class={styles.prose} data-prose>
       <Content />
     </div>
+
+    <PostNavigation prevPost={prevPost} nextPost={nextPost} />
 
     <Comments />
   </article>
@@ -118,5 +132,15 @@ const readingTime = Math.ceil(words / 200);
       anchor.setAttribute('target', '_blank');
       anchor.setAttribute('rel', 'noopener noreferrer');
     }
+  });
+
+  // Add anchor links to h2 and h3 headings
+  document.querySelectorAll('[data-prose] h2[id], [data-prose] h3[id]').forEach((heading) => {
+    const anchor = document.createElement('a');
+    anchor.href = `#${heading.id}`;
+    anchor.className = 'heading-anchor';
+    anchor.setAttribute('aria-label', `Link to ${heading.textContent}`);
+    anchor.textContent = '#';
+    heading.insertBefore(anchor, heading.firstChild);
   });
 </script>
