@@ -1,0 +1,21 @@
+---
+import { SITE_CONFIG } from '../config';
+
+// Only render if Measurement ID is configured and not a placeholder
+const isConfigured = SITE_CONFIG.GA_MEASUREMENT_ID &&
+                     !SITE_CONFIG.GA_MEASUREMENT_ID.includes('XXXXXXXXXX');
+const measurementId = SITE_CONFIG.GA_MEASUREMENT_ID;
+---
+
+{isConfigured && (
+  <>
+    <!-- Google tag (gtag.js) -->
+    <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${measurementId}`}></script>
+    <script is:inline define:vars={{ measurementId }}>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', measurementId);
+    </script>
+  </>
+)}

@@ -1,4 +1,6 @@
 ---
+import GoogleAnalytics from './GoogleAnalytics.astro';
+
 interface Props {
   title: string;
   description?: string;
@@ -63,3 +65,6 @@ const { title, description = 'Tech Scrolls - Personal blog on software engineeri
   })();
   document.documentElement.setAttribute('data-theme', theme);
 </script>
+
+<!-- Analytics -->
+<GoogleAnalytics />
