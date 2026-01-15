@@ -5,7 +5,7 @@ const currentYear = new Date().getFullYear();
 <footer class="footer">
   <div class="footer-content">
     <p class="copyright">
-      &copy; {currentYear} Tech Scrolls
+      &copy; <span id="footer-year">{currentYear}</span> Tech Scrolls
     </p>
     <div class="links">
       <a href="https://github.com/korya" target="_blank" rel="noopener noreferrer">GitHub</a>
@@ -52,3 +52,7 @@ const currentYear = new Date().getFullYear();
     color: var(--color-accent);
   }
 </style>
+
+<script>
+  document.getElementById('footer-year').textContent = new Date().getFullYear();
+</script>
