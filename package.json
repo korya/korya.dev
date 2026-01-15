@@ -4,8 +4,8 @@
   "version": "1.0.0",
   "scripts": {
     "sync": "node scripts/sync-content.js",
-    "dev": "npm run sync && astro dev",
-    "build": "npm run sync && astro build",
+    "dev": "yarn sync && astro dev",
+    "build": "yarn sync && astro build",
     "preview": "astro preview",
     "check": "astro check"
   },
@@ -13,7 +13,7 @@
     "@astrojs/mdx": "^3.1.0",
     "@astrojs/preact": "^3.5.0",
     "@astrojs/rss": "^4.0.14",
-    "@astrojs/sitemap": "^3.2.0",
+    "@astrojs/sitemap": "3.2.0",
     "astro": "^4.16.0",
     "preact": "^10.24.0"
   }
