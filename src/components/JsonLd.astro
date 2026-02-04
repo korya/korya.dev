@@ -1,0 +1,97 @@
+---
+import { SITE_CONFIG } from '../config';
+
+interface Props {
+  type: 'BlogPosting' | 'WebSite';
+  title?: string;
+  description?: string;
+  date?: Date;
+  tags?: string[];
+  wordCount?: number;
+  url?: string;
+}
+
+const { type, title, description, date, tags, wordCount, url } = Astro.props;
+
+function generateBlogPostingSchema() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: title,
+    description: description,
+    datePublished: date?.toISOString(),
+    dateModified: date?.toISOString(),
+    author: {
+      '@type': 'Person',
+      name: SITE_CONFIG.AUTHOR.name,
+      url: SITE_CONFIG.AUTHOR.url,
+    },
+    publisher: {
+      '@type': 'Person',
+      name: SITE_CONFIG.AUTHOR.name,
+      url: SITE_CONFIG.AUTHOR.url,
+    },
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': url,
+    },
+    ...(wordCount && { wordCount }),
+    ...(tags && tags.length > 0 && { keywords: tags.join(', ') }),
+  };
+}
+
+function generateWebSiteSchema() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: SITE_CONFIG.SITE_TITLE,
+    description: SITE_CONFIG.SITE_DESCRIPTION,
+    url: SITE_CONFIG.SITE_URL,
+    author: {
+      '@type': 'Person',
+      name: SITE_CONFIG.AUTHOR.name,
+      url: SITE_CONFIG.AUTHOR.url,
+    },
+  };
+}
+
+function generateBreadcrumbSchema() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Home',
+        item: SITE_CONFIG.SITE_URL,
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Posts',
+        item: `${SITE_CONFIG.SITE_URL}/`,
+      },
+      ...(title
+        ? [
+            {
+              '@type': 'ListItem',
+              position: 3,
+              name: title,
+              item: url,
+            },
+          ]
+        : []),
+    ],
+  };
+}
+
+const schema =
+  type === 'BlogPosting'
+    ? [generateBlogPostingSchema(), generateBreadcrumbSchema()]
+    : [generateWebSiteSchema()];
+---
+
+{schema.map((s) => (
+  <script type="application/ld+json" set:html={JSON.stringify(s)} />
+))}

@@ -4,4 +4,11 @@ export const SITE_CONFIG = {
   // Format: G-XXXXXXXXXX
   // Find this in Google Analytics Admin > Data Streams
   GA_MEASUREMENT_ID: 'G-DXHD6BHKK1',
+  SITE_TITLE: 'Tech Scrolls',
+  SITE_DESCRIPTION: 'Personal blog on software engineering, tools, and workflows',
+  SITE_URL: 'https://korya.dev',
+  AUTHOR: {
+    name: '@korya',
+    url: 'https://korya.dev/about',
+  },
 } as const;

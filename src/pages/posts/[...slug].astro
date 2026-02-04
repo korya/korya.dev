@@ -6,6 +6,8 @@ import Comments from '../../components/Comments.astro';
 import CodeCopyButton from '../../components/CodeCopyButton.astro';
 import BackToTop from '../../components/BackToTop.astro';
 import PostNavigation from '../../components/PostNavigation.astro';
+import JsonLd from '../../components/JsonLd.astro';
+import { SITE_CONFIG } from '../../config';
 import styles from '../../styles/prose.module.css';
 
 export async function getStaticPaths() {
@@ -41,9 +43,26 @@ const formattedDate = post.data.date.toLocaleDateString('en-US', {
 // Calculate reading time (roughly 200 words per minute)
 const words = post.body.split(/\s+/).length;
 const readingTime = Math.ceil(words / 200);
+
+const postUrl = `${SITE_CONFIG.SITE_URL}/posts/${post.slug}/`;
 ---
 
-<BaseLayout title={`${post.data.title} | Tech Scrolls`} description={post.data.description}>
+<BaseLayout
+  title={`${post.data.title} | ${SITE_CONFIG.SITE_TITLE}`}
+  description={post.data.description}
+  articleDate={post.data.date}
+  articleTags={post.data.tags}
+>
+  <JsonLd
+    slot="head"
+    type="BlogPosting"
+    title={post.data.title}
+    description={post.data.description}
+    date={post.data.date}
+    tags={post.data.tags}
+    wordCount={words}
+    url={postUrl}
+  />
   <article class="post">
     <header class="post-header">
       <h1 class="post-title">{post.data.title}</h1>
