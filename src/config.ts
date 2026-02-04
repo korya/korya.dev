@@ -11,4 +11,7 @@ export const SITE_CONFIG = {
     name: '@korya',
     url: 'https://korya.dev/about',
   },
+  // Cusdis comment system App ID
+  // Get yours at https://cusdis.com
+  CUSDIS_APP_ID: 'ed2f966b-260b-4e2a-bec9-142e76f7ea6f',
 } as const;

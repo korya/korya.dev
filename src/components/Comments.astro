@@ -1,34 +1,27 @@
 ---
+import { SITE_CONFIG } from '../config';
+
 interface Props {
-  slug?: string;
+  title?: string;
 }
 
-const { slug } = Astro.props;
+const { title = SITE_CONFIG.SITE_TITLE } = Astro.props;
 ---
 
 <section class="comments">
   <h2 class="comments-title">Comments</h2>
-  <div id="giscus-container">
-    <script
-      is:inline
-      src="https://giscus.app/client.js"
-      data-repo="korya/korya.dev"
-      data-repo-id="R_kgDOKNBeTg"
-      data-category="Announcements"
-      data-category-id="DIC_kwDOKNBeTs4CzB10"
-      data-mapping="pathname"
-      data-strict="0"
-      data-reactions-enabled="1"
-      data-emit-metadata="0"
-      data-input-position="top"
-      data-theme="preferred_color_scheme"
-      data-lang="en"
-      data-loading="lazy"
-      crossorigin="anonymous"
-      async
-    ></script>
-  </div>
+  <div
+    id="cusdis_thread"
+    data-host="https://cusdis.com"
+    data-app-id={SITE_CONFIG.CUSDIS_APP_ID}
+    data-page-id={Astro.url.pathname}
+    data-page-url={Astro.url.href}
+    data-page-title={title}
+    data-theme="auto"
+  ></div>
 </section>
+
+<script is:inline src="https://cusdis.com/js/cusdis.es.js" async defer></script>
 
 <style>
   .comments {
@@ -42,29 +35,8 @@ const { slug } = Astro.props;
     font-weight: 600;
     margin-bottom: var(--space-lg);
   }
+
+  :global(#cusdis_thread iframe) {
+    min-height: 450px !important;
+  }
 </style>
-
-<script>
-  // Update Giscus theme when theme toggle is clicked
-  const updateGiscusTheme = () => {
-    const theme = document.documentElement.getAttribute('data-theme');
-    const iframe = document.querySelector<HTMLIFrameElement>('iframe.giscus-frame');
-    if (iframe) {
-      iframe.contentWindow?.postMessage(
-        { giscus: { setConfig: { theme: theme === 'dark' ? 'dark' : 'light' } } },
-        'https://giscus.app'
-      );
-    }
-  };
-
-  // Listen for theme changes
-  const observer = new MutationObserver((mutations) => {
-    mutations.forEach((mutation) => {
-      if (mutation.attributeName === 'data-theme') {
-        updateGiscusTheme();
-      }
-    });
-  });
-
-  observer.observe(document.documentElement, { attributes: true });
-</script>

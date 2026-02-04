@@ -91,7 +91,7 @@ const postUrl = `${SITE_CONFIG.SITE_URL}/posts/${post.slug}/`;
 
     <PostNavigation prevPost={prevPost} nextPost={nextPost} />
 
-    <Comments />
+    <Comments title={post.data.title} />
   </article>
   <CodeCopyButton />
   <BackToTop />
