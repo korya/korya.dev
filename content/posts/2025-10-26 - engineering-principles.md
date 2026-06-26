@@ -2,6 +2,7 @@
 title: 'Engineering Principles'
 date: 2025-10-26
 draft: false
+tags: ['software development', 'engineering']
 toc: false
 ---
 
@@ -56,4 +57,3 @@ it a product-solution alignment.
 
 Note: These are somewhat very "raw" and unstructured thoughts. Capturing it here
 so I can get to it later.
-
