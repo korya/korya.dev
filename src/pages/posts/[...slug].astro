@@ -44,6 +44,11 @@ const formattedDate = post.data.date.toLocaleDateString('en-US', {
 const words = post.body.split(/\s+/).length;
 const readingTime = Math.ceil(words / 200);
 
+// Video posts show watch time (floored to the nearest minute) instead of reading time
+const watchMinutes = post.data.videoLength
+  ? Math.floor(post.data.videoLength.split(':').reduce((acc, part) => acc * 60 + Number(part), 0) / 60)
+  : null;
+
 const postUrl = `${SITE_CONFIG.SITE_URL}/posts/${post.slug}/`;
 ---
 
@@ -69,7 +74,7 @@ const postUrl = `${SITE_CONFIG.SITE_URL}/posts/${post.slug}/`;
       <div class="post-meta">
         <time datetime={post.data.date.toISOString()}>{formattedDate}</time>
         <span class="separator">·</span>
-        <span>{readingTime} min read</span>
+        <span>{watchMinutes !== null ? `${watchMinutes} min watch` : `${readingTime} min read`}</span>
         {post.data.tags && post.data.tags.length > 0 && (
           <>
             <span class="separator">·</span>

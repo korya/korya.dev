@@ -4,6 +4,7 @@ date: 2026-05-29
 draft: false
 tags: ['agents', 'future', 'tiki-toki']
 toc: false
+videoLength: '3:51'
 ---
 
 <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; margin: var(--space-lg, 2rem) 0;">
