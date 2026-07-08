@@ -32,4 +32,4 @@ But this change will be very slow — probably 5 to 10 years — because it will
 
 </details>
 
-X-Posted: [LinkedIn](https://www.linkedin.com/posts/kochelorov_what-is-all-this-agent-hype-about-what-is-ugcPost-7466181579959173120-U1-9/), [X](https://x.com/korya_dev/status/2074635212638560698?s=20)
+X-Posted: [LinkedIn](https://www.linkedin.com/posts/kochelorov_what-is-all-this-agent-hype-about-what-is-ugcPost-7466181579959173120-U1-9/), [X](https://x.com/korya_dev/status/2074635212638560698)

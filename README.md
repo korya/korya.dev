@@ -26,7 +26,7 @@ The site is hosted as a static app on [DigitalOcean](https://www.digitalocean.co
 
 Adding a post:
 
-1. Create a new Markdown file in `content/posts/` named `YYYY-MM-DD - <title>.md`.
+1. Create a new Markdown file in `content/posts/` named `YYYY-MM-DD-<title>.md` (single dashes only — the filename becomes the URL slug, so avoid spaces and `---`).
 2. Add the frontmatter (see fields below) and start with `draft: true`.
 3. Write a `description` — a concise 1–2 sentence summary. **Every post must have one**: it feeds the SEO meta description, the Open Graph / Twitter cards, the `JsonLd` structured data, and the post's summary in `llms.txt`.
 4. Write the content.

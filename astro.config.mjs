@@ -12,15 +12,22 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 // Map each published post's URL to its frontmatter date, so the sitemap can
 // emit an accurate per-post <lastmod> instead of a uniform build timestamp.
 const postDates = new Map();
+// Redirects from the historical '---' slugs (produced when filenames used to
+// contain ' - ' between the date and the title) to the current single-dash
+// slugs, so old shared/indexed links keep working after the filename rename.
+const redirects = {};
 const postsDir = join(__dirname, 'content', 'posts');
 for (const file of readdirSync(postsDir)) {
   if (!file.endsWith('.md')) continue;
   const raw = readFileSync(join(postsDir, file), 'utf-8');
-  if (/^draft:\s*true\s*$/m.test(raw)) continue; // drafts aren't in the sitemap
+  if (/^draft:\s*true\s*$/m.test(raw)) continue; // drafts aren't built or linked
   const date = raw.match(/^date:\s*(\d{4}-\d{2}-\d{2})/m)?.[1];
   if (!date) continue;
   const slug = file.replace(/\.md$/, '').replace(/ /g, '-');
   postDates.set(`${SITE}/posts/${slug}/`, new Date(date));
+  // The old slug expanded the date/title separator to '---'.
+  const oldSlug = slug.replace(/^(\d{4}-\d{2}-\d{2})-/, '$1---');
+  if (oldSlug !== slug) redirects[`/posts/${oldSlug}/`] = `/posts/${slug}/`;
 }
 
 // Non-post pages (home, about, tags) have no single content date; fall back to
@@ -30,6 +37,7 @@ const buildDate = new Date();
 export default defineConfig({
   site: SITE,
   output: 'static',
+  redirects,
   integrations: [
     mdx(),
     preact(),
