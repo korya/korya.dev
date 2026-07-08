@@ -1,5 +1,6 @@
 ---
 title: 'Engineering Principles'
+description: "Five simple principles that boosted every team I worked with: focus on customers, experiment and move fast, simplify, automate, and ensure reproducibility."
 date: 2025-10-26
 draft: false
 tags: ['software development', 'engineering']

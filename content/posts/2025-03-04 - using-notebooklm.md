@@ -1,5 +1,6 @@
 ---
 title: 'Using NotebookLM for reading research papers'
+description: "How I use Google's NotebookLM as an interactive RAG to skim ML papers, including the Audio Overview prompt I rely on to stay current."
 date: 2025-03-04
 draft: false
 tags: ['howto', 'tools', 'efficiency']

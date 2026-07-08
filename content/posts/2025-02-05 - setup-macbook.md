@@ -1,5 +1,6 @@
 ---
 title: 'Setting up a Mac in 2025'
+description: "The 2025 run of my from-scratch Mac setup: MacOS preferences, Homebrew, SSH keys, dotfiles, and the tools I install."
 date: 2025-02-05
 draft: false
 tags: ['howto', 'macbook', 'setup']
