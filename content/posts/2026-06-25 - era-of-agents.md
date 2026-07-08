@@ -34,4 +34,4 @@ And what that means — and that's a very nice, bright future I'm looking forwar
 
 </details>
 
-X-Posted: [LinkedIn](https://www.linkedin.com/posts/kochelorov_what-is-going-to-change-when-a-phone-turns-ugcPost-7475980770742824962-aI91/)
+X-Posted: [LinkedIn](https://www.linkedin.com/posts/kochelorov_what-is-going-to-change-when-a-phone-turns-ugcPost-7475980770742824962-aI91/), [X](https://x.com/korya_dev/status/2074889741225374193)
