@@ -2,7 +2,7 @@
 title: 'Era of Agents: The Internet Will Inevitably Become Agent-First'
 description: "When agents act on our behalf, the web's UX shifts from human-focused to agent-focused. That shift is a big opening for small startups."
 date: 2026-07-07
-draft: true
+draft: false
 tags: ['agents', 'future', 'tiki-toki']
 toc: false
 videoLength: '4:03'
@@ -33,3 +33,5 @@ But essentially, what this means is that the whole internet as we know it will t
 These days capital is kind of not evenly distributed, and everyone is afraid that Anthropic, OpenAI, and Google will just eat the whole world. But I don't think this will happen. Worst case, they'll just buy you out — they'll acquire your startup, just because you're already there, you're more flexible, you're more advanced to some degree, and it's cheaper for them to buy you out than to develop it from scratch. And this will hopefully contribute to distributing wealth more equally in our society. So — time of big opportunities, guys. Use this time. Best of luck to you. See you.
 
 </details>
+
+X-Posted: [LinkedIn](https://www.linkedin.com/posts/kochelorov_the-internet-will-inevitably-become-agent-ugcPost-7480381165158420481-Ae4A/)
