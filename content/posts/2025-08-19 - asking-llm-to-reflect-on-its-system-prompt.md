@@ -1,5 +1,6 @@
 ---
 title: 'Use LLM to improve its own system prompt'
+description: "Simple prompts that get an LLM to explain and critique its own system instructions, so you can spot the confusing or contradictory parts and fix them."
 date: 2025-08-19
 draft: true
 tags: ['howto', 'tools', 'efficiency']

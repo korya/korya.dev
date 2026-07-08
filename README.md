@@ -24,8 +24,9 @@ Adding a post:
 
 1. Create a new Markdown file in `content/posts/` named `YYYY-MM-DD - <title>.md`.
 2. Add the frontmatter (see fields below) and start with `draft: true`.
-3. Write the content.
-4. Set `draft: false` to publish.
+3. Write a `description` — a concise 1–2 sentence summary. **Every post must have one**: it feeds the SEO meta description, the Open Graph / Twitter cards, the `JsonLd` structured data, and the post's summary in `llms.txt`.
+4. Write the content.
+5. Set `draft: false` to publish.
 
 ### Frontmatter
 
@@ -36,7 +37,7 @@ Adding a post:
 | `draft`       | no       | `true` hides the post from the build. Defaults to `false`.         |
 | `tags`        | no       | List of tags, e.g. `['agents', 'future']`. Defaults to `[]`.       |
 | `toc`         | no       | `true` shows a table of contents. Defaults to `false`.            |
-| `description` | no       | Meta description for SEO / social cards.                           |
+| `description` | **yes**  | 1–2 sentence summary. Feeds the SEO meta description, social cards, `JsonLd`, and the `llms.txt` post summary. |
 | `videoLength` | no       | `M:SS` duration for video posts; shows "N min watch" (floored) instead of read time. |
 
 The schema is defined in `src/content/config.ts`.

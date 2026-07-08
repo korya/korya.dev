@@ -1,5 +1,6 @@
 ---
 title: 'Setting up a Mac in 2024'
+description: "A step-by-step log of resetting a MacBook from scratch: MacOS defaults, Homebrew, dotfiles, developer tools, and Tailscale."
 date: 2024-01-13
 draft: false
 tags: ['howto', 'macbook', 'setup']

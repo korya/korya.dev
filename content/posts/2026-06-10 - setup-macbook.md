@@ -1,5 +1,6 @@
 ---
 title: 'Setting up a Mac in 2026'
+description: "My 2026 Mac reset, now a single bootstrap script. Also how switching to Claude Code for almost all my coding reshaped the toolset and retired the IDEs."
 date: 2026-06-10
 draft: false
 tags: ['howto', 'macbook', 'setup']

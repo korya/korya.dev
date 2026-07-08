@@ -1,5 +1,6 @@
 ---
 title: 'Era of Agents: The Internet Will Inevitably Become Agent-First'
+description: "When agents act on our behalf, the web's UX shifts from human-focused to agent-focused. That shift is a big opening for small startups."
 date: 2026-07-07
 draft: true
 tags: ['agents', 'future', 'tiki-toki']
