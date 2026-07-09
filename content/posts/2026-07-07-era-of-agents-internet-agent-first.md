@@ -34,4 +34,4 @@ These days capital is kind of not evenly distributed, and everyone is afraid tha
 
 </details>
 
-X-Posted: [LinkedIn](https://www.linkedin.com/posts/kochelorov_the-internet-will-inevitably-become-agent-ugcPost-7480381165158420481-Ae4A/)
+X-Posted: [LinkedIn](https://www.linkedin.com/posts/kochelorov_the-internet-will-inevitably-become-agent-ugcPost-7480381165158420481-Ae4A/), [X](https://x.com/korya_dev/status/2075302753602068581)
