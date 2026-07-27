@@ -38,4 +38,4 @@ I'll leave you with an analogy. Decades ago, this is exactly how Linux went from
 
 </details>
 
-X-Posted: [LinkedIn](https://www.linkedin.com/posts/kochelorov_everyone-is-talking-about-fable-5-some-are-ugcPost-7480961612690939905-1Unc/)
+X-Posted: [LinkedIn](https://www.linkedin.com/posts/kochelorov_everyone-is-talking-about-fable-5-some-are-ugcPost-7480961612690939905-1Unc/), [X](https://x.com/korya_dev/status/2081862265251172844)
