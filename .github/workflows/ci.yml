@@ -19,9 +19,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # 24, not the current LTS: Astro pulls in fontkitten transitively, which
+      # declares engines.node >=24.12, and yarn --frozen-lockfile refuses to install
+      # under anything lower.
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           cache: yarn
 
       - name: Install dependencies
