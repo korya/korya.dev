@@ -171,3 +171,34 @@ h3:hover .heading-anchor,
     opacity: 0.5;
   }
 }
+
+/* Print: drop the site chrome and force light colours, so Print-to-PDF yields a
+   clean document. Scoped component styles can't reach .header/.footer, so these
+   rules have to live here. */
+@media print {
+  :root {
+    --color-bg: #ffffff;
+    --color-bg-elevated: #ffffff;
+    --color-text: #000000;
+    --color-text-muted: #444444;
+    --color-border: #cccccc;
+    --color-code-bg: #ffffff;
+  }
+
+  .header,
+  .footer,
+  .back-to-top,
+  .copy-button {
+    display: none !important;
+  }
+
+  html {
+    background: #ffffff;
+    font-size: 11pt;
+  }
+
+  .main {
+    max-width: none;
+    padding: 0;
+  }
+}
