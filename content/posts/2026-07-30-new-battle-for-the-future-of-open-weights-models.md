@@ -57,3 +57,5 @@ no one wants Anthropic to be at the top, and Anthropic wants to stay there. So w
 see how it develops.
 
 </details>
+
+X-Posted: [LinkedIn](https://www.linkedin.com/posts/kochelorov_new-battle-for-the-future-of-open-weights-activity-7488537637931151360-IfSx), [X](https://x.com/korya_dev/status/2082806250455077137)
