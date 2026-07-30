@@ -1,0 +1,1314 @@
+---
+// Implements the "1a Editorial" direction from the Resume page design project:
+// warm paper, Newsreader serif, JetBrains Mono for metadata, one rust accent.
+//
+// This page deliberately does not use BaseLayout. The design supplies its own
+// sticky header, nav and footer, and its palette/typography are a full departure
+// from the blog's (Manrope on grey). Wrapping it in the site chrome would stack
+// two sticky headers and mean fighting global.css on every rule, so the page owns
+// its shell and imports only BaseHead for meta/SEO/analytics.
+import BaseHead from '../components/BaseHead.astro';
+import { SITE_CONFIG } from '../config';
+import {
+  ALONGSIDE,
+  CHAPTERS,
+  EDUCATION,
+  FOOTER_LINKS,
+  LINKS,
+  NAV,
+  OUTCOMES,
+  PRACTICES,
+  PROFILE,
+  ROLES,
+  TOOLBELT,
+} from '../data/resume';
+
+// Printed pages cannot be clicked, so every outbound link also shows where it goes.
+// Trimmed to the typeable part: scheme and "www." dropped, trailing slash removed,
+// but any meaningful path kept (technion.ac.il/en still resolves, and would not if
+// the path were cut).
+const printUrl = (href: string) =>
+  href.replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/\/$/, '');
+
+const title = 'Dmitri Kochelorov | Resume';
+const description = `${PROFILE.currentRole.title}, ${PROFILE.currentRole.company}. ${PROFILE.headline} ${PROFILE.headlineAccent}`;
+
+const personSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'ProfilePage',
+  mainEntity: {
+    '@type': 'Person',
+    name: 'Dmitri K',
+    alternateName: SITE_CONFIG.AUTHOR.name,
+    jobTitle: `${PROFILE.currentRole.title}, ${PROFILE.currentRole.company}`,
+    description: `${PROFILE.headline} ${PROFILE.headlineAccent}`,
+    url: `${SITE_CONFIG.SITE_URL}/resume`,
+    sameAs: [
+      ...LINKS.filter((l) => l.href.startsWith('http')).map((l) => l.href),
+      PROFILE.currentRole.href,
+      ALONGSIDE.href,
+    ],
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: 'Kitchener',
+      addressRegion: 'ON',
+      addressCountry: 'CA',
+    },
+    worksFor: {
+      '@type': 'Organization',
+      name: PROFILE.currentRole.company,
+      url: PROFILE.currentRole.href,
+    },
+    alumniOf: {
+      '@type': 'EducationalOrganization',
+      name: EDUCATION.school,
+      sameAs: EDUCATION.schoolHref,
+    },
+    knowsAbout: TOOLBELT.groups.flatMap((g) =>
+      g.items.replace(/\.$/, '').split(', ')
+    ),
+    hasOccupation: ROLES.map((role) => ({
+      '@type': 'Occupation',
+      name: role.title,
+      occupationLocation: { '@type': 'Organization', name: role.company },
+      startDate: role.start,
+      ...(role.end ? { endDate: role.end } : {}),
+    })),
+  },
+};
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <BaseHead title={title} description={description} />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,300;6..72,400;6..72,500&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(personSchema)} />
+  </head>
+
+  <body>
+    <a class="skip" href="#work">Skip to work history</a>
+
+    <div class="bar">
+      <div class="bar-inner">
+        <a class="mark" href="/">{PROFILE.mark}</a>
+        <nav class="bar-nav" aria-label="Sections">
+          {NAV.map(({ href, label }) => <a href={href}>{label}</a>)}
+        </nav>
+        <button id="theme-pill" class="pill" type="button" aria-live="polite">
+          <span class="pill-dark">dark</span>
+          <span class="pill-light">light</span>
+        </button>
+      </div>
+    </div>
+
+    <main>
+      <header class="masthead">
+        <img
+          class="qr"
+          src="/resume-prod-qr-code.png"
+          width="144"
+          height="144"
+          alt="QR code linking to korya.dev/resume"
+        />
+        <div class="masthead-copy">
+          <h1>{PROFILE.name}</h1>
+          <p class="role-now">
+            {PROFILE.currentRole.title},{' '}
+            <a
+              class="company"
+              href={PROFILE.currentRole.href}
+              data-url={printUrl(PROFILE.currentRole.href)}
+              target="_blank"
+              rel="noopener noreferrer"
+            >{`${PROFILE.currentRole.company} ↗`}</a>
+          </p>
+          <p class="lead">
+            {PROFILE.headline}{' '}
+            <span class="accent">{PROFILE.headlineAccent}</span>
+          </p>
+          <p class="bio">{PROFILE.doctrine}</p>
+        </div>
+        <div class="masthead-links">
+          <span class="place">{PROFILE.location}</span>
+          {LINKS.map(({ label, href }) =>
+            href.startsWith('http') ? (
+              <a href={href} target="_blank" rel="noopener noreferrer">{`${label} ↗`}</a>
+            ) : (
+              <a href={href}>{label}</a>
+            )
+          )}
+        </div>
+      </header>
+
+      <section class="outcomes" aria-label="Track record at a glance">
+        {OUTCOMES.map(({ figure, label, note }) => (
+          <div class="outcome">
+            <div class="outcome-figure">{figure}</div>
+            <div class="outcome-label">{label}</div>
+            <div class="outcome-note">{note}</div>
+          </div>
+        ))}
+      </section>
+
+      <section id="chapters" class="chapters-section" aria-labelledby="chapters-eyebrow">
+        <div class="eyebrow" id="chapters-eyebrow">{CHAPTERS.eyebrow}</div>
+        <div class="chapters">
+          {CHAPTERS.items.map(({ href, label, years, note, highlight }) => (
+            <a href={href} class:list={['chapter', { highlight }]}>
+              <span class="chapter-note">{note}</span>
+              <span class="chapter-label">{label}</span>
+              <span class="chapter-years">{years}</span>
+            </a>
+          ))}
+        </div>
+      </section>
+
+      <section id="work" class="work" aria-labelledby="work-eyebrow">
+        <div class="eyebrow" id="work-eyebrow">Work</div>
+        {ROLES.map((role) => {
+          const lead = role.bullets.slice(0, role.leadCount ?? 2);
+          const rest = role.bullets.slice(role.leadCount ?? 2);
+          return (
+            <article class="role" id={role.id}>
+              <div class="role-head">
+                <div>
+                  <h2 class="role-title">
+                    {role.title},{' '}
+                    <a
+                      class="company"
+                      href={role.companyHref}
+                      data-url={printUrl(role.companyHref)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >{`${role.company} ↗`}</a>
+                  </h2>
+                  <p class="role-blurb">
+                    {role.blurb.map(({ text, href }) =>
+                      href ? (
+                        <a
+                          class="inline-link"
+                          href={href}
+                          data-url={printUrl(href)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >{text}</a>
+                      ) : (
+                        text
+                      )
+                    )}
+                  </p>
+                </div>
+                <div class="role-meta">{role.period}</div>
+              </div>
+
+              <ul class="bullets">
+                {lead.map(({ text, accent }) => (
+                  <li class:list={[{ accent }]}>{text}</li>
+                ))}
+              </ul>
+
+              {rest.length > 0 && (
+                <details class="more">
+                  <summary>
+                    <span class="hint-more">more +</span>
+                    <span class="hint-less">less −</span>
+                  </summary>
+                  <ul class="bullets">
+                    {rest.map(({ text, accent }) => (
+                      <li class:list={[{ accent }]}>{text}</li>
+                    ))}
+                  </ul>
+                </details>
+              )}
+            </article>
+          );
+        })}
+
+        <div class="alongside">
+          <div class="eyebrow">{ALONGSIDE.eyebrow}</div>
+          <p>
+            <a
+              class="company"
+              href={ALONGSIDE.href}
+              data-url={printUrl(ALONGSIDE.href)}
+              target="_blank"
+              rel="noopener noreferrer"
+            >{`${ALONGSIDE.name} ↗`}</a>{' '}
+            <span class="alongside-period">· {ALONGSIDE.period}</span><br />
+            {ALONGSIDE.description}
+          </p>
+        </div>
+      </section>
+
+      <section id="what" class="what">
+        <div class="what-col">
+          <div class="eyebrow">{TOOLBELT.eyebrow}</div>
+          <p class="toolbelt">
+            {TOOLBELT.groups.map(({ label, items }, i) => (
+              <>
+                {i > 0 && <br />}
+                <strong>{label}</strong>: {items}
+              </>
+            ))}
+          </p>
+        </div>
+        <div class="what-col">
+          <div class="eyebrow">{PRACTICES.eyebrow}</div>
+          <ul class="bullets">
+            {PRACTICES.items.map((item) => <li>{item}</li>)}
+          </ul>
+        </div>
+      </section>
+
+      <section id="education" class="education">
+        <div>
+          <div class="eyebrow">Education</div>
+          <h2 class="role-title">{EDUCATION.degree}</h2>
+          <p class="role-blurb">
+            <a
+              class="company"
+              href={EDUCATION.schoolHref}
+              data-url={printUrl(EDUCATION.schoolHref)}
+              target="_blank"
+              rel="noopener noreferrer"
+            >{`${EDUCATION.school} ↗`}</a>, {EDUCATION.location}
+          </p>
+        </div>
+        <div class="role-meta">{EDUCATION.period}</div>
+      </section>
+
+      <footer class="foot">
+        {FOOTER_LINKS.map(({ prefix, label, href }) => (
+          <span>
+            {prefix}{' '}
+            {href.startsWith('http') ? (
+              <a href={href} target="_blank" rel="noopener noreferrer">{label}</a>
+            ) : (
+              <a href={href}>{label}</a>
+            )}
+          </span>
+        ))}
+      </footer>
+    </main>
+
+    <script>
+      // A printed resume must show every bullet, but the extra ones sit in a closed
+      // <details> and CSS cannot set [open]. Expand for the print job, then restore
+      // the reader's own state. Guarded because browsers can fire beforeprint more
+      // than once per job, and recapturing mid-job would record the forced-open
+      // state as the reader's and leave everything expanded afterwards.
+      const expanders = Array.from(document.querySelectorAll('details.more'));
+      let printState = null;
+      window.addEventListener('beforeprint', () => {
+        if (printState === null) printState = expanders.map((d) => d.open);
+        expanders.forEach((d) => (d.open = true));
+      });
+      window.addEventListener('afterprint', () => {
+        if (printState === null) return;
+        expanders.forEach((d, i) => (d.open = printState[i] ?? false));
+        printState = null;
+      });
+
+      // The chapter strip links to work entries; open the target's extra bullets on
+      // arrival so a deep link lands on the whole entry rather than half of one.
+      const openFromHash = () => {
+        const id = decodeURIComponent(location.hash.slice(1));
+        if (!id) return;
+        const details = document.getElementById(id)?.querySelector('details.more');
+        if (details instanceof HTMLDetailsElement) details.open = true;
+      };
+      window.addEventListener('hashchange', openFromHash);
+      openFromHash();
+
+      // Reuses the site-wide theme contract (data-theme + localStorage 'theme') so a
+      // choice made here survives navigation to the blog, and vice versa.
+      const pill = document.getElementById('theme-pill');
+      const syncLabel = () => {
+        const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+        pill?.setAttribute(
+          'aria-label',
+          dark ? 'Switch to light theme' : 'Switch to dark theme'
+        );
+      };
+      pill?.addEventListener('click', () => {
+        const next =
+          document.documentElement.getAttribute('data-theme') === 'dark'
+            ? 'light'
+            : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('theme', next);
+        syncLabel();
+      });
+      syncLabel();
+    </script>
+  </body>
+</html>
+
+<style>
+  /* Tokens for "1a Editorial". Light is the design's default; dark is its companion
+     scale. Scoped to this page, so the blog's palette is untouched. */
+  :root {
+    --bg: #faf7f1;
+    --ink: #1c1917;
+    --mut: #78706a;
+    --rule: rgba(28, 25, 23, 0.14);
+    --acc: oklch(0.52 0.13 42);
+    --soft: rgba(28, 25, 23, 0.045);
+
+    --serif: Newsreader, Georgia, 'Times New Roman', serif;
+    --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+    --col: 900px;
+    --pad: 56px;
+  }
+
+  :root[data-theme='dark'] {
+    --bg: #15130f;
+    --ink: #f3ece1;
+    --mut: #9c9287;
+    --rule: rgba(243, 236, 225, 0.16);
+    --acc: oklch(0.76 0.12 62);
+    --soft: rgba(243, 236, 225, 0.06);
+  }
+
+  /* Reset. The page owns its shell, so global.css is not in play here. */
+  :global(*),
+  :global(*::before),
+  :global(*::after) {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  :global(html) {
+    background: var(--bg);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+  }
+
+  :global(body) {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--serif);
+    padding-bottom: 64px;
+    transition: background 0.35s ease, color 0.35s ease;
+  }
+
+  main {
+    max-width: var(--col);
+    margin: 0 auto;
+  }
+
+  /* The sticky bar is ~52px tall, so anchor jumps from its nav (and from the
+     chapter strip) would land with the target tucked underneath it. */
+  :where(section, .role) {
+    scroll-margin-top: 72px;
+  }
+
+  .skip {
+    position: absolute;
+    left: -9999px;
+  }
+
+  .skip:focus {
+    left: var(--pad);
+    top: 8px;
+    z-index: 10;
+    background: var(--bg);
+    color: var(--ink);
+    padding: 8px 12px;
+    border: 1px solid var(--acc);
+    font: 400 13px/1 var(--mono);
+  }
+
+  /* Sticky bar --------------------------------------------------------- */
+
+  /* Full-bleed background and rule, inner content on the same column as the
+     page. A 900px-wide bar would leave its border stopping mid-viewport. */
+  .bar {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: var(--bg);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .bar-inner {
+    max-width: var(--col);
+    margin: 0 auto;
+    padding: 14px var(--pad);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+  }
+
+  .mark {
+    font: 500 13px/1 var(--mono);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--mut);
+    text-decoration: none;
+  }
+
+  .mark:hover {
+    color: var(--ink);
+  }
+
+  .bar-nav {
+    display: flex;
+    gap: 22px;
+    font: 400 13px/1 var(--mono);
+    letter-spacing: 0.06em;
+  }
+
+  .bar-nav a {
+    color: var(--mut);
+    text-decoration: none;
+    padding: 4px 0;
+    border-bottom: 1px solid transparent;
+  }
+
+  .bar-nav a:hover {
+    color: var(--ink);
+    border-bottom-color: var(--acc);
+  }
+
+  .pill {
+    appearance: none;
+    border: 1px solid var(--rule);
+    background: transparent;
+    color: var(--mut);
+    border-radius: 999px;
+    padding: 5px 12px;
+    font: 400 11px/1 var(--mono);
+    letter-spacing: 0.1em;
+    cursor: pointer;
+  }
+
+  .pill:hover {
+    color: var(--ink);
+    border-color: var(--acc);
+  }
+
+  /* The pill names the theme it switches *to*, matching the design. */
+  .pill-light {
+    display: none;
+  }
+
+  :root[data-theme='dark'] .pill-light {
+    display: inline;
+  }
+
+  :root[data-theme='dark'] .pill-dark {
+    display: none;
+  }
+
+  /* Masthead ----------------------------------------------------------- */
+
+  /* Named areas so the QR can sit first in the DOM (which is what lets it float on
+     small screens) while still painting top-right of the copy on desktop. */
+  .masthead {
+    padding: 76px var(--pad) 44px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "copy qr"
+      "copy links";
+    gap: 24px 40px;
+    align-items: end;
+  }
+
+  .masthead-copy {
+    grid-area: copy;
+    max-width: 620px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  h1 {
+    font: 300 clamp(3rem, 8.4vw, 76px) / 0.98 var(--serif);
+    letter-spacing: -0.02em;
+  }
+
+  .role-now {
+    font: 400 19px/1.4 var(--serif);
+    margin-top: -6px;
+  }
+
+  .lead {
+    font: 400 27px/1.35 var(--serif);
+    text-wrap: pretty;
+  }
+
+  .accent {
+    color: var(--acc);
+  }
+
+  .bio {
+    font: 400 17px/1.6 var(--serif);
+    color: var(--mut);
+    text-wrap: pretty;
+  }
+
+  /* Three things this code needs in order to actually scan:
+     1. A light plate. The PNG has an alpha channel and a near-zero quiet zone, so
+        on the dark theme the paper showed through and the code stopped being
+        dark-on-light. The padding supplies the missing quiet zone (~3.5 modules).
+     2. Enough pixels per module. The symbol is 29 modules; with border-box the
+        content area must stay near 116px to clear 4px per module on a 1x display.
+        At 90px it measured 3.1, and smooth downscaling blurred the modules badly
+        enough that decoders resolved the damage into a *different* valid URL.
+     3. Nearest-neighbour scaling, so resampling keeps hard module edges instead of
+        interpolating them into grey. */
+  .qr {
+    grid-area: qr;
+    align-self: start;
+    justify-self: end;
+    width: 144px;
+    height: 144px;
+    padding: 14px;
+    border-radius: 3px;
+    image-rendering: pixelated;
+  }
+
+  /* No plate in the light theme: the warm paper is already light enough to scan
+     against, and a pure-white block floating on it read like a stuck-on label.
+     The dark theme still needs one, because scanners need dark-on-light and the
+     PNG's quiet zone is transparent. #f3ece1 is the dark theme's own warm
+     off-white (its --ink), so the plate belongs to the palette instead of
+     glaring white against near-black. */
+  :root[data-theme='dark'] .qr {
+    background: #f3ece1;
+  }
+
+  .masthead-links {
+    grid-area: links;
+    justify-self: end;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font: 400 13px/1 var(--mono);
+    letter-spacing: 0.04em;
+    text-align: right;
+  }
+
+  .place {
+    color: var(--mut);
+  }
+
+  .masthead-links a {
+    color: var(--ink);
+    text-decoration: none;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 3px;
+  }
+
+  .masthead-links a:hover {
+    color: var(--acc);
+    border-bottom-color: var(--acc);
+  }
+
+  /* Outcomes ----------------------------------------------------------- */
+
+  .outcomes {
+    padding: 0 var(--pad) 40px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 28px;
+  }
+
+  .outcome {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding-top: 14px;
+    border-top: 2px solid var(--acc);
+  }
+
+  .outcome-figure {
+    font: 400 26px/1.1 var(--serif);
+    letter-spacing: -0.01em;
+  }
+
+  .outcome-label {
+    font: 500 11px/1.3 var(--mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--mut);
+  }
+
+  .outcome-note {
+    font: 400 14px/1.45 var(--serif);
+    color: var(--mut);
+    text-wrap: pretty;
+  }
+
+  /* Shared section furniture ------------------------------------------- */
+
+  .eyebrow {
+    font: 500 11px/1 var(--mono);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--mut);
+  }
+
+  /* Chapters ------------------------------------------------------------ */
+
+  .chapters-section {
+    padding: 40px var(--pad);
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .chapters-section .eyebrow {
+    margin-bottom: 26px;
+  }
+
+  /* Equal widths, not duration-scaled: proportional bars render a decade at
+     Planitar as a slab and the recent AI work as slivers, burying exactly what
+     this page is arguing. The years are printed on every chapter instead. */
+  .chapters {
+    display: flex;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .chapter {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 5px;
+    padding-bottom: 10px;
+    text-decoration: none;
+    color: inherit;
+    border-bottom: 2px solid var(--rule);
+  }
+
+  .chapter.highlight {
+    border-bottom-color: var(--acc);
+  }
+
+  .chapter:hover,
+  .chapter:focus-visible {
+    border-bottom-color: var(--acc);
+    outline: none;
+  }
+
+  .chapter-label {
+    font: 400 16px/1.2 var(--serif);
+  }
+
+  .chapter:hover .chapter-label {
+    color: var(--acc);
+  }
+
+  .chapter-years {
+    font: 400 11px/1.2 var(--mono);
+    color: var(--mut);
+  }
+
+  /* Always visible, never hover-only: on a phone there is no hover, and this is
+     where the scope evidence lives. */
+  .chapter-note {
+    font: 400 13px/1.35 var(--serif);
+    color: var(--mut);
+    text-wrap: pretty;
+  }
+
+  /* Work --------------------------------------------------------------- */
+
+  .work {
+    padding: 40px var(--pad) 8px;
+  }
+
+  .work > .eyebrow {
+    margin-bottom: 8px;
+  }
+
+  .role {
+    padding: 26px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .role-head {
+    display: grid;
+    grid-template-columns: 1fr 168px;
+    gap: 24px;
+    align-items: baseline;
+  }
+
+  .role-title {
+    font: 400 25px/1.25 var(--serif);
+  }
+
+  .company {
+    color: var(--acc);
+    text-decoration: none;
+    border-bottom: 1px solid var(--acc);
+  }
+
+  .company:hover {
+    background: var(--soft);
+  }
+
+  .role-blurb {
+    font: 400 17px/1.5 var(--serif);
+    color: var(--mut);
+    margin-top: 7px;
+  }
+
+  .inline-link {
+    color: var(--ink);
+    text-decoration: none;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .inline-link:hover {
+    color: var(--acc);
+    border-bottom-color: var(--acc);
+  }
+
+  .role-meta {
+    font: 400 12px/1.5 var(--mono);
+    color: var(--mut);
+    text-align: right;
+  }
+
+  .bullets {
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+    font: 400 17px/1.55 var(--serif);
+    padding-left: 20px;
+  }
+
+  .role .bullets {
+    margin-top: 18px;
+  }
+
+  .bullets li.accent {
+    color: var(--acc);
+  }
+
+  .bullets li::marker {
+    color: var(--mut);
+  }
+
+  /* The lead bullets are always on screen; this only reveals the remainder, so a
+     scanner gets the evidence without expanding anything. */
+  .more summary {
+    display: inline-block;
+    margin-top: 14px;
+    font: 400 12px/1.5 var(--mono);
+    color: var(--acc);
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .more summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .more summary:focus-visible {
+    outline: 1px solid var(--acc);
+    outline-offset: 4px;
+  }
+
+  .more[open] .hint-more,
+  .more:not([open]) .hint-less {
+    display: none;
+  }
+
+  .more .bullets {
+    margin-top: 12px;
+  }
+
+  /* Alongside ---------------------------------------------------------- */
+
+  .alongside {
+    padding: 26px 0 8px;
+  }
+
+  .alongside .eyebrow {
+    margin-bottom: 10px;
+  }
+
+  .alongside p {
+    font: 400 16px/1.55 var(--serif);
+    color: var(--mut);
+    max-width: 640px;
+  }
+
+  .alongside-period {
+    font: 400 12px/1.5 var(--mono);
+  }
+
+  /* What I do ---------------------------------------------------------- */
+
+  .what {
+    padding: 40px var(--pad);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px 56px;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .what-col {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .toolbelt {
+    font: 400 17px/1.7 var(--serif);
+  }
+
+  .toolbelt strong {
+    font-weight: 500;
+  }
+
+  .what .bullets {
+    font-size: 16px;
+  }
+
+  /* Education ---------------------------------------------------------- */
+
+  .education {
+    padding: 40px var(--pad) 0;
+    display: grid;
+    grid-template-columns: 1fr 168px;
+    gap: 24px;
+    align-items: baseline;
+  }
+
+  .education .eyebrow {
+    margin-bottom: 8px;
+  }
+
+  .education .role-title {
+    margin-bottom: 7px;
+  }
+
+  /* Footer ------------------------------------------------------------- */
+
+  .foot {
+    margin: 48px var(--pad) 0;
+    padding-top: 22px;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 26px;
+    font: 400 12px/1.6 var(--mono);
+    color: var(--mut);
+  }
+
+  .foot a {
+    color: var(--ink);
+  }
+
+  .foot a:hover {
+    color: var(--acc);
+  }
+
+  /* Narrow screens ----------------------------------------------------- */
+
+  @media (max-width: 64rem) {
+    .outcomes {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 60rem) {
+    :root {
+      --pad: 28px;
+    }
+
+    .bar-nav {
+      gap: 16px;
+    }
+
+    /* Five equal chapters get too narrow to read here; two rows keep the notes
+       legible without a horizontal scroll. */
+    .chapters {
+      flex-wrap: wrap;
+    }
+
+    .chapter {
+      flex: 1 1 30%;
+      min-width: 150px;
+    }
+  }
+
+  @media (max-width: 44rem) {
+    .bar-nav {
+      display: none;
+    }
+
+    /* The QR stays in the top-right corner here rather than dropping below the
+       bio. Grid cannot do that without squeezing the copy into a ~200px column, so
+       the masthead becomes a plain block and the QR floats: the heading and the
+       paragraphs then flow around it and reclaim the full width once past it.
+       This is why the image is first in the DOM, since a float only affects the
+       content that follows it. */
+    .masthead {
+      display: block;
+      padding-top: 48px;
+    }
+
+    .masthead-copy {
+      display: block;
+      max-width: none;
+    }
+
+    .masthead-copy > * + * {
+      margin-top: 16px;
+    }
+
+    .qr {
+      float: right;
+      width: 116px;
+      height: 116px;
+      padding: 11px;
+      margin: 0 0 14px 18px;
+    }
+
+    /* width:100% is load-bearing. This is a flex container, so it establishes its
+       own formatting context and gets sized to avoid the floated QR, which shrank
+       it to the width of its longest line and parked it on the right. */
+    .masthead-links {
+      clear: both;
+      width: 100%;
+      align-items: flex-start;
+      text-align: left;
+      padding-top: 24px;
+    }
+
+    .lead {
+      font-size: 22px;
+    }
+
+    .outcomes {
+      grid-template-columns: 1fr;
+      gap: 18px;
+    }
+
+    /* The date rail has nowhere to go at this width, so it stacks under the title
+       rather than squeezing the heading into a two-word column. */
+    .role-head,
+    .education {
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+
+    .role-meta,
+    .education .role-meta {
+      text-align: left;
+    }
+
+    .chapter {
+      flex: 1 1 100%;
+    }
+
+    .what {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* Print -------------------------------------------------------------- */
+
+  @media print {
+    :root {
+      --bg: #ffffff;
+      --ink: #000000;
+      /* Darker than the screen's muted tone: mid greys that read fine on a backlit
+         display go weak and washed out on paper. */
+      --mut: #333333;
+      --rule: rgba(0, 0, 0, 0.28);
+      --acc: #000000;
+      --pad: 0;
+    }
+
+    .bar,
+    .skip,
+    .more summary,
+    .chapters-section {
+      display: none;
+    }
+
+    :global(body) {
+      padding-bottom: 0;
+      font-size: 11pt;
+    }
+
+    /* Header ------------------------------------------------------------
+       Pinned explicitly rather than inherited from a screen breakpoint. Paper
+       width lands either side of the 44rem rule depending on the reader's margin
+       setting (0.75in gives ~672px, Chrome's default ~739px), so without this the
+       printed header silently switched between the float and grid layouts. */
+    .masthead {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      grid-template-areas:
+        "copy qr"
+        "copy links";
+      gap: 8px 24px;
+      align-items: start;
+      padding: 0 0 14px;
+    }
+
+    .masthead-copy {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-width: none;
+    }
+
+    .masthead-copy > * + * {
+      margin-top: 0;
+    }
+
+    /* Paper supplies the quiet zone, so no plate is needed, and it would not print
+       anyway: Chrome leaves background graphics off by default. */
+    .qr {
+      float: none;
+      grid-area: qr;
+      justify-self: end;
+      align-self: start;
+      width: 96px;
+      height: 96px;
+      margin: 0;
+      padding: 8px 0 0 8px;
+      background: none;
+    }
+
+    .masthead-links {
+      grid-area: links;
+      justify-self: end;
+      clear: none;
+      width: auto;
+      align-items: flex-end;
+      text-align: right;
+      padding-top: 0;
+      gap: 5px;
+      font-size: 10px;
+    }
+
+    h1 {
+      font-size: 30px;
+    }
+
+    .role-now {
+      font-size: 14px;
+      margin-top: 0;
+    }
+
+    .lead {
+      font-size: 15px;
+    }
+
+    .bio {
+      font-size: 12.5px;
+      line-height: 1.45;
+      color: var(--mut);
+    }
+
+    /* Outcomes ----------------------------------------------------------
+       One compact line instead of a 2x2 block. The per-item notes are dropped;
+       the figure and its label carry the point on paper. */
+    .outcomes {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px 18px;
+      padding: 8px 0 10px;
+      border-top: 1px solid var(--rule);
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .outcome {
+      flex-direction: row;
+      align-items: baseline;
+      gap: 5px;
+      border-top: 0;
+      padding-top: 0;
+    }
+
+    .outcome-figure {
+      font-size: 12.5px;
+    }
+
+    .outcome-label {
+      font-size: 8.5px;
+      letter-spacing: 0.06em;
+      color: var(--ink);
+    }
+
+    .outcome-note {
+      display: none;
+    }
+
+    /* Work --------------------------------------------------------------- */
+
+    .work {
+      padding: 14px 0 0;
+    }
+
+    .work > .eyebrow {
+      break-after: avoid;
+      margin-bottom: 4px;
+    }
+
+    .role {
+      padding: 10px 0;
+    }
+
+    .role-title {
+      font-size: 16px;
+    }
+
+    .role-blurb {
+      font-size: 12px;
+      line-height: 1.35;
+      margin-top: 3px;
+      color: var(--mut);
+    }
+
+    .role-meta {
+      font-size: 9.5px;
+      color: var(--mut);
+    }
+
+    .bullets {
+      font-size: 12px;
+      line-height: 1.38;
+      gap: 4px;
+      padding-left: 15px;
+      color: var(--ink);
+    }
+
+    .role .bullets {
+      margin-top: 7px;
+    }
+
+    .more .bullets {
+      margin-top: 4px;
+    }
+
+    .bullets li.accent {
+      color: var(--ink);
+      font-weight: 500;
+    }
+
+    .alongside {
+      padding: 10px 0 4px;
+    }
+
+    .alongside p {
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    /* What I do / education ---------------------------------------------- */
+
+    .what {
+      padding: 14px 0;
+      gap: 14px 32px;
+    }
+
+    .toolbelt {
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .what .bullets {
+      font-size: 12px;
+    }
+
+    .education {
+      padding: 14px 0 0;
+    }
+
+    .education .role-title {
+      margin-bottom: 3px;
+    }
+
+    .foot {
+      margin: 16px 0 0;
+      padding-top: 10px;
+      font-size: 9.5px;
+    }
+
+    /* Pagination --------------------------------------------------------- */
+
+    /* Chrome hides a closed <details>' contents through content-visibility on
+       ::details-content rather than display on the children, so overriding the
+       child alone prints nothing. The beforeprint handler is the fallback for
+       browsers without the pseudo-element. */
+    .more::details-content {
+      content-visibility: visible;
+      block-size: auto;
+    }
+
+    .more > *:not(summary) {
+      display: block;
+    }
+
+    .role,
+    .education,
+    .what-col,
+    .alongside {
+      break-inside: avoid;
+    }
+
+    .role-title,
+    .role-blurb {
+      break-after: avoid;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    /* Show each company link's destination beside it. Set from data-url rather than
+       attr(href) so the reader gets "starboard.biz" instead of the full scheme-and-
+       slash form. The contact rail is left alone: it already carries the handles. */
+    /* A saved PDF keeps these as real, clickable annotations, so they still need to
+       look like links. The border-bottom is swapped for an underline because a
+       border on the inline box would run under the appended URL too. Making the
+       ::after an inline-block turns it into an atomic inline, and text decoration
+       from an ancestor is not drawn across those, so the name is underlined and the
+       URL beside it is not. */
+    .company,
+    .inline-link {
+      border-bottom: 0;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    .company::after,
+    .inline-link::after {
+      content: ' (' attr(data-url) ')';
+      display: inline-block;
+      text-decoration: none;
+      font-family: var(--mono);
+      font-size: 0.78em;
+      color: var(--mut);
+      white-space: nowrap;
+    }
+
+    .foot a {
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+  }
+</style>
