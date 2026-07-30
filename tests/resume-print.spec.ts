@@ -120,6 +120,7 @@ test.describe('print layout', () => {
       link: getComputedStyle(el).textDecorationLine,
       afterDisplay: getComputedStyle(el, '::after').display,
       afterDecoration: getComputedStyle(el, '::after').textDecorationLine,
+      afterMarginLeft: parseFloat(getComputedStyle(el, '::after').marginLeft),
     }));
     // A saved PDF keeps these clickable, so they must still read as links...
     expect(styles.link).toBe('underline');
@@ -127,6 +128,9 @@ test.describe('print layout', () => {
     // inline is not crossed by an ancestor's decoration.
     expect(styles.afterDisplay).toBe('inline-block');
     expect(styles.afterDecoration).toBe('none');
+    // The gap must come from a margin. A leading space inside content() is
+    // collapsible on an inline-block and disappears on some Chromium versions.
+    expect(styles.afterMarginLeft).toBeGreaterThan(0);
   });
 
   test('body text prints dark enough to read on paper', async ({ page }) => {

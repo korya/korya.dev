@@ -1297,8 +1297,12 @@ const personSchema = {
 
     .company::after,
     .inline-link::after {
-      content: ' (' attr(data-url) ')';
+      /* The gap is a margin, not a leading space inside content: the pseudo-element
+         is an inline-block, so leading whitespace in its content is collapsible and
+         Chromium 148 drops it while 150 keeps it. */
+      content: '(' attr(data-url) ')';
       display: inline-block;
+      margin-left: 0.4em;
       text-decoration: none;
       font-family: var(--mono);
       font-size: 0.78em;
