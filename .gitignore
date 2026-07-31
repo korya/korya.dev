@@ -21,3 +21,7 @@ npm-debug.log*
 .env.*.local
 
 .*.sw[a-z]
+
+# Playwright
+test-results/
+playwright-report/

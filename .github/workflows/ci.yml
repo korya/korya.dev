@@ -1,0 +1,66 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+# A second push to the same branch makes the in-flight run redundant.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  e2e:
+    name: Build and end-to-end tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # 24, not the current LTS: Astro pulls in fontkitten transitively, which
+      # declares engines.node >=24.12, and yarn --frozen-lockfile refuses to install
+      # under anything lower.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      # Downloading Chromium is the slow part of this job, so cache it against the
+      # resolved Playwright version rather than the lockfile hash: that way an
+      # unrelated dependency bump does not throw the browser away.
+      - name: Resolve Playwright version
+        id: playwright
+        run: |
+          echo "version=$(node -p "require('@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}
+
+      # Runs on a cache hit too: the browser binary is cached, but the OS libraries
+      # it links against are not part of that cache.
+      - name: Install Chromium and its system dependencies
+        run: npx playwright install --with-deps chromium
+
+      # playwright.config.ts builds the site and serves it before the suite runs, so
+      # the tests exercise dist/ rather than the dev server.
+      - name: Run end-to-end tests
+        run: yarn test
+
+      - name: Upload Playwright report
+        uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7
+          if-no-files-found: ignore

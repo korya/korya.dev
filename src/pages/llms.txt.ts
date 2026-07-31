@@ -21,6 +21,7 @@ export async function GET(context: APIContext) {
 ## About
 
 - [About the Author](${SITE_CONFIG.AUTHOR.url})
+- [Resume](${SITE_CONFIG.SITE_URL}/resume): Career history, skills, and experience.
 
 ## Blog Posts
 
