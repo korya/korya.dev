@@ -19,7 +19,7 @@ test.describe('resume page builds', () => {
 
   test('renders the masthead', async ({ page }) => {
     await expect(page).toHaveTitle(/Resume/);
-    await expect(page.locator('.masthead h1')).toHaveText('Dmitri K.');
+    await expect(page.locator('.masthead h1')).toHaveText('Dmitri Kochelorov');
     await expect(page.locator('.role-now')).toContainText('CEO & Co-founder');
     await expect(page.locator('.role-now')).toContainText('FrontSail AI');
     await expect(page.locator('.bio')).toContainText('Whoever ships a feature');

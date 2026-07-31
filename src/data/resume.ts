@@ -37,9 +37,7 @@ export interface Role {
 }
 
 export const PROFILE = {
-  name: 'Dmitri K.',
-  /** Monogram used as the sticky-header wordmark. */
-  mark: 'DK',
+  name: 'Dmitri Kochelorov',
   location: 'Kitchener, ON · Canada',
   currentRole: {
     title: 'CEO & Co-founder',
