@@ -13,8 +13,19 @@ yarn install
 yarn dev      # sync content + start the dev server
 yarn build    # sync content + build to dist/
 yarn preview  # preview the production build
-yarn check    # type-check the project
+yarn test     # end-to-end tests (Playwright) against the production build
+yarn pdf      # regenerate the resume PDF (see below)
 ```
+
+### The resume PDF
+
+`/resume/offline.pdf` is a committed file under `public/`, rendered from `/resume` by
+`yarn pdf`. **Run it after changing the resume and commit the result**, otherwise the
+downloadable copy drifts from the page.
+
+It is not generated during `astro build` on purpose. The site deploys on a buildpack
+with no root access, so Chrome's shared libraries cannot be installed there and a
+build-time render fails the whole deploy.
 
 Posts are authored in `content/posts/` and copied into `src/content/posts/` by `scripts/sync-content.js`, which runs automatically before `dev` and `build`. Edit posts under `content/posts/` — never `src/content/posts/`, which is generated and overwritten.
 
