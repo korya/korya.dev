@@ -15,6 +15,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import puppeteer from 'puppeteer';
 import { PDF_TARGET } from '../src/lib/pdf-targets.mjs';
+import { PDF_STAMP_PATH, hashPdfSources } from '../src/lib/pdf-sources.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PORT = 4179;
@@ -73,6 +74,13 @@ try {
     await writeFile(out, buffer);
     console.log(`✔ wrote public/${PDF_TARGET.output} (${(buffer.length / 1024).toFixed(0)} KB)`);
 
+    // Record what this PDF was rendered from, so a test can tell when it goes stale.
+    const sha256 = await hashPdfSources(root);
+    await writeFile(
+      join(root, PDF_STAMP_PATH),
+      JSON.stringify({ sha256, renderedFrom: PDF_TARGET.source }, null, 2) + '\n'
+    );
+    console.log(`✔ stamped ${PDF_STAMP_PATH} (${sha256.slice(0, 12)}…)`);
   } finally {
     await browser.close();
   }
