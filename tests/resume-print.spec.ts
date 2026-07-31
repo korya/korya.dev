@@ -30,6 +30,8 @@ test.describe('print layout', () => {
     await expect(page.locator('.bar')).toBeHidden();
     await expect(page.locator('.chapters-section')).toBeHidden();
     await expect(page.locator('.more summary').first()).toBeHidden();
+    // Whoever is holding the printout already has the PDF.
+    await expect(page.locator('.download')).toBeHidden();
   });
 
   for (const margin of MARGINS) {

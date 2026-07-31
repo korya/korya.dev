@@ -60,6 +60,16 @@ test.describe('resume page builds', () => {
     }
   });
 
+  test('offers the PDF for download', async ({ page }) => {
+    const link = page.locator('.download');
+    await expect(link).toBeVisible();
+    await expect(link).toHaveAttribute('href', '/resume/offline.pdf');
+    // Without the download attribute the browser saves the route's filename, leaving
+    // the reader with "offline.pdf" on their disk.
+    await expect(link).toHaveAttribute('download', /Resume\.pdf$/);
+    await expect(link).toHaveAttribute('download', /Dmitri Kochelorov/);
+  });
+
   test('no stale contact details or em dashes in the copy', async ({ page }) => {
     const text = await page.locator('body').innerText();
     expect(text).not.toContain('271102');

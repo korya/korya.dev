@@ -67,6 +67,13 @@ export const LINKS = [
   { label: 'Blog (korya.dev)', href: '/' },
 ];
 
+// Deliberately not part of LINKS: those feed schema.org `sameAs`, which is for
+// profiles that identify the same person, not for documents.
+export const RESUME_PDF = {
+  href: '/resume/offline.pdf',
+  label: 'Download PDF',
+};
+
 /** The four numbers that carry the argument, read before anything else. */
 export const OUTCOMES = [
   {
