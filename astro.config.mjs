@@ -51,6 +51,12 @@ export default defineConfig({
     // Definitions live in src/lib/pdf-targets.mjs because the dev middleware has to
     // generate the same file the same way.
     pdf({
+      // GitHub's runners are Ubuntu 24.04, where AppArmor blocks unprivileged user
+      // namespaces and Chrome's sandbox cannot initialise: it aborts with "No usable
+      // sandbox" and the build fails. Only dropped on CI, so the sandbox stays on for
+      // local builds. The page being rendered is our own freshly built output, not
+      // untrusted content.
+      launch: process.env.CI ? { args: ['--no-sandbox'] } : {},
       pages: Object.fromEntries(
         PDF_TARGETS.map(({ source, output, screen, pdf: pdfOptions }) => [
           source,
