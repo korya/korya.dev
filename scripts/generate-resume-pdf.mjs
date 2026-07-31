@@ -16,6 +16,7 @@ import { fileURLToPath } from 'node:url';
 import puppeteer from 'puppeteer';
 import { PDF_TARGET } from '../src/lib/pdf-targets.mjs';
 import { PDF_STAMP_PATH, hashFile, hashPdfSources } from '../src/lib/pdf-sources.mjs';
+import { renderResumePdf } from '../src/lib/pdf-render.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PORT = 4179;
@@ -65,9 +66,8 @@ try {
   });
   try {
     const page = await browser.newPage();
-    await page.emulateMediaType('print');
-    await page.goto(`${origin}${PDF_TARGET.source}`, { waitUntil: 'networkidle2' });
-    const buffer = await page.pdf(PDF_TARGET.pdf);
+    const { buffer, site, rewritten } = await renderResumePdf(page, origin);
+    console.log(`› rewrote ${rewritten} relative link(s) to ${site}`);
 
     const out = join(root, 'public', PDF_TARGET.output);
     await mkdir(dirname(out), { recursive: true });

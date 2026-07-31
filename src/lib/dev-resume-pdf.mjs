@@ -1,4 +1,5 @@
 import { PDF_TARGET } from './pdf-targets.mjs';
+import { renderResumePdf } from './pdf-render.mjs';
 
 // Dev-only: re-render the resume PDF on each request so it reflects the current page
 // rather than whatever was last committed.
@@ -27,13 +28,8 @@ export function devResumePdf() {
             const { default: puppeteer } = await import('puppeteer');
             browser = await puppeteer.launch();
             const page = await browser.newPage();
-
-            // Rendering a different path on this same server, so no recursion.
-            await page.emulateMediaType('print');
-            await page.goto(new URL(PDF_TARGET.source, url.origin).href, {
-              waitUntil: 'networkidle2',
-            });
-            const buffer = await page.pdf(PDF_TARGET.pdf);
+            // Renders a different path on this same server, so no recursion.
+            const { buffer } = await renderResumePdf(page, url.origin);
 
             res.setHeader('content-type', 'application/pdf');
             res.setHeader('cache-control', 'no-store');
