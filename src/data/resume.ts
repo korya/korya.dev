@@ -37,9 +37,7 @@ export interface Role {
 }
 
 export const PROFILE = {
-  name: 'Dmitri K.',
-  /** Monogram used as the sticky-header wordmark. */
-  mark: 'DK',
+  name: 'Dmitri Kochelorov',
   location: 'Kitchener, ON · Canada',
   currentRole: {
     title: 'CEO & Co-founder',
@@ -68,6 +66,13 @@ export const LINKS = [
   { label: '@korya on GitHub', href: 'https://github.com/korya' },
   { label: 'Blog (korya.dev)', href: '/' },
 ];
+
+// Deliberately not part of LINKS: those feed schema.org `sameAs`, which is for
+// profiles that identify the same person, not for documents.
+export const RESUME_PDF = {
+  href: '/resume/offline.pdf',
+  label: 'Download PDF',
+};
 
 /** The four numbers that carry the argument, read before anything else. */
 export const OUTCOMES = [

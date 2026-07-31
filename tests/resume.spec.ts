@@ -19,7 +19,7 @@ test.describe('resume page builds', () => {
 
   test('renders the masthead', async ({ page }) => {
     await expect(page).toHaveTitle(/Resume/);
-    await expect(page.locator('.masthead h1')).toHaveText('Dmitri K.');
+    await expect(page.locator('.masthead h1')).toHaveText('Dmitri Kochelorov');
     await expect(page.locator('.role-now')).toContainText('CEO & Co-founder');
     await expect(page.locator('.role-now')).toContainText('FrontSail AI');
     await expect(page.locator('.bio')).toContainText('Whoever ships a feature');
@@ -58,6 +58,16 @@ test.describe('resume page builds', () => {
       expect(href).not.toContain('example.com');
       expect(href).not.toContain('localhost');
     }
+  });
+
+  test('offers the PDF for download', async ({ page }) => {
+    const link = page.locator('.download');
+    await expect(link).toBeVisible();
+    await expect(link).toHaveAttribute('href', '/resume/offline.pdf');
+    // Without the download attribute the browser saves the route's filename, leaving
+    // the reader with "offline.pdf" on their disk.
+    await expect(link).toHaveAttribute('download', /Resume\.pdf$/);
+    await expect(link).toHaveAttribute('download', /Dmitri Kochelorov/);
   });
 
   test('no stale contact details or em dashes in the copy', async ({ page }) => {

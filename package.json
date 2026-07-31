@@ -20,6 +20,7 @@
     "preact": "^10.24.0"
   },
   "devDependencies": {
-    "@playwright/test": "^1.62.1"
+    "@playwright/test": "^1.62.1",
+    "astro-pdf": "^1.10.1"
   }
 }

@@ -19,6 +19,7 @@ import {
   OUTCOMES,
   PRACTICES,
   PROFILE,
+  RESUME_PDF,
   ROLES,
   TOOLBELT,
 } from '../data/resume';
@@ -38,7 +39,7 @@ const personSchema = {
   '@type': 'ProfilePage',
   mainEntity: {
     '@type': 'Person',
-    name: 'Dmitri K',
+    name: 'Dmitri Kochelorov',
     alternateName: SITE_CONFIG.AUTHOR.name,
     jobTitle: `${PROFILE.currentRole.title}, ${PROFILE.currentRole.company}`,
     description: `${PROFILE.headline} ${PROFILE.headlineAccent}`,
@@ -94,7 +95,7 @@ const personSchema = {
 
     <div class="bar">
       <div class="bar-inner">
-        <a class="mark" href="/">{PROFILE.mark}</a>
+        <a class="mark" href="/">Home</a>
         <nav class="bar-nav" aria-label="Sections">
           {NAV.map(({ href, label }) => <a href={href}>{label}</a>)}
         </nav>
@@ -141,6 +142,11 @@ const personSchema = {
               <a href={href}>{label}</a>
             )
           )}
+          <a
+            class="download"
+            href={RESUME_PDF.href}
+            download={`${PROFILE.name} - Resume.pdf`}
+          >{`${RESUME_PDF.label} ↓`}</a>
         </div>
       </header>
 
@@ -448,10 +454,12 @@ const personSchema = {
     gap: 24px;
   }
 
+  /* A word, not the old two-letter monogram: the uppercase transform and wide
+     tracking that suited "DK" would render this as "HOME" and read as a wordmark
+     rather than the nav link it now is. Tracking matches the sibling links. */
   .mark {
     font: 500 13px/1 var(--mono);
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
+    letter-spacing: 0.06em;
     color: var(--mut);
     text-decoration: none;
   }
@@ -601,6 +609,14 @@ const personSchema = {
 
   .place {
     color: var(--mut);
+  }
+
+  /* Sits with the contact links but reads as the action it is. The download
+     attribute names the saved file after its owner: without it the browser keeps
+     the route's filename and the reader is left with "offline.pdf" on disk. */
+  .download {
+    color: var(--acc);
+    border-bottom-color: var(--acc);
   }
 
   .masthead-links a {
@@ -1038,8 +1054,10 @@ const personSchema = {
       --pad: 0;
     }
 
+    /* Meaningless on paper: whoever holds this already has the PDF. */
     .bar,
     .skip,
+    .download,
     .more summary,
     .chapters-section {
       display: none;
