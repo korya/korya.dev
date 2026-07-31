@@ -3,7 +3,6 @@ import ThemeToggle from './ThemeToggle.astro';
 
 const navItems = [
   { href: '/', label: 'Posts' },
-  { href: '/resume', label: 'Resume' },
   { href: '/about', label: 'About' },
 ];
 
@@ -77,25 +76,5 @@ const currentPath = Astro.url.pathname;
 
   .nav-link.active {
     font-weight: 500;
-  }
-
-  /* Four nav items plus the theme toggle no longer fit beside the logo on small
-     phones, so tighten the rhythm rather than let the logo wrap. */
-  @media (max-width: 30rem) {
-    .nav {
-      padding: var(--space-md);
-    }
-
-    .nav-links {
-      gap: var(--space-md);
-    }
-
-    .logo {
-      font-size: 1rem;
-    }
-
-    .nav-link {
-      font-size: 0.875rem;
-    }
   }
 </style>
