@@ -15,7 +15,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import puppeteer from 'puppeteer';
 import { PDF_TARGET } from '../src/lib/pdf-targets.mjs';
-import { PDF_STAMP_PATH, hashPdfSources } from '../src/lib/pdf-sources.mjs';
+import { PDF_STAMP_PATH, hashFile, hashPdfSources } from '../src/lib/pdf-sources.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PORT = 4179;
@@ -78,7 +78,11 @@ try {
     const sha256 = await hashPdfSources(root);
     await writeFile(
       join(root, PDF_STAMP_PATH),
-      JSON.stringify({ sha256, renderedFrom: PDF_TARGET.source }, null, 2) + '\n'
+      JSON.stringify(
+        { sha256, pdfSha256: await hashFile(out), renderedFrom: PDF_TARGET.source },
+        null,
+        2
+      ) + '\n'
     );
     console.log(`✔ stamped ${PDF_STAMP_PATH} (${sha256.slice(0, 12)}…)`);
   } finally {

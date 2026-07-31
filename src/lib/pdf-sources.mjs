@@ -20,6 +20,11 @@ export const PDF_SOURCES = [
 /** Where the digest recorded by `yarn pdf` lives. Outside public/, so it is not served. */
 export const PDF_STAMP_PATH = 'src/lib/pdf-stamp.json';
 
+/** Digest of a single file. */
+export async function hashFile(path) {
+  return createHash('sha256').update(await readFile(path)).digest('hex');
+}
+
 /** Digest of every source file, order-stable and path-sensitive. */
 export async function hashPdfSources(root) {
   const hash = createHash('sha256');
