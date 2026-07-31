@@ -2,8 +2,8 @@ import { defineConfig } from 'astro/config';
 import mdx from '@astrojs/mdx';
 import preact from '@astrojs/preact';
 import sitemap from '@astrojs/sitemap';
-import pdf from 'astro-pdf';
-import { PDF_TARGETS, pdfRedirects } from './src/lib/pdf-targets.mjs';
+import { pdfRedirects } from './src/lib/pdf-targets.mjs';
+import { devResumePdf } from './src/lib/dev-resume-pdf.mjs';
 import { readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
@@ -48,27 +48,9 @@ export default defineConfig({
   integrations: [
     mdx(),
     preact(),
-    // Definitions live in src/lib/pdf-targets.mjs because the dev middleware has to
-    // generate the same file the same way.
-    pdf({
-      // GitHub's runners are Ubuntu 24.04, where AppArmor blocks unprivileged user
-      // namespaces and Chrome's sandbox cannot initialise: it aborts with "No usable
-      // sandbox" and the build fails. Only dropped on CI, so the sandbox stays on for
-      // local builds. The page being rendered is our own freshly built output, not
-      // untrusted content.
-      launch: process.env.CI ? { args: ['--no-sandbox'] } : {},
-      pages: Object.fromEntries(
-        PDF_TARGETS.map(({ source, output, screen, pdf: pdfOptions }) => [
-          source,
-          {
-            path: output,
-            ensurePath: true,
-            screen,
-            pdf: pdfOptions,
-          },
-        ])
-      ),
-    }),
+    // Dev only: re-renders /resume/offline.pdf per request. In production the
+    // committed copy under public/ is served as a static file.
+    devResumePdf(),
     sitemap({
       changefreq: 'weekly',
       lastmod: buildDate,
