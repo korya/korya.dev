@@ -43,5 +43,16 @@ for (const { name, clean, file } of OUTPUTS) {
         expect(body).toContain(url);
       }
     });
+
+    test('links point at the site, not the machine that rendered it', async ({ request }) => {
+      const body = (await (await request.get(file)).body()).toString('latin1');
+
+      // The PDF is rendered from a throwaway localhost server. Relative links would be
+      // captured against that origin and are dead for anyone who opens the file
+      // elsewhere, which is everyone.
+      expect(body).not.toMatch(/https?:\/\/localhost/);
+      expect(body).not.toMatch(/https?:\/\/127\.0\.0\.1/);
+      expect(body).toContain('https://korya.dev/');
+    });
   });
 }
