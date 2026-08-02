@@ -91,6 +91,27 @@ test.describe('resume page builds', () => {
   });
 });
 
+test.describe('robots.txt', () => {
+  test('points at llms.txt without disturbing the rules', async ({ request }) => {
+    const res = await request.get('/robots.txt');
+    expect(res.status()).toBe(200);
+    const body = await res.text();
+
+    expect(body).toContain('Llms: https://korya.dev/llms.txt');
+    // The pointer sits among real directives; a malformed line here would silently
+    // change what crawlers are allowed to fetch.
+    expect(body).toContain('Sitemap: https://korya.dev/sitemap-index.xml');
+    expect(body).toMatch(/User-agent: \*\s*\nAllow: \//);
+  });
+
+  test('the file it points at is actually served', async ({ request }) => {
+    // A pointer to a 404 is worse than no pointer.
+    const res = await request.get('/llms.txt');
+    expect(res.status()).toBe(200);
+    expect(res.headers()['content-type']).toContain('text/plain');
+  });
+});
+
 test.describe('work entries expand', () => {
   test('lead bullets show before any interaction', async ({ page }) => {
     await page.goto('/resume');

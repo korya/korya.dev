@@ -3,6 +3,12 @@ Allow: /
 
 Sitemap: https://korya.dev/sitemap-index.xml
 
+# llms.txt is a plain-text digest of this site for LLMs (https://llmstxt.org/).
+# robots.txt defines no field for it: RFC 9309 specifies only user-agent, allow and
+# disallow, and requires parsers to ignore lines they do not recognise. So the pointer
+# below is discoverable but advisory, not a directive anything is obliged to honour.
+Llms: https://korya.dev/llms.txt
+
 # AI crawlers
 User-agent: GPTBot
 Allow: /
