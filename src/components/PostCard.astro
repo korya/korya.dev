@@ -20,25 +20,26 @@ const formattedDate = date.toLocaleDateString('en-US', {
 ---
 
 <article class="post-card">
-  {/* The icon is the only signal of post type in this list, so it carries a label
-      rather than aria-hidden. */}
-  <span class="post-icon" role="img" aria-label={isVideo ? 'Video post' : 'Written post'}>
-    {isVideo ? (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="9" />
-        <path d="M10.2 8.4 15.6 12l-5.4 3.6z" />
-      </svg>
-    ) : (
-      /* Runs wider and taller than a literal page would: a portrait rectangle
-         reads lighter than the circle beside it at matching bounds. */
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M14.5 2.8H6.8a2 2 0 0 0-2 2v14.4a2 2 0 0 0 2 2h10.4a2 2 0 0 0 2-2V7.5z" />
-        <path d="M14.5 2.8v4.7h4.7" />
-        <path d="M8.5 13h7M8.5 16.6h4.5" />
-      </svg>
-    )}
-  </span>
+  {/* One link over both the icon and the title, rather than a second link on the
+      icon: two links to the same post would be announced twice. The icon keeps its
+      label, so the link reads as "Video post <title>". */}
   <a href={`/posts/${slug}`} class="post-link">
+    <span class="post-icon" role="img" aria-label={isVideo ? 'Video post' : 'Written post'}>
+      {isVideo ? (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="9" />
+          <path d="M10.2 8.4 15.6 12l-5.4 3.6z" />
+        </svg>
+      ) : (
+        /* Runs wider and taller than a literal page would: a portrait rectangle
+           reads lighter than the circle beside it at matching bounds. */
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14.5 2.8H6.8a2 2 0 0 0-2 2v14.4a2 2 0 0 0 2 2h10.4a2 2 0 0 0 2-2V7.5z" />
+          <path d="M14.5 2.8v4.7h4.7" />
+          <path d="M8.5 13h7M8.5 16.6h4.5" />
+        </svg>
+      )}
+    </span>
     <h2 class="post-title">{title}</h2>
   </a>
   <div class="post-meta">
@@ -55,11 +56,9 @@ const formattedDate = date.toLocaleDateString('en-US', {
 
 <style>
   .post-card {
-    /* Icon owns the first column; title and meta share the second, so a title
-       that wraps stays aligned with the date beneath it. */
-    display: grid;
-    grid-template-columns: auto 1fr;
-    column-gap: var(--space-md);
+    /* Fixed rather than auto, because the meta row indents by the same amount
+       without being part of the link's grid. */
+    --icon-col: 1.125rem;
     padding: var(--space-lg) 0;
     border-bottom: 1px solid var(--color-border);
   }
@@ -68,9 +67,16 @@ const formattedDate = date.toLocaleDateString('en-US', {
     border-bottom: none;
   }
 
+  /* The link is the grid: icon in column one, title in column two, so the whole
+     of both is clickable and a wrapped title never runs back under the icon. */
+  .post-link {
+    display: grid;
+    grid-template-columns: var(--icon-col) 1fr;
+    column-gap: var(--space-md);
+    text-decoration: none;
+  }
+
   .post-icon {
-    grid-column: 1;
-    grid-row: 1;
     display: flex;
     align-items: center;
     /* Matches the title's line box, which centres the glyph on the first line
@@ -81,14 +87,8 @@ const formattedDate = date.toLocaleDateString('en-US', {
   }
 
   .post-icon svg {
-    width: 1.125rem;
-    height: 1.125rem;
-  }
-
-  .post-link {
-    grid-column: 2;
-    grid-row: 1;
-    text-decoration: none;
+    width: var(--icon-col);
+    height: var(--icon-col);
   }
 
   .post-title {
@@ -100,20 +100,14 @@ const formattedDate = date.toLocaleDateString('en-US', {
     transition: color 0.15s ease;
   }
 
-  .post-link:hover .post-title {
-    color: var(--color-accent);
-  }
-
-  /* The icon sits outside the link and before it, so no sibling selector reaches
-     it. :has() ties it to the title's own hover, rather than the whole row: the
-     two lighting up at different moments is what would read as a bug. */
-  .post-card:has(.post-link:hover) .post-icon {
+  .post-link:hover .post-title,
+  .post-link:hover .post-icon {
     color: var(--color-accent);
   }
 
   .post-meta {
-    grid-column: 2;
-    grid-row: 2;
+    /* Lines up with the title rather than the icon, matching the link's grid. */
+    margin-left: calc(var(--icon-col) + var(--space-md));
     display: flex;
     align-items: center;
     gap: var(--space-md);
