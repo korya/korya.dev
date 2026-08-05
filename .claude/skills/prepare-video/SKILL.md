@@ -11,13 +11,37 @@ shared subtitle style. Everything runs locally — no upload, no third-party ser
 Pipeline position: shoot → **prepare-video** → upload to YouTube → `create-video-post`
 → `compose-youtube-description`.
 
-| Mode | Output | For |
+| Mode | Output | Destination |
 |---|---|---|
-| **vertical** | 1080×1920 + captions | Shorts, Reels, TikTok |
-| **horizontal** | 1920×1080 blur-fill + captions | YouTube proper (won't be classed a Short) |
+| **vertical** | 1080×1920 + captions | LinkedIn (and YouTube Shorts, a future target) |
+| **horizontal** | 1920×1080 blur-fill + captions | YouTube (won't be classed a Short) |
 
 Both modes can be produced from the same source. If the user hasn't said which,
 ask — don't assume, and don't render both speculatively (each is a full encode).
+
+## The quality policy — read before choosing any encoder setting
+
+**Ship the highest-quality master and let the platform transcode.** Every
+destination re-encodes on upload. The better the file their transcoder receives, the
+better the result viewers get, and file size is cheap by comparison.
+
+Two rules follow, and they override any per-platform "recommended settings" list:
+
+**Never pre-degrade for a platform's current limitations.** LinkedIn converts
+everything to sRGB today, which tempts you to tone-map HDR→SDR before uploading.
+Don't. When LinkedIn's standards improve, an already-flattened file cannot benefit,
+and a correct master needs no re-render. The same logic rejects dropping 60 fps to
+LinkedIn's "recommended" 30, or transcoding HEVC to H.264: those are
+recommendations, not requirements — LinkedIn accepts HDR, HEVC and 60 fps uploads
+and always has.
+
+**Never transform a previous output.** Always start from the original camera file,
+and do multi-step work in a single ffmpeg pass. Chained encodes stack generation
+loss. Audio is stream-copied (`-c:a copy`) throughout — it needs no second
+generation.
+
+Consequence: **both modes stay HLG HDR.** The SDR path exists only for a destination
+that outright rejects HDR; see *Flattening to SDR* below.
 
 ## Step 0 — Prerequisites, checked before anything else
 
@@ -64,6 +88,10 @@ For horizontal mode, also check duration: YouTube classes an upload as a Short o
 it is vertical/square **and** ≤ 3 minutes. Over 180 s, widening is unnecessary for that
 reason — say so and ask whether the user wants it anyway for aesthetics.
 
+The same threshold cuts the other way in vertical mode: a cut longer than 3 minutes
+cannot become a Short, so it is a LinkedIn-only deliverable. Worth mentioning, since
+Shorts is a stated future target. LinkedIn's own feed limit is 10 minutes.
+
 ## Step 2 — Transcribe
 
 Word-level timestamps are required; the karaoke highlight is built from them.
@@ -87,7 +115,8 @@ python3 <skill>/scripts/make_ass.py /tmp/pv/audio.json out.ass \
 
 - `--layout` sets frame size, font size, margins and words-per-line. A caption tuned
   for a phone is the wrong size for a 16:9 frame; never reuse one file for both.
-- `--tone hlg` for **any HDR source**. Non-negotiable, and the reason is unobvious:
+- `--tone hlg` for **any HDR source** — which, under the quality policy, is every
+  deliverable from an iPhone recording. Non-negotiable, and the reason is unobvious:
   libass renders SDR-referenced RGB, so `#FFFFFF` burned into an HLG frame lands at
   HLG *peak* rather than diffuse white. Every tone-mapper desaturates its top end, so
   for SDR viewers — most of YouTube — the amber highlight collapses into the white
@@ -109,7 +138,7 @@ Full detail on the style, the filler policy and the tuning knobs:
 ```
 $FF -y -v error -stats -i '<in>' -vf "subtitles=out.ass" \
   -map 0:v:0 -map 0:a:0 -map_metadata 0 \
-  -c:v hevc_videotoolbox -b:v 16M -tag:v hvc1 -pix_fmt p010le \
+  -c:v hevc_videotoolbox -b:v 30M -tag:v hvc1 -pix_fmt p010le \
   -color_primaries bt2020 -color_trc arib-std-b67 -colorspace bt2020nc \
   -c:a copy -movflags +faststart '<name>_captioned.mp4'
 ```
@@ -127,7 +156,7 @@ $FF -y -v error -stats -i '<in>' -filter_complex "
 [fg]scale=-2:1080[fgs];
 [bgb][fgs]overlay=(W-w)/2:0,subtitles=out.ass[v]" \
   -map "[v]" -map 0:a:0 -map_metadata 0 \
-  -c:v hevc_videotoolbox -b:v 20M -tag:v hvc1 -pix_fmt p010le \
+  -c:v hevc_videotoolbox -b:v 24M -tag:v hvc1 -pix_fmt p010le \
   -color_primaries bt2020 -color_trc arib-std-b67 -colorspace bt2020nc \
   -c:a copy -movflags +faststart '<name>_16x9.mp4'
 ```
@@ -139,8 +168,28 @@ Err high. Alternative background treatments (colour wash, inset card) and the ge
 maths live in **`reference/widen-16x9.md`** — variant A above is the chosen default,
 so don't offer a menu unless asked.
 
-For an **SDR** source: drop the three colour flags and `-pix_fmt p010le`, and use
-`--tone sdr`.
+**Bitrates differ by mode on purpose.** Vertical carries full-frame detail at
+1080×1920, so it gets 30M. Horizontal spends most of its frame on a heavy blur that
+costs almost nothing to encode — only the 608 px strip holds real detail — so 24M
+buys the same visible quality.
+
+If the source is genuinely **SDR**: drop the three colour flags and `-pix_fmt
+p010le`, and generate captions with `--tone sdr`.
+
+### Flattening to SDR — the exception, not the default
+
+Only when a destination outright rejects HDR. Tone-map **before** the `subtitles`
+filter, so captions are authored in the space they're displayed in and need no
+luminance compromise:
+
+```
+zscale=t=linear:npl=100,tonemap=hable,zscale=t=bt709:m=bt709:p=bt709:r=tv,format=yuv420p,subtitles=out.ass
+```
+
+Pair it with `--tone sdr` and an H.264 encoder (`-c:v libx264 -preset slow -crf 18`).
+Note `p=bt709` — omitting it converts the transfer and matrix but leaves the
+*primaries* tagged `bt2020`, producing a file whose colour tags contradict each
+other. `ffprobe` catches this; the eye may not until it's on someone else's screen.
 
 Write output **next to the source**. Never overwrite the original.
 `hevc_videotoolbox` is hardware-accelerated — a 3.5-minute render takes well under a

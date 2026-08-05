@@ -32,7 +32,9 @@ def ass_colour(rgb, scale):
     return f"&H00{b:02X}{g:02X}{r:02X}&"
 
 LAYOUTS = {
-    # Phone-first: big type, parked high enough to clear Reels/TikTok UI chrome.
+    # Phone-first: big type, parked high enough to clear the caption overlay and
+    # button rail that Shorts puts over the lower frame. LinkedIn's feed chrome is
+    # lighter, so a Shorts-safe margin is safe there too.
     "vertical": {
         "play_w": 1080, "play_h": 1920,
         "font_size": 78, "outline": 6, "shadow": 4,

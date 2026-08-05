@@ -55,6 +55,13 @@ check a tone-mapped still afterwards (`SKILL.md` Step 5, check 4).
 Deepening the accent hue instead does *not* fix it — tested `#FF9500` at 88 % white and
 the highlight was still weak. Luminance is the lever, not hue.
 
+60 % is not a compromise, it is the correct value: in HLG, diffuse white sits near 60 %
+of the signal range, so `--tone hlg` captions render at normal white on an HDR display
+while 100 % ones would glare at peak brightness. The only place the difference shows is
+a tone-mapped SDR view, where full-range captions burned into an already-flattened frame
+look slightly more vivid. That is not a reason to flatten the master — see the quality
+policy in `SKILL.md`.
+
 ## Speech cleanup
 
 Verbatim transcription is honest but noisy on screen. `make_ass.py` strips:
