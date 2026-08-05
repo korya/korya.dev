@@ -8,6 +8,9 @@ interface Props {
   image?: string;
   articleDate?: Date;
   articleTags?: string[];
+  /** Load the site's Manrope stylesheet. /resume sets its own serif stack and never
+   *  renders a glyph in Manrope, so it opts out rather than paying for the request. */
+  siteFonts?: boolean;
 }
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
@@ -18,6 +21,7 @@ const {
   image = '/profile.png',
   articleDate,
   articleTags,
+  siteFonts = true,
 } = Astro.props;
 
 const isArticle = !!articleDate;
@@ -36,7 +40,9 @@ const isArticle = !!articleDate;
 <!-- Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+{siteFonts && (
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+)}
 
 <!-- Canonical URL -->
 <link rel="canonical" href={canonicalURL} />

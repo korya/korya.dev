@@ -82,7 +82,7 @@ const personSchema = {
 <!doctype html>
 <html lang="en">
   <head>
-    <BaseHead title={title} description={description} />
+    <BaseHead title={title} description={description} siteFonts={false} />
     <link
       href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,300;6..72,400;6..72,500&family=JetBrains+Mono:wght@400;500&display=swap"
       rel="stylesheet"
@@ -365,7 +365,11 @@ const personSchema = {
     --acc: oklch(0.52 0.13 42);
     --soft: rgba(28, 25, 23, 0.045);
 
-    --serif: Newsreader, Georgia, 'Times New Roman', serif;
+    /* No Georgia. It is wide enough that the masthead h1 wraps to four lines where
+       Newsreader takes two, so the swap when Newsreader arrives collapsed the header
+       by 87px and shoved the page up: CLS 0.22 at a 412px viewport. Times wraps the
+       same as Newsreader, so the swap is nearly invisible. Measured, not guessed. */
+    --serif: Newsreader, 'Times New Roman', serif;
     --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 
     --col: 900px;

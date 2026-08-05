@@ -1,16 +1,31 @@
 ---
 interface Props {
   src: string;
+  /** Intrinsic pixel size. Required: without it the browser reserves no space and
+   *  the rest of the page jumps down when the image arrives. Global CSS keeps
+   *  `max-width: 100%; height: auto`, so these are the aspect ratio, not a lock. */
+  width: number;
+  height: number;
   alt?: string;
   caption?: string;
   align?: 'left' | 'center' | 'right';
+  /** Set on images above the fold. Lazy-loading those delays the first paint of
+   *  the thing the reader came for. */
+  eager?: boolean;
 }
 
-const { src, alt = '', caption, align = 'center' } = Astro.props;
+const { src, width, height, alt = '', caption, align = 'center', eager = false } = Astro.props;
 ---
 
 <figure class:list={['figure', `align-${align}`]}>
-  <img src={src} alt={alt} loading="lazy" />
+  <img
+    src={src}
+    width={width}
+    height={height}
+    alt={alt}
+    loading={eager ? 'eager' : 'lazy'}
+    decoding={eager ? 'sync' : 'async'}
+  />
   {caption && <figcaption>{caption}</figcaption>}
 </figure>
 
