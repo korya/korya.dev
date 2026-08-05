@@ -21,6 +21,7 @@ const posts = (await getCollection('posts'))
           date={post.data.date}
           slug={post.slug}
           tags={post.data.tags}
+          videoLength={post.data.videoLength}
         />
       ))}
     </div>
