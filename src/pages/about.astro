@@ -2,10 +2,6 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Figure from '../components/interactive/Figure.astro';
 import styles from '../styles/prose.module.css';
-import { BIO, CONTACT } from '../data/about';
-
-/** External links get the usual noopener treatment; in-site ones must not. */
-const isExternal = (href: string) => href.startsWith('http');
 ---
 
 <BaseLayout title="About | Tech Scrolls">
@@ -15,29 +11,36 @@ const isExternal = (href: string) => href.startsWith('http');
     <Figure src="/profile.png" align="center" />
 
     <div class={styles.prose}>
-      {BIO.map((paragraph) => (
-        <p>
-          {paragraph.map((segment) =>
-            segment.href ? (
-              isExternal(segment.href) ? (
-                <a href={segment.href} target="_blank" rel="noopener noreferrer">{segment.text}</a>
-              ) : (
-                <a href={segment.href}>{segment.text}</a>
-              )
-            ) : (
-              segment.text
-            )
-          )}
-        </p>
-      ))}
+      <p>
+        I'm Dmitri. I co-founded <a href="https://frontsail.ai/" target="_blank" rel="noopener noreferrer">FrontSail AI</a>,
+        where we build an agentic operating system that takes the repetitive
+        back-office work off small businesses' hands.
+      </p>
+
+      <p>
+        Before that I spent a decade at <a href="https://goiguide.com/" target="_blank" rel="noopener noreferrer">Planitar</a>.
+        I joined as the first engineer and left as R&D director of a 20-person org,
+        then went back to writing code full time so I could build AI agents myself.
+        The longer version is on my <a href="/resume">resume</a>.
+      </p>
+
+      <p>
+        This is my personal blog containing my thoughts and some fragments of thoughts on tech topics.
+      </p>
+
+      <p>
+        The idea behind this blog is to reflect and structure the information in my head. Writing is one of the best ways to achieve that.
+      </p>
+
+      <p>
+        I will be glad if you find it useful or even better, inspiring.
+      </p>
 
       <h2>Contact</h2>
       <ul>
-        {CONTACT.map((link) => (
-          <li>
-            {link.platform}: <a href={link.href} target="_blank" rel="noopener noreferrer">{link.label}</a>
-          </li>
-        ))}
+        <li>Github: <a href="https://github.com/korya" target="_blank" rel="noopener noreferrer">@korya</a></li>
+        <li>X/Twitter: <a href="https://x.com/korya_dev" target="_blank" rel="noopener noreferrer">@korya_dev</a></li>
+        <li>LinkedIn: <a href="https://www.linkedin.com/in/kochelorov/" target="_blank" rel="noopener noreferrer">kochelorov</a></li>
       </ul>
     </div>
   </article>

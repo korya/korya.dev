@@ -1,7 +1,6 @@
 import { getCollection } from 'astro:content';
 import type { APIContext } from 'astro';
 import { SITE_CONFIG } from '../config';
-import { BIO, CONTACT } from '../data/about';
 import {
   ALONGSIDE,
   EDUCATION,
@@ -11,7 +10,26 @@ import {
   TOOLBELT,
 } from '../data/resume';
 
-/** Flatten a Segment[] paragraph to plain prose, dropping the link markup.
+/** Copied by hand from /about, which holds the same words as markup. Keep the two
+ *  in step: see AGENTS.md. The resume sections below need no such care, since they
+ *  read the same src/data/resume.ts that /resume renders from. */
+const ABOUT = `I'm Dmitri. I co-founded FrontSail AI, where we build an agentic operating system that takes the repetitive back-office work off small businesses' hands.
+
+Before that I spent a decade at Planitar. I joined as the first engineer and left as R&D director of a 20-person org, then went back to writing code full time so I could build AI agents myself. The longer version is on my resume.
+
+This is my personal blog containing my thoughts and some fragments of thoughts on tech topics.
+
+The idea behind this blog is to reflect and structure the information in my head. Writing is one of the best ways to achieve that.
+
+I will be glad if you find it useful or even better, inspiring.
+
+### Contact
+
+- Github: [@korya](https://github.com/korya)
+- X/Twitter: [@korya_dev](https://x.com/korya_dev)
+- LinkedIn: [kochelorov](https://www.linkedin.com/in/kochelorov/)`;
+
+/** Flatten a resume Segment[] blurb to plain prose, dropping the link markup.
  *  llms.txt is read for the facts, not for navigation, so inline anchors would
  *  only add noise around the words that carry the meaning. */
 const flatten = (segments: readonly { text: string }[]) =>
@@ -31,12 +49,6 @@ export async function GET(context: APIContext) {
       return `- [${post.data.title}](${SITE_CONFIG.SITE_URL}/posts/${post.slug}/)${description}`;
     })
     .join('\n');
-
-  const bio = BIO.map((paragraph) => flatten(paragraph)).join('\n\n');
-
-  const contact = CONTACT.map(
-    (link) => `- ${link.platform}: [${link.label}](${link.href})`
-  ).join('\n');
 
   // Each role becomes a heading plus its bullets. The bullets already carry the
   // stack and the outcomes, so nothing else needs restating around them.
@@ -63,11 +75,7 @@ export async function GET(context: APIContext) {
 
 ## About
 
-${bio}
-
-### Contact
-
-${contact}
+${ABOUT}
 
 ## ${PROFILE.name}
 

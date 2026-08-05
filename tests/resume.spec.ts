@@ -142,12 +142,13 @@ test.describe('llms.txt', () => {
     expect(body).toContain('](https://korya.dev/posts/');
   });
 
-  test('inlines prose without leaking link markup', async ({ request }) => {
+  test('inlines role blurbs without leaking link markup', async ({ request }) => {
     const body = await fetchBody(request);
-    // BIO segments carry hrefs for the HTML page; flatten() must drop them, or
-    // the bio reads as half-rendered markdown.
-    const [, aboutSection] = body.split('## About');
-    expect(aboutSection.split('### Contact')[0]).not.toContain('](');
+    // Planitar's blurb is the one built from linked Segments; flatten() must drop
+    // the href, or the line reads as half-rendered markdown.
+    expect(body).toContain(
+      "First engineer → 20+ person R&D org behind the iGUIDE, Canada’s leading 3D virtual tour platform."
+    );
   });
 });
 
