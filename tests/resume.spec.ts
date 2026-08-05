@@ -112,6 +112,46 @@ test.describe('robots.txt', () => {
   });
 });
 
+test.describe('llms.txt', () => {
+  const fetchBody = async (request: { get: (url: string) => Promise<{ text: () => Promise<string> }> }) =>
+    (await request.get('/llms.txt')).text();
+
+  test('carries the about prose, not just a link to it', async ({ request }) => {
+    const body = await fetchBody(request);
+    // The point of inlining is that a crawler never has to fetch /about.
+    expect(body).toContain("I'm Dmitri. I co-founded FrontSail AI");
+    expect(body).toContain('- LinkedIn: [kochelorov](https://www.linkedin.com/in/kochelorov/)');
+  });
+
+  test('carries the resume detail, not just a link to it', async ({ request }) => {
+    const body = await fetchBody(request);
+    expect(body).toContain('CEO & Co-founder at [FrontSail AI]');
+    // Every role, so a dropped entry in ROLES fails here rather than silently
+    // shrinking what an LLM knows about the career.
+    for (const company of ['FrontSail AI', 'Starboard', 'Klue', 'Planitar', 'Jungo']) {
+      expect(body).toContain(`, ${company} (`);
+    }
+    expect(body).toContain('B.Sc. Computer Software Engineering');
+  });
+
+  test('still lists every published post', async ({ request }) => {
+    const body = await fetchBody(request);
+    // The blog index is the original job of this file; enriching it must not
+    // displace the posts.
+    expect(body).toContain('## Blog Posts');
+    expect(body).toContain('](https://korya.dev/posts/');
+  });
+
+  test('inlines role blurbs without leaking link markup', async ({ request }) => {
+    const body = await fetchBody(request);
+    // Planitar's blurb is the one built from linked Segments; flatten() must drop
+    // the href, or the line reads as half-rendered markdown.
+    expect(body).toContain(
+      "First engineer → 20+ person R&D org behind the iGUIDE, Canada’s leading 3D virtual tour platform."
+    );
+  });
+});
+
 test.describe('work entries expand', () => {
   test('lead bullets show before any interaction', async ({ page }) => {
     await page.goto('/resume');
