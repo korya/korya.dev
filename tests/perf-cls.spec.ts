@@ -8,8 +8,16 @@ import { test, expect, type Page } from '@playwright/test';
 // and the shift is width-dependent. The same page measured 0.002 at 360px and 0.218 at
 // 412px, so a test at the wrong width would have passed throughout.
 
-/** Lighthouse scores CLS <= 0.1 as "good"; 0.05 leaves room to notice drift first. */
+/** For pages whose shift sources are all fixed. Lighthouse calls <= 0.1 "good"; half
+ *  that leaves room to notice drift before it costs score. */
 const CLS_BUDGET = 0.05;
+
+/** For pages that still swap Manrope against whatever sans the OS supplies. That shift
+ *  is unfixed (it needs a metric-matched fallback, deliberately out of scope here) and
+ *  its size depends on the fallback the host happens to have: /about measures 0.015 on
+ *  macOS and 0.087 on the Linux CI runner. Holding these at Lighthouse's "good"
+ *  threshold locks in the current state without asserting a host-specific number. */
+const CLS_BUDGET_FONT_SWAP = 0.1;
 
 const measureCls = async (page: Page, path: string) => {
   await page.addInitScript(() => {
@@ -37,18 +45,14 @@ test.describe('layout stability', () => {
   });
 
   test('/about does not lurch when the portrait loads', async ({ page }) => {
-    // The <img> needs intrinsic width/height, or the prose below it is pushed down
-    // once the image arrives.
-    expect(await measureCls(page, '/about')).toBeLessThan(CLS_BUDGET);
+    // The portrait needs intrinsic width/height, or the prose below is pushed down
+    // when it arrives. Unsized, this page measured 0.256; the budget is the loose one
+    // because the Manrope swap underneath is still worth ~0.09 here on Linux.
+    expect(await measureCls(page, '/about')).toBeLessThan(CLS_BUDGET_FONT_SWAP);
   });
 
   test('the post index stays within the "good" band', async ({ page }) => {
-    // Looser than CLS_BUDGET on purpose. The index still shifts ~0.046 when Manrope
-    // swaps in, which is a real (if minor) instance of the same fault this file
-    // guards on /resume. It is not fixed here, so the budget is set at Lighthouse's
-    // "good" threshold to lock in the current state without asserting a number the
-    // page sits within 8% of.
-    expect(await measureCls(page, '/')).toBeLessThan(0.1);
+    expect(await measureCls(page, '/')).toBeLessThan(CLS_BUDGET_FONT_SWAP);
   });
 });
 
