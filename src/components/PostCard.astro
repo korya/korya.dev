@@ -19,7 +19,7 @@ const formattedDate = date.toLocaleDateString('en-US', {
 });
 ---
 
-<article class="post-card">
+<article class="post-card" data-type={isVideo ? 'video' : 'text'}>
   {/* One link over both the icon and the title, rather than a second link on the
       icon: two links to the same post would be announced twice. The icon keeps its
       label, so the link reads as "Video post <title>". */}
@@ -63,7 +63,11 @@ const formattedDate = date.toLocaleDateString('en-US', {
     border-bottom: 1px solid var(--color-border);
   }
 
-  .post-card:last-child {
+  /* .is-last is set by the filter script, which knows which card is last once
+     some of them are hidden. :last-child alone would leave a rule dangling under
+     the final visible entry. */
+  .post-card:last-child,
+  .post-card.is-last {
     border-bottom: none;
   }
 

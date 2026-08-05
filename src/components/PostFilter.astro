@@ -1,0 +1,124 @@
+---
+interface Props {
+  /** Counts per type, used for the labels and to drop a filter nobody can use. */
+  video: number;
+  text: number;
+}
+
+const { video, text } = Astro.props;
+
+// A filter with nothing to filter is noise, and one whose only other option is
+// empty is a trap. Both types have to exist for the control to earn its place.
+const worthShowing = video > 0 && text > 0;
+
+const options = [
+  { id: 'all', label: 'All', count: video + text },
+  { id: 'video', label: 'Video', count: video },
+  { id: 'text', label: 'Written', count: text },
+];
+---
+
+{worthShowing && (
+  /* Hidden until the script unhides it: filtering is client-side, so without JS
+     these buttons would be dead controls over a list that already shows
+     everything. Better to render nothing than something inert. */
+  <div class="post-filter" role="group" aria-label="Filter posts by type" hidden>
+    {options.map((option) => (
+      <button type="button" class="filter-pill" data-filter={option.id} aria-pressed={option.id === 'all'}>
+        {option.label}
+        <span class="count">{option.count}</span>
+      </button>
+    ))}
+  </div>
+)}
+
+<style>
+  .post-filter {
+    display: flex;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-lg);
+  }
+
+  /* Any `display` here beats the user agent's `[hidden] { display: none }`, so
+     without this the "hidden until JS runs" markup renders anyway. */
+  .post-filter[hidden] {
+    display: none;
+  }
+
+  .filter-pill {
+    display: inline-flex;
+    align-items: baseline;
+    gap: var(--space-xs);
+    padding: var(--space-xs) var(--space-sm);
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    background: none;
+    font: inherit;
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    transition: color 0.15s ease, border-color 0.15s ease;
+  }
+
+  .filter-pill:hover {
+    color: var(--color-text);
+    border-color: var(--color-text-muted);
+  }
+
+  .filter-pill[aria-pressed='true'] {
+    color: var(--color-accent);
+    border-color: currentColor;
+  }
+
+  .count {
+    font-size: 0.75rem;
+    /* Holds its own width so the row does not shift as counts change. */
+    font-variant-numeric: tabular-nums;
+    opacity: 0.7;
+  }
+</style>
+
+<script>
+  const filter = document.querySelector<HTMLElement>('.post-filter');
+  const cards = Array.from(document.querySelectorAll<HTMLElement>('.post-card'));
+
+  if (filter && cards.length) {
+    const pills = Array.from(filter.querySelectorAll<HTMLButtonElement>('.filter-pill'));
+    const types = pills.map((pill) => pill.dataset.filter);
+
+    const apply = (type: string) => {
+      for (const card of cards) {
+        card.hidden = type !== 'all' && card.dataset.type !== type;
+      }
+
+      // The card list draws a rule between entries and drops it on the last one.
+      // :last-child still points at a hidden card once filtering starts, so the
+      // last *visible* one is marked explicitly.
+      const visible = cards.filter((card) => !card.hidden);
+      for (const card of cards) card.classList.remove('is-last');
+      visible.at(-1)?.classList.add('is-last');
+
+      for (const pill of pills) {
+        pill.setAttribute('aria-pressed', String(pill.dataset.filter === type));
+      }
+    };
+
+    const select = (type: string, pushUrl: boolean) => {
+      apply(type);
+      if (!pushUrl) return;
+      // Keeps the choice shareable and survivable across a reload, without
+      // adding routes that would only duplicate the index.
+      const url = type === 'all' ? location.pathname : `?type=${type}`;
+      history.replaceState({}, '', url);
+    };
+
+    for (const pill of pills) {
+      pill.addEventListener('click', () => select(pill.dataset.filter!, true));
+    }
+
+    const requested = new URLSearchParams(location.search).get('type');
+    select(requested && types.includes(requested) ? requested : 'all', false);
+
+    filter.hidden = false;
+  }
+</script>
