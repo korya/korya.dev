@@ -201,3 +201,43 @@ test.describe('post type filter without JavaScript', () => {
     expect(await page.locator('.post-card').count()).toBeGreaterThan(0);
   });
 });
+
+test.describe('filter sits on the title row', () => {
+  test('pills share the heading row and align to its right edge', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto('/');
+    const title = (await page.locator('.page-title').boundingBox())!;
+    const filter = (await page.locator('.post-filter').boundingBox())!;
+    const list = (await page.locator('.post-list').boundingBox())!;
+
+    // Vertically overlapping means one row, not stacked.
+    expect(filter.y).toBeLessThan(title.y + title.height);
+    expect(filter.y + filter.height).toBeGreaterThan(title.y);
+    // To the right of the heading, flush with the content column.
+    expect(filter.x).toBeGreaterThan(title.x + title.width);
+    expect(Math.abs(filter.x + filter.width - (list.x + list.width))).toBeLessThan(2);
+  });
+
+  test('it wraps below the heading rather than overflowing when narrow', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 360, height: 900 });
+    await page.goto('/');
+    const title = (await page.locator('.page-title').boundingBox())!;
+    const filter = (await page.locator('.post-filter').boundingBox())!;
+    expect(filter.y).toBeGreaterThanOrEqual(title.y + title.height - 1);
+    const overflows = await page.evaluate(
+      () => document.documentElement.scrollWidth > window.innerWidth
+    );
+    expect(overflows).toBe(false);
+  });
+
+  test('the heading keeps its spacing when the filter is absent', async ({ page }) => {
+    // The row owns the margin below now. With JS off the filter is not rendered, and
+    // the list must not ride up against the heading.
+    await page.goto('/tags/privacy');
+    const title = (await page.locator('.page-title').boundingBox())!;
+    const list = (await page.locator('.post-list').boundingBox())!;
+    expect(list.y).toBeGreaterThan(title.y + title.height);
+  });
+});

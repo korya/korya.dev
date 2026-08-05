@@ -16,8 +16,10 @@ const videoCount = posts.filter((post) => Boolean(post.data.videoLength)).length
 <BaseLayout title={SITE_CONFIG.SITE_TITLE}>
   <JsonLd slot="head" type="WebSite" />
   <section class="posts">
-    <h1 class="page-title">Posts</h1>
-    <PostFilter video={videoCount} text={posts.length - videoCount} />
+    <div class="posts-head">
+      <h1 class="page-title">Posts</h1>
+      <PostFilter video={videoCount} text={posts.length - videoCount} />
+    </div>
     <div class="post-list">
       {posts.map((post) => (
         <PostCard
@@ -37,9 +39,22 @@ const videoCount = posts.filter((post) => Boolean(post.data.videoLength)).length
     max-width: var(--content-width);
   }
 
+  /* Title and filter share a row, pills pushed right. Baseline rather than centre
+     alignment: it sits the pill labels on the same line as the heading, which centring
+     does not, given the pills are a fraction of the heading's size. */
+  .posts-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-sm) var(--space-md);
+    margin-bottom: var(--space-lg);
+  }
+
   .page-title {
     font-size: 2rem;
     font-weight: 600;
-    margin-bottom: var(--space-lg);
+    /* The row owns the spacing below, so the title must not add its own. */
+    margin: 0;
   }
 </style>

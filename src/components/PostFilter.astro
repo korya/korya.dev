@@ -36,7 +36,8 @@ const options = [
   .post-filter {
     display: flex;
     gap: var(--space-sm);
-    margin-bottom: var(--space-lg);
+    /* No outer margin: the surrounding row places this, so owning spacing here would
+       fight it and leave a gap when the filter is hidden. */
   }
 
   /* Any `display` here beats the user agent's `[hidden] { display: none }`, so
