@@ -38,6 +38,22 @@ test.describe('post type icons', () => {
     await expect(video.locator(VIDEO_ICON)).toHaveCount(1);
   });
 
+  test('clicking the icon opens the post', async ({ page }) => {
+    await page.goto('/');
+    const card = page.locator('.post-card').first();
+    const href = await card.locator('.post-link').getAttribute('href');
+    await card.locator('.post-icon').click();
+    await expect(page).toHaveURL(new RegExp(`${href}/?$`));
+  });
+
+  test('the icon and title are one link, not two to the same post', async ({ page }) => {
+    await page.goto('/');
+    const card = page.locator('.post-card').first();
+    // A second link on the icon would have a screen reader announce the post twice.
+    await expect(card.locator('a[href^="/posts/"]')).toHaveCount(1);
+    await expect(card.locator('.post-link .post-icon')).toHaveCount(1);
+  });
+
   test('the icon is exposed to assistive tech, not hidden as decoration', async ({
     page,
   }) => {
