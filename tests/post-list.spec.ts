@@ -104,3 +104,100 @@ test.describe('post type icons', () => {
     expect(overflows).toBe(false);
   });
 });
+
+test.describe('post type filter', () => {
+  const visible = (page: import('@playwright/test').Page) =>
+    page.locator('.post-card:visible');
+
+  test('narrows the list to one type and back', async ({ page }) => {
+    await page.goto('/');
+    const total = await visible(page).count();
+    expect(total).toBeGreaterThan(0);
+
+    await page.locator('[data-filter="video"]').click();
+    const videos = await visible(page).count();
+    expect(videos).toBeGreaterThan(0);
+    expect(videos).toBeLessThan(total);
+    // Everything left standing is actually a video.
+    for (const card of await visible(page).all()) {
+      await expect(card).toHaveAttribute('data-type', 'video');
+    }
+
+    await page.locator('[data-filter="text"]').click();
+    for (const card of await visible(page).all()) {
+      await expect(card).toHaveAttribute('data-type', 'text');
+    }
+    expect(await visible(page).count()).toBe(total - videos);
+
+    await page.locator('[data-filter="all"]').click();
+    expect(await visible(page).count()).toBe(total);
+  });
+
+  test('the counts on the pills match what filtering shows', async ({ page }) => {
+    await page.goto('/');
+    for (const type of ['video', 'text']) {
+      const pill = page.locator(`[data-filter="${type}"]`);
+      const claimed = Number(await pill.locator('.count').innerText());
+      await pill.click();
+      expect(await visible(page).count()).toBe(claimed);
+    }
+  });
+
+  test('the choice survives a reload and can be shared', async ({ page }) => {
+    await page.goto('/');
+    await page.locator('[data-filter="video"]').click();
+    expect(new URL(page.url()).search).toBe('?type=video');
+
+    await page.reload();
+    await expect(page.locator('[data-filter="video"]')).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    );
+    for (const card of await visible(page).all()) {
+      await expect(card).toHaveAttribute('data-type', 'video');
+    }
+  });
+
+  test('a junk type in the URL falls back to showing everything', async ({ page }) => {
+    await page.goto('/');
+    const total = await visible(page).count();
+    await page.goto('/?type=nonsense');
+    expect(await visible(page).count()).toBe(total);
+    await expect(page.locator('[data-filter="all"]')).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    );
+  });
+
+  test('the rule between entries drops under the last visible one', async ({ page }) => {
+    // :last-child still points at a hidden card once filtering starts, which would
+    // leave a rule hanging under the final entry.
+    await page.goto('/');
+    await page.locator('[data-filter="text"]').click();
+    const last = visible(page).last();
+    const width = await last.evaluate(
+      (el) => getComputedStyle(el).borderBottomWidth
+    );
+    expect(width).toBe('0px');
+  });
+
+  test('only one pill reads as pressed at a time', async ({ page }) => {
+    await page.goto('/');
+    await page.locator('[data-filter="video"]').click();
+    expect(await page.locator('[aria-pressed="true"]').count()).toBe(1);
+  });
+});
+
+test.describe('post type filter without JavaScript', () => {
+  test.use({ javaScriptEnabled: false });
+
+  test('is not rendered at all, rather than shown as a dead control', async ({
+    page,
+  }) => {
+    await page.goto('/');
+    // Filtering is client-side. Inert pills over a list that already shows
+    // everything would be worse than no pills.
+    await expect(page.locator('.post-filter')).toBeHidden();
+    expect(await page.locator('.post-card').count()).toBeGreaterThan(0);
+  });
+});

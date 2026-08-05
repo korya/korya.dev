@@ -2,18 +2,22 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PostCard from '../components/PostCard.astro';
+import PostFilter from '../components/PostFilter.astro';
 import JsonLd from '../components/JsonLd.astro';
 import { SITE_CONFIG } from '../config';
 
 const posts = (await getCollection('posts'))
   .filter((post) => !post.data.draft)
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+const videoCount = posts.filter((post) => Boolean(post.data.videoLength)).length;
 ---
 
 <BaseLayout title={SITE_CONFIG.SITE_TITLE}>
   <JsonLd slot="head" type="WebSite" />
   <section class="posts">
     <h1 class="page-title">Posts</h1>
+    <PostFilter video={videoCount} text={posts.length - videoCount} />
     <div class="post-list">
       {posts.map((post) => (
         <PostCard
