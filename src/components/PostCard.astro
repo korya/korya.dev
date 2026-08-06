@@ -1,4 +1,6 @@
 ---
+import PostTypeIcon from './PostTypeIcon.astro';
+
 interface Props {
   title: string;
   date: Date;
@@ -25,20 +27,7 @@ const formattedDate = date.toLocaleDateString('en-US', {
       label, so the link reads as "Video post <title>". */}
   <a href={`/posts/${slug}`} class="post-link">
     <span class="post-icon" role="img" aria-label={isVideo ? 'Video post' : 'Written post'}>
-      {isVideo ? (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="9" />
-          <path d="M10.2 8.4 15.6 12l-5.4 3.6z" />
-        </svg>
-      ) : (
-        /* Runs wider and taller than a literal page would: a portrait rectangle
-           reads lighter than the circle beside it at matching bounds. */
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M14.5 2.8H6.8a2 2 0 0 0-2 2v14.4a2 2 0 0 0 2 2h10.4a2 2 0 0 0 2-2V7.5z" />
-          <path d="M14.5 2.8v4.7h4.7" />
-          <path d="M8.5 13h7M8.5 16.6h4.5" />
-        </svg>
-      )}
+      <PostTypeIcon type={isVideo ? 'video' : 'text'} />
     </span>
     <h2 class="post-title">{title}</h2>
   </a>
@@ -90,7 +79,11 @@ const formattedDate = date.toLocaleDateString('en-US', {
     transition: color 0.15s ease;
   }
 
-  .post-icon svg {
+  /* :global because the glyph comes from PostTypeIcon. Astro's scoping stamps its
+     attribute only on this component's own elements, so a plain `.post-icon svg`
+     compiles to a selector the child's markup can never match, and the icon
+     collapses to zero width. Scoped by .post-icon, so nothing leaks. */
+  .post-icon :global(svg) {
     width: var(--icon-col);
     height: var(--icon-col);
   }
