@@ -348,6 +348,25 @@ const personSchema = {
         syncLabel();
       });
       syncLabel();
+
+      // Report PDF downloads to GA ourselves rather than relying on Enhanced
+      // Measurement's automatic file_download. That event is driven by GTM's
+      // link-click auto-event, which keys on a click that navigates; this link
+      // carries a `download` attribute, so the browser saves the file and never
+      // navigates. Clicking it produced no beacon in testing even with Enhanced
+      // Measurement and File downloads both enabled on the stream.
+      //
+      // The name is deliberately not `file_download`: if the automatic event does
+      // fire for some readers, a matching name would double-count them. This one
+      // stands alone and means exactly what it says.
+      document.querySelector('a.download')?.addEventListener('click', () => {
+        // gtag is absent when the measurement ID is unset (local dev) or when a
+        // reader blocks the script, which must not break the download itself.
+        window.gtag?.('event', 'resume_pdf_download', {
+          file_name: 'resume-offline.pdf',
+          link_url: '/resume/offline.pdf',
+        });
+      });
     </script>
   </body>
 </html>

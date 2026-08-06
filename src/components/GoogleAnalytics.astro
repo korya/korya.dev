@@ -11,11 +11,19 @@ const measurementId = SITE_CONFIG.GA_MEASUREMENT_ID;
   <>
     <!-- Google tag (gtag.js) -->
     <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${measurementId}`}></script>
-    <script is:inline define:vars={{ measurementId }}>
+    {/*
+      set:html rather than define:vars. define:vars wraps the script in an IIFE to
+      scope the variables it injects, which also traps `function gtag(){}` inside the
+      closure: gtag('config') still runs, so page_view works and nothing looks broken,
+      but window.gtag is undefined and any later gtag('event', ...) throws. Assigning
+      window.gtag explicitly keeps that true regardless of how the script is wrapped.
+    */}
+    <script is:inline set:html={`
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
+      window.gtag = gtag;
       gtag('js', new Date());
-      gtag('config', measurementId);
-    </script>
+      gtag('config', ${JSON.stringify(measurementId)});
+    `} />
   </>
 )}

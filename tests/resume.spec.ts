@@ -368,3 +368,64 @@ test.describe('masthead on a phone', () => {
     expect(await perModule()).toBeGreaterThan(3);
   });
 });
+
+test.describe('PDF download tracking', () => {
+  // Every page load in this suite runs the real GA snippet against the real
+  // measurement ID, so these tests block the analytics hosts outright. Without that,
+  // CI would post a fake resume_pdf_download on every run and corrupt the very number
+  // the event exists to measure.
+  const blockAnalytics = async (page: import('@playwright/test').Page) => {
+    const hits: string[] = [];
+    for (const pattern of [
+      '**://*.google-analytics.com/**',
+      '**://*.analytics.google.com/**',
+    ]) {
+      await page.route(pattern, async (route) => {
+        hits.push(route.request().url());
+        await route.fulfill({ status: 204, body: '' });
+      });
+    }
+    return hits;
+  };
+
+  test('gtag is reachable from page scripts', async ({ page }) => {
+    // Astro's define:vars wraps an inline script in an IIFE, which once trapped the
+    // gtag function inside it: config still ran, so nothing looked broken, but
+    // window.gtag was undefined and every custom event threw.
+    await blockAnalytics(page);
+    for (const path of ['/resume', '/', '/about']) {
+      await page.goto(path);
+      expect(await page.evaluate(() => typeof (window as any).gtag), path).toBe(
+        'function'
+      );
+    }
+  });
+
+  test('clicking the PDF link reports one download event', async ({ page }) => {
+    const hits = await blockAnalytics(page);
+    await page.goto('/resume', { waitUntil: 'networkidle' });
+    hits.length = 0;
+
+    await page.locator('a.download').click({ noWaitAfter: true });
+    await expect
+      .poll(() => hits.filter((u) => u.includes('resume_pdf_download')).length)
+      .toBe(1);
+
+    const hit = decodeURIComponent(hits.find((u) => u.includes('resume_pdf_download'))!);
+    expect(hit).toContain('en=resume_pdf_download');
+    expect(hit).toContain('file_name=resume-offline.pdf');
+    expect(hit).toContain('link_url=/resume/offline.pdf');
+  });
+
+  test('the link still downloads rather than navigating', async ({ page }) => {
+    // The event must not come at the cost of the behaviour it measures: the download
+    // attribute is what names the saved file after its owner.
+    await blockAnalytics(page);
+    await page.goto('/resume', { waitUntil: 'networkidle' });
+    const [download] = await Promise.all([
+      page.waitForEvent('download'),
+      page.locator('a.download').click({ noWaitAfter: true }),
+    ]);
+    expect(download.suggestedFilename()).toContain('Resume.pdf');
+  });
+});
