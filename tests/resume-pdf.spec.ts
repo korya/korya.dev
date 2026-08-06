@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 
 // The resume PDF is generated at build time from the same data as the page. These
 // assert the artifact exists, is reachable at its clean URL, and carries the properties
