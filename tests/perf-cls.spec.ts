@@ -103,33 +103,33 @@ test.describe('fonts do not block the first paint', () => {
   // TTFB stayed at ~120ms. These assert the non-blocking shape, on every page type.
   const PAGES = ['/', '/about', '/resume'];
 
-  test('no font stylesheet blocks rendering', async ({ page }) => {
+  // Fetch the response body, never document.outerHTML. What blocks rendering is how
+  // the link is *authored*; onload rewrites rel to "stylesheet" the moment the sheet
+  // arrives, so the live DOM shows the promoted value and reading it asserts nothing.
+  // The DOM version of this passed locally and on CI once, then failed — the race was
+  // simply which side of DOMContentLoaded the stylesheet landed on.
+  const served = async (
+    request: { get: (url: string) => Promise<{ text: () => Promise<string> }> },
+    path: string
+  ) => (await request.get(path)).text();
+
+  test('no font stylesheet blocks rendering', async ({ request }) => {
     for (const path of PAGES) {
-      await page.goto(path, { waitUntil: 'domcontentloaded' });
-      const blocking = await page.evaluate(() =>
-        Array.from(document.querySelectorAll('link[rel="stylesheet"]'))
-          .map((l) => (l as HTMLLinkElement).href)
-          .filter((href) => href.includes('fonts.googleapis.com'))
-          // Promoted by onload after first paint; only a link that was *authored* as a
-          // stylesheet blocks, and those live in <noscript>.
-          .filter((_, i, all) => all.length > 0)
-      );
-      const authored = await page.evaluate(() =>
-        document.documentElement.outerHTML
-          .replace(/<noscript>[\s\S]*?<\/noscript>/g, '')
-          .match(/<link[^>]*rel="stylesheet"[^>]*fonts\.googleapis\.com[^>]*>/g)?.length ?? 0
-      );
-      expect(authored, `${path} ships a render-blocking font stylesheet`).toBe(0);
-      expect(blocking.length).toBeGreaterThanOrEqual(0);
+      const html = await served(request, path);
+      const outsideNoscript = html.replace(/<noscript>[\s\S]*?<\/noscript>/g, '');
+      const blocking =
+        outsideNoscript.match(
+          /<link[^>]*rel="stylesheet"[^>]*fonts\.googleapis\.com[^>]*>/g
+        ) ?? [];
+      expect(blocking, `${path} ships a render-blocking font stylesheet`).toEqual([]);
     }
   });
 
   test('each page preloads its font stylesheet and keeps a noscript fallback', async ({
-    page,
+    request,
   }) => {
     for (const path of PAGES) {
-      await page.goto(path, { waitUntil: 'domcontentloaded' });
-      const html = await page.evaluate(() => document.documentElement.outerHTML);
+      const html = await served(request, path);
       expect(html, `${path} preload`).toMatch(
         /<link[^>]*rel="preload"[^>]*as="style"[^>]*fonts\.googleapis\.com/
       );
