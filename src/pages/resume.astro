@@ -543,7 +543,14 @@ const personSchema = {
   }
 
   h1 {
-    font: 300 clamp(3rem, 8.4vw, 76px) / 0.98 var(--serif);
+    /* The 2.125rem floor is what lets the fluid middle term do its job on a phone.
+       At 3rem the floor won everywhere below ~570px, pinning the name at 48px, and
+       "Kochelorov" needs 221px at that size. Beside the floated QR that leaves the
+       masthead 83px of room it does not have, so the second line cleared the float
+       and the surname sat ~180px below the first. At 34px the surname needs 150px
+       and fits with the QR untouched. Measured at 360px, where the copy column is
+       304px wide. */
+    font: 300 clamp(2.125rem, 8.4vw, 76px) / 0.98 var(--serif);
     letter-spacing: -0.02em;
   }
 

@@ -300,3 +300,71 @@ test.describe('QR code', () => {
     expect(r + g + b).toBeGreaterThan(600);
   });
 });
+
+test.describe('masthead on a phone', () => {
+  // The name is the one element that has to share a line with the floated QR. When
+  // it does not fit, the second line clears the float and the surname lands ~180px
+  // below the given name, with the QR in the gap. Nothing about it is a layout
+  // *shift* -- it renders that way and stays -- so no CLS budget catches it.
+  // 320px (iPhone SE 1st gen) is deliberately absent. Fixing it needs the QR shrunk
+  // to ~80px as well, which is 2.0px per module -- half the scannability bar the
+  // desktop QR is held to. Trading the QR away for a 2016 device was not the deal.
+  const NARROW = [360, 375, 390, 412, 430];
+
+  for (const width of NARROW) {
+    test(`the name is not split by the QR at ${width}px`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto('/resume');
+      const h1 = page.locator('.masthead h1');
+      const { height, lineHeight } = await h1.evaluate((el) => ({
+        height: el.getBoundingClientRect().height,
+        lineHeight: parseFloat(getComputedStyle(el).lineHeight),
+      }));
+      // Two lines of name is fine; the float clearance adds a third line's worth of
+      // empty space on top, so anything past 2.5 line-boxes means it broke.
+      expect(
+        height,
+        `name occupies ${(height / lineHeight).toFixed(1)} line-boxes at ${width}px`
+      ).toBeLessThan(lineHeight * 2.5);
+    });
+  }
+
+  test('the QR still sits beside the name, not below the bio', async ({ page }) => {
+    // The fix must not turn into "drop the QR out of the corner": the masthead floats
+    // it on purpose so the copy wraps around it.
+    await page.setViewportSize({ width: 390, height: 900 });
+    await page.goto('/resume');
+    const qr = (await page.locator('.qr').boundingBox())!;
+    const h1 = (await page.locator('.masthead h1').boundingBox())!;
+    expect(await page.locator('.qr').evaluate((el) => getComputedStyle(el).float)).toBe(
+      'right'
+    );
+    // Top-aligned with the name rather than pushed under it.
+    expect(qr.y).toBeLessThan(h1.y + h1.height);
+    expect(qr.x).toBeGreaterThan(h1.x);
+  });
+
+  test('the QR is scannable on desktop and documented as marginal on mobile', async ({
+    page,
+  }) => {
+    const perModule = async () =>
+      page.locator('.qr').evaluate((el) => {
+        const cs = getComputedStyle(el);
+        const pad = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
+        return (el.getBoundingClientRect().width - pad) / 29;
+      });
+
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto('/resume');
+    expect(await perModule()).toBeGreaterThanOrEqual(4);
+
+    // Known shortfall, asserted so it cannot quietly get worse. The mobile QR renders
+    // at ~3.2px per module, below the 4px the desktop one is held to, because the
+    // corner it sits in is only so wide. It is also self-referential there -- it links
+    // to the page you are already on -- so shrinking it further to buy layout room
+    // would be trading away the little scannability it has for no reader benefit.
+    await page.setViewportSize({ width: 390, height: 900 });
+    await page.goto('/resume');
+    expect(await perModule()).toBeGreaterThan(3);
+  });
+});
