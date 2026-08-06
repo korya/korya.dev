@@ -1,0 +1,33 @@
+---
+interface Props {
+  type: 'video' | 'text';
+}
+
+const { type } = Astro.props;
+---
+
+{/*
+  The two post-type glyphs, shared by the list entries and the filter pills so the
+  mark next to a post and the mark on the control that filters for it cannot drift.
+
+  Always aria-hidden: every use sits next to something that already names it -- a
+  labelled wrapper in the post list, the pill's own text in the filter. Exposing the
+  glyph too would have a screen reader say it twice.
+
+  Sized and coloured by the caller via currentColor and a width/height rule, so the
+  same paths serve an 18px list marker and a 14px pill mark.
+*/}
+{type === 'video' ? (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <circle cx="12" cy="12" r="9" />
+    <path d="M10.2 8.4 15.6 12l-5.4 3.6z" />
+  </svg>
+) : (
+  /* Runs wider and taller than a literal page would: a portrait rectangle reads
+     lighter than the circle beside it at matching bounds. */
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M14.5 2.8H6.8a2 2 0 0 0-2 2v14.4a2 2 0 0 0 2 2h10.4a2 2 0 0 0 2-2V7.5z" />
+    <path d="M14.5 2.8v4.7h4.7" />
+    <path d="M8.5 13h7M8.5 16.6h4.5" />
+  </svg>
+)}

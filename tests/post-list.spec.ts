@@ -241,3 +241,59 @@ test.describe('filter sits on the title row', () => {
     expect(list.y).toBeGreaterThan(title.y + title.height);
   });
 });
+
+test.describe('type glyphs render at a real size', () => {
+  // These assert the <svg> itself, not its wrapper. The wrapper keeps its width from
+  // the grid column, so when the glyph was moved into a child component and Astro's
+  // scoped `.post-icon svg` rule stopped matching, it collapsed to 0x0 and every
+  // existing test still passed.
+  test('the list glyph has non-zero dimensions', async ({ page }) => {
+    await page.goto('/');
+    const box = await page.locator('.post-card .post-icon svg').first().boundingBox();
+    expect(box!.width).toBeGreaterThan(8);
+    expect(box!.height).toBeGreaterThan(8);
+  });
+
+  test('the pill glyphs have non-zero dimensions', async ({ page }) => {
+    await page.goto('/');
+    for (const type of ['video', 'text']) {
+      const box = await page.locator(`[data-filter="${type}"] svg`).boundingBox();
+      expect(box!.width, `${type} pill glyph`).toBeGreaterThan(8);
+      expect(box!.height, `${type} pill glyph`).toBeGreaterThan(8);
+    }
+  });
+
+  test('Video and Written pills carry a glyph, All does not', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.locator('[data-filter="video"] svg')).toHaveCount(1);
+    await expect(page.locator('[data-filter="text"] svg')).toHaveCount(1);
+    // "All" selects no single type, so a glyph would be claiming something untrue.
+    await expect(page.locator('[data-filter="all"] svg')).toHaveCount(0);
+  });
+
+  test('the pill glyph is not announced on top of the pill label', async ({ page }) => {
+    await page.goto('/');
+    // The button already reads "Video 8"; an exposed glyph would say it twice.
+    await expect(page.locator('[data-filter="video"] svg')).toHaveAttribute(
+      'aria-hidden',
+      'true'
+    );
+  });
+
+  test('the pill glyph takes the accent colour with its pill', async ({ page }) => {
+    await page.goto('/');
+    const pill = page.locator('[data-filter="video"]');
+    const glyph = page.locator('[data-filter="video"] svg');
+    await expect(pill).toBeVisible();
+    const before = await glyph.evaluate((el) => getComputedStyle(el).color);
+
+    await pill.click();
+    await expect(pill).toHaveAttribute('aria-pressed', 'true');
+
+    // The pill transitions colour over 0.15s, so poll rather than sampling once --
+    // reading immediately can catch the pre-transition value under load.
+    await expect
+      .poll(() => glyph.evaluate((el) => getComputedStyle(el).color))
+      .not.toBe(before);
+  });
+});

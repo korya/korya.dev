@@ -1,4 +1,6 @@
 ---
+import PostTypeIcon from './PostTypeIcon.astro';
+
 interface Props {
   /** Counts per type, used for the labels and to drop a filter nobody can use. */
   video: number;
@@ -11,10 +13,12 @@ const { video, text } = Astro.props;
 // empty is a trap. Both types have to exist for the control to earn its place.
 const worthShowing = video > 0 && text > 0;
 
+// `icon` is the post type this pill selects, and doubles as "does it get a glyph":
+// All selects no single type, so it gets none.
 const options = [
-  { id: 'all', label: 'All', count: video + text },
-  { id: 'video', label: 'Video', count: video },
-  { id: 'text', label: 'Written', count: text },
+  { id: 'all', label: 'All', count: video + text, icon: null },
+  { id: 'video', label: 'Video', count: video, icon: 'video' as const },
+  { id: 'text', label: 'Written', count: text, icon: 'text' as const },
 ];
 ---
 
@@ -25,6 +29,7 @@ const options = [
   <div class="post-filter" role="group" aria-label="Filter posts by type" hidden>
     {options.map((option) => (
       <button type="button" class="filter-pill" data-filter={option.id} aria-pressed={option.id === 'all'}>
+        {option.icon && <PostTypeIcon type={option.icon} />}
         {option.label}
         <span class="count">{option.count}</span>
       </button>
@@ -69,6 +74,16 @@ const options = [
   .filter-pill[aria-pressed='true'] {
     color: var(--color-accent);
     border-color: currentColor;
+  }
+
+  /* The row is baseline-aligned so the label and its smaller count sit on one line.
+     An SVG has no baseline to align to and would hang low, so the glyph opts out and
+     centres instead. */
+  .filter-pill :global(svg) {
+    width: 0.875rem;
+    height: 0.875rem;
+    align-self: center;
+    flex-shrink: 0;
   }
 
   .count {
