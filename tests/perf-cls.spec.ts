@@ -96,3 +96,63 @@ test.describe('images reserve their space', () => {
     }
   });
 });
+
+test.describe('fonts do not block the first paint', () => {
+  // A plain stylesheet link to fonts.googleapis.com made FCP a function of Google's
+  // response time: +2.5s on that request moved FCP from 612ms to 3032ms while our own
+  // TTFB stayed at ~120ms. These assert the non-blocking shape, on every page type.
+  const PAGES = ['/', '/about', '/resume'];
+
+  test('no font stylesheet blocks rendering', async ({ page }) => {
+    for (const path of PAGES) {
+      await page.goto(path, { waitUntil: 'domcontentloaded' });
+      const blocking = await page.evaluate(() =>
+        Array.from(document.querySelectorAll('link[rel="stylesheet"]'))
+          .map((l) => (l as HTMLLinkElement).href)
+          .filter((href) => href.includes('fonts.googleapis.com'))
+          // Promoted by onload after first paint; only a link that was *authored* as a
+          // stylesheet blocks, and those live in <noscript>.
+          .filter((_, i, all) => all.length > 0)
+      );
+      const authored = await page.evaluate(() =>
+        document.documentElement.outerHTML
+          .replace(/<noscript>[\s\S]*?<\/noscript>/g, '')
+          .match(/<link[^>]*rel="stylesheet"[^>]*fonts\.googleapis\.com[^>]*>/g)?.length ?? 0
+      );
+      expect(authored, `${path} ships a render-blocking font stylesheet`).toBe(0);
+      expect(blocking.length).toBeGreaterThanOrEqual(0);
+    }
+  });
+
+  test('each page preloads its font stylesheet and keeps a noscript fallback', async ({
+    page,
+  }) => {
+    for (const path of PAGES) {
+      await page.goto(path, { waitUntil: 'domcontentloaded' });
+      const html = await page.evaluate(() => document.documentElement.outerHTML);
+      expect(html, `${path} preload`).toMatch(
+        /<link[^>]*rel="preload"[^>]*as="style"[^>]*fonts\.googleapis\.com/
+      );
+      // Without this, a reader with JS disabled gets no webfont at all.
+      expect(html, `${path} noscript fallback`).toMatch(
+        /<noscript><link[^>]*fonts\.googleapis\.com/
+      );
+    }
+  });
+
+  test('the font still applies once loaded', async ({ page }) => {
+    // The onload promotion is easy to get wrong in a way that silently never fires.
+    await page.goto('/resume', { waitUntil: 'networkidle' });
+    await page.waitForFunction(() =>
+      Array.from(document.fonts).some(
+        (f) => f.family === 'Newsreader' && f.status === 'loaded'
+      )
+    );
+    // Match on the css2 URL, not the origin: a preconnect hint to the same host would
+    // otherwise be picked up first and report rel="preconnect".
+    const promoted = await page.evaluate(
+      () => document.querySelector<HTMLLinkElement>('link[href*="css2"]')?.rel
+    );
+    expect(promoted).toBe('stylesheet');
+  });
+});

@@ -1,0 +1,32 @@
+---
+interface Props {
+  /** A fonts.googleapis.com css2 URL. */
+  href: string;
+}
+
+const { href } = Astro.props;
+---
+
+{/*
+  Google's font stylesheet, fetched without blocking the first paint.
+
+  A plain <link rel="stylesheet"> to a third-party origin holds up rendering until it
+  resolves, which made first paint a direct function of Google's response time: an
+  injected 2.5s delay on this request moved FCP from 612ms to 3032ms, while our own
+  server's TTFB never moved off ~120ms. That is how /resume scored 76 on a run where
+  every metric we control was perfect.
+
+  `rel="preload" as="style"` fetches at high priority without blocking, then onload
+  promotes it to a real stylesheet. Clearing onload first stops the handler re-firing
+  when the rel change triggers a second load event in some browsers.
+
+  The font arrives after first paint either way, so text paints in the fallback and
+  swaps -- which is why the fallback stacks are metric-matched (see resume.astro).
+*/}
+<link
+  rel="preload"
+  as="style"
+  href={href}
+  onload="this.onload=null;this.rel='stylesheet'"
+/>
+<noscript><link rel="stylesheet" href={href} /></noscript>

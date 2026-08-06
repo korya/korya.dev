@@ -8,6 +8,7 @@
 // two sticky headers and mean fighting global.css on every rule, so the page owns
 // its shell and imports only BaseHead for meta/SEO/analytics.
 import BaseHead from '../components/BaseHead.astro';
+import FontStylesheet from '../components/FontStylesheet.astro';
 import { SITE_CONFIG } from '../config';
 import {
   ALONGSIDE,
@@ -83,10 +84,7 @@ const personSchema = {
 <html lang="en">
   <head>
     <BaseHead title={title} description={description} siteFonts={false} />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,300;6..72,400;6..72,500&family=JetBrains+Mono:wght@400;500&display=swap"
-      rel="stylesheet"
-    />
+    <FontStylesheet href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,300;6..72,400;6..72,500&family=JetBrains+Mono:wght@400;500&display=swap" />
     <script type="application/ld+json" set:html={JSON.stringify(personSchema)} />
   </head>
 
