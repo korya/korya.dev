@@ -1,5 +1,6 @@
 ---
 import GoogleAnalytics from './GoogleAnalytics.astro';
+import FontStylesheet from './FontStylesheet.astro';
 import { SITE_CONFIG } from '../config';
 
 interface Props {
@@ -41,7 +42,7 @@ const isArticle = !!articleDate;
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 {siteFonts && (
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <FontStylesheet href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" />
 )}
 
 <!-- Canonical URL -->
