@@ -1,4 +1,5 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect } from './fixtures';
+import { type Page } from '@playwright/test';
 
 // The printed resume is a deliverable in its own right, and almost none of it is
 // visible from the screen view: the header is relaid out, the outcomes collapse to a

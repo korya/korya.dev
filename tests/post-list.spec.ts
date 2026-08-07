@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 
 // The post list on / and /tags/<tag>. The icon marks each entry as video or text,
 // and it is the only signal of that in the list, so it is covered as content

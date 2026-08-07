@@ -1,4 +1,5 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect } from './fixtures';
+import { type Page } from '@playwright/test';
 
 // Layout stability. This exists because a font-stack change once cost 11 points of
 // the mobile Lighthouse score with nothing else on the page changing, and nothing in

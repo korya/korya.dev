@@ -1,4 +1,5 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect } from './fixtures';
+import { type Page } from '@playwright/test';
 
 // Screen behaviour for /resume. The print rules live in resume-print.spec.ts.
 
@@ -370,29 +371,14 @@ test.describe('masthead on a phone', () => {
 });
 
 test.describe('PDF download tracking', () => {
-  // Every page load in this suite runs the real GA snippet against the real
-  // measurement ID, so these tests block the analytics hosts outright. Without that,
-  // CI would post a fake resume_pdf_download on every run and corrupt the very number
-  // the event exists to measure.
-  const blockAnalytics = async (page: import('@playwright/test').Page) => {
-    const hits: string[] = [];
-    for (const pattern of [
-      '**://*.google-analytics.com/**',
-      '**://*.analytics.google.com/**',
-    ]) {
-      await page.route(pattern, async (route) => {
-        hits.push(route.request().url());
-        await route.fulfill({ status: 204, body: '' });
-      });
-    }
-    return hits;
-  };
+  // The analyticsHits fixture blocks the collection endpoints for every test in the
+  // suite and hands back what would have been sent, so these can assert the beacon
+  // without a single hit reaching the real property.
 
   test('gtag is reachable from page scripts', async ({ page }) => {
     // Astro's define:vars wraps an inline script in an IIFE, which once trapped the
     // gtag function inside it: config still ran, so nothing looked broken, but
     // window.gtag was undefined and every custom event threw.
-    await blockAnalytics(page);
     for (const path of ['/resume', '/', '/about']) {
       await page.goto(path);
       expect(await page.evaluate(() => typeof (window as any).gtag), path).toBe(
@@ -401,17 +387,21 @@ test.describe('PDF download tracking', () => {
     }
   });
 
-  test('clicking the PDF link reports one download event', async ({ page }) => {
-    const hits = await blockAnalytics(page);
+  test('clicking the PDF link reports one download event', async ({
+    page,
+    analyticsHits,
+  }) => {
     await page.goto('/resume', { waitUntil: 'networkidle' });
-    hits.length = 0;
+    analyticsHits.length = 0;
 
     await page.locator('a.download').click({ noWaitAfter: true });
     await expect
-      .poll(() => hits.filter((u) => u.includes('resume_pdf_download')).length)
+      .poll(() => analyticsHits.filter((u) => u.includes('resume_pdf_download')).length)
       .toBe(1);
 
-    const hit = decodeURIComponent(hits.find((u) => u.includes('resume_pdf_download'))!);
+    const hit = decodeURIComponent(
+      analyticsHits.find((u) => u.includes('resume_pdf_download'))!
+    );
     expect(hit).toContain('en=resume_pdf_download');
     expect(hit).toContain('file_name=resume-offline.pdf');
     expect(hit).toContain('link_url=/resume/offline.pdf');
@@ -420,12 +410,25 @@ test.describe('PDF download tracking', () => {
   test('the link still downloads rather than navigating', async ({ page }) => {
     // The event must not come at the cost of the behaviour it measures: the download
     // attribute is what names the saved file after its owner.
-    await blockAnalytics(page);
     await page.goto('/resume', { waitUntil: 'networkidle' });
     const [download] = await Promise.all([
       page.waitForEvent('download'),
       page.locator('a.download').click({ noWaitAfter: true }),
     ]);
     expect(download.suggestedFilename()).toContain('Resume.pdf');
+  });
+
+  test('no test in this suite leaks a hit to the real property', async ({
+    page,
+    analyticsHits,
+  }) => {
+    // The fixture is the only thing standing between a CI run and a few hundred fake
+    // page_views. If it ever stops applying, this fails rather than the data quietly
+    // going wrong.
+    await page.goto('/resume', { waitUntil: 'networkidle' });
+    await expect.poll(() => analyticsHits.length).toBeGreaterThan(0);
+    for (const url of analyticsHits) {
+      expect(url).toMatch(/google-analytics\.com|analytics\.google\.com/);
+    }
   });
 });
