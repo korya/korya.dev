@@ -1,6 +1,20 @@
+/* Metric-matched stand-in shown while Manrope loads. The overrides reshape Arial
+ * (Liberation Sans on Linux) to Manrope's vertical metrics and average advance
+ * width, so the swap does not reflow the page. Values computed from the fonts'
+ * hhea tables and frequency-weighted a-z advances: Manrope upm 2000, ascent 2132,
+ * descent 600; Arial upm 2048, ascent 1854, descent 434, lineGap 67. */
+@font-face {
+  font-family: 'Manrope Fallback';
+  src: local('Arial');
+  size-adjust: 103.57%;
+  ascent-override: 102.93%;
+  descent-override: 28.97%;
+  line-gap-override: 0%;
+}
+
 :root {
   /* Typography */
-  --font-sans: 'Manrope', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-sans: 'Manrope', 'Manrope Fallback', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
   /* Spacing */
