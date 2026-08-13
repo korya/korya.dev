@@ -5,7 +5,7 @@ date: 2026-08-13
 draft: false
 tags: ['agents', 'future', 'tiki-toki']
 toc: false
-videoLength: '1:53'
+videoLength: '3:15'
 ---
 
 <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; margin: var(--space-lg, 2rem) 0;">
@@ -43,6 +43,44 @@ ad-hoc software anymore — putting the logic into agents that will do it when n
 in the best way it can be done.
 
 Bye-bye!
+
+</details>
+
+## Follow-up: eating my own dog food
+
+A fitting example of the point above: this very video was post-processed by Claude
+Code using an agent skill I wrote — the
+[prepare-video skill](https://github.com/korya/korya.dev/blob/a9479ffc722b335b9fd937f93586d6aed05fe12a/.claude/skills/prepare-video/SKILL.md).
+It widens my portrait recordings for YouTube and burns in the karaoke subtitles.
+
+<div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; margin: var(--space-lg, 2rem) 0;">
+  <iframe
+    style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; border-radius: 8px;"
+    src="https://www.youtube-nocookie.com/embed/9kJIgLb-OII"
+    title="era of agents: using claude code to post-process videos"
+    loading="lazy"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+    allowfullscreen
+  ></iframe>
+</div>
+
+<details>
+<summary>Transcript</summary>
+
+And in fact, this video is post-processed by Claude Code using a skill that I wrote
+for it. The skill turns my videos into a horizontal one so I can upload it to
+YouTube — adding this padding on the left and right, with the blurred, mirrored
+content of the video. And the subtitles that you see here are added by the skill as
+well.
+
+So even in the future I don't have to use some software for post-processing my
+videos. There is no stupid logo injected into my video, and I don't have to pay five
+bucks to do it. I just asked my agent to do it once — told it exactly how I want it
+to be done — and then asked the agent to encode it as a skill. And now I can reuse
+it.
+
+Moreover, you can go to my GitHub — it's the source code of my personal website —
+take the skill, use it as well, and generate a similar video. Amazing.
 
 </details>
 
