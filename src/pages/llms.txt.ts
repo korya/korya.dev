@@ -15,6 +15,8 @@ import {
  *  read the same src/data/resume.ts that /resume renders from. */
 const ABOUT = `I'm Dmitri. I co-founded FrontSail AI, where we build an agentic operating system that takes the repetitive back-office work off small businesses' hands.
 
+Alongside that I run Cosmic Lift (https://cosmic-lift.com/), my consulting practice. Fractional CTO work, training, and product architecture and development for companies going AI-first, or making what they already have AI-ready.
+
 Before that I spent a decade at Planitar. I joined as the first engineer and left as R&D director of a 20-person org, then went back to writing code full time so I could build AI agents myself. The longer version is on my resume.
 
 This is my personal blog containing my thoughts and some fragments of thoughts on tech topics.
