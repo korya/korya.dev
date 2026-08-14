@@ -10,6 +10,22 @@ export const SITE_CONFIG = {
   AUTHOR: {
     name: '@korya',
     url: 'https://korya.dev/about',
+    /** Canonical JSON-LD node id for Dmitri. Pages that name him as author reference
+     *  this id instead of describing a fresh Person, so a crawler reading several
+     *  pages sees one node rather than a pile of lookalikes. The full description,
+     *  affiliations included, lives on /about and /resume. */
+    id: 'https://korya.dev/#person',
+  },
+  /** Organizations described elsewhere on the web. Reusing the id a site publishes
+   *  for itself is what lets the two graphs join: cosmic-lift.com emits this exact
+   *  id for its Organization node. FrontSail publishes no id, so it is referenced
+   *  by url alone. */
+  ORGS: {
+    COSMIC_LIFT: {
+      id: 'https://cosmic-lift.com/#organization',
+      name: 'Cosmic Lift',
+      url: 'https://cosmic-lift.com/',
+    },
   },
   // Cusdis comment system App ID
   // Get yours at https://cusdis.com
