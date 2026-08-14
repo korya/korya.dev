@@ -40,16 +40,15 @@ const personSchema = {
   '@type': 'ProfilePage',
   mainEntity: {
     '@type': 'Person',
+    '@id': SITE_CONFIG.AUTHOR.id,
     name: 'Dmitri Kochelorov',
     alternateName: SITE_CONFIG.AUTHOR.name,
     jobTitle: `${PROFILE.currentRole.title}, ${PROFILE.currentRole.company}`,
     description: `${PROFILE.headline} ${PROFILE.headlineAccent}`,
     url: `${SITE_CONFIG.SITE_URL}/resume`,
-    sameAs: [
-      ...LINKS.filter((l) => l.href.startsWith('http')).map((l) => l.href),
-      PROFILE.currentRole.href,
-      ALONGSIDE.href,
-    ],
+    // Profiles of this same person only. The companies are affiliations, which is the
+    // distinction the LINKS comment in resume.ts already draws for the print links.
+    sameAs: LINKS.filter((l) => l.href.startsWith('http')).map((l) => l.href),
     address: {
       '@type': 'PostalAddress',
       addressLocality: 'Kitchener',
@@ -60,6 +59,15 @@ const personSchema = {
       '@type': 'Organization',
       name: PROFILE.currentRole.company,
       url: PROFILE.currentRole.href,
+    },
+    // Reuses the id cosmic-lift.com publishes for its own Organization node, so the
+    // two sites describe one company rather than two that merely share a name.
+    affiliation: {
+      '@type': 'Organization',
+      '@id': SITE_CONFIG.ORGS.COSMIC_LIFT.id,
+      name: ALONGSIDE.name,
+      url: ALONGSIDE.href,
+      description: ALONGSIDE.description,
     },
     alumniOf: {
       '@type': 'EducationalOrganization',

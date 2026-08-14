@@ -87,8 +87,21 @@ test.describe('resume page builds', () => {
     const schema = JSON.parse(raw);
     expect(schema['@type']).toBe('ProfilePage');
     expect(schema.mainEntity.jobTitle).toContain('CEO & Co-founder');
-    expect(schema.mainEntity.sameAs).toContain('https://frontsail.ai/');
     expect(schema.mainEntity.hasOccupation).toHaveLength(5);
+    // One canonical node for Dmitri across the site, referenced by every page that
+    // names him as author.
+    expect(schema.mainEntity['@id']).toBe('https://korya.dev/#person');
+    // Companies belong in worksFor/affiliation. sameAs is for other profiles of the
+    // same person, so a company URL appearing here is the bug this guards against.
+    expect(schema.mainEntity.sameAs).not.toContain('https://frontsail.ai/');
+    expect(schema.mainEntity.sameAs).not.toContain('https://cosmic-lift.com/');
+    expect(schema.mainEntity.sameAs).toContain('https://github.com/korya');
+    expect(schema.mainEntity.worksFor.url).toBe('https://frontsail.ai/');
+    // The id cosmic-lift.com publishes for itself, reused verbatim so both sites
+    // describe one company.
+    expect(schema.mainEntity.affiliation['@id']).toBe(
+      'https://cosmic-lift.com/#organization'
+    );
   });
 });
 

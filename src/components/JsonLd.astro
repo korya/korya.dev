@@ -23,11 +23,13 @@ function generateBlogPostingSchema() {
     dateModified: date?.toISOString(),
     author: {
       '@type': 'Person',
+      '@id': SITE_CONFIG.AUTHOR.id,
       name: SITE_CONFIG.AUTHOR.name,
       url: SITE_CONFIG.AUTHOR.url,
     },
     publisher: {
       '@type': 'Person',
+      '@id': SITE_CONFIG.AUTHOR.id,
       name: SITE_CONFIG.AUTHOR.name,
       url: SITE_CONFIG.AUTHOR.url,
     },
@@ -49,6 +51,7 @@ function generateWebSiteSchema() {
     url: SITE_CONFIG.SITE_URL,
     author: {
       '@type': 'Person',
+      '@id': SITE_CONFIG.AUTHOR.id,
       name: SITE_CONFIG.AUTHOR.name,
       url: SITE_CONFIG.AUTHOR.url,
     },
