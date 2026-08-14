@@ -46,12 +46,14 @@ Bye-bye!
 
 </details>
 
-## Follow-up: eating my own dog food
+## Follow-up: Using skills for video post-processing
 
-A fitting example of the point above: this very video was post-processed by Claude
-Code using an agent skill I wrote — the
+A great example of the point above: this very video was post-processed by Claude
+Code using an agent skill I wrote - the
 [prepare-video skill](https://github.com/korya/korya.dev/blob/a9479ffc722b335b9fd937f93586d6aed05fe12a/.claude/skills/prepare-video/SKILL.md).
-It widens my portrait recordings for YouTube and burns in the karaoke subtitles.
+It turns a vertical video into a horizontal one by adding padding on the sides, adds subtitles and transcodes the video if needed.
+
+It was pretty simple to create the skill and saves me about 30 minutes on every publishing. Moreover, I don't have to use other video editing apps for such trivial tasks. And hence, no injected logos, no ads, no time wasted on yet another genious UI, and no extra payments. Pure benefit!
 
 <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; margin: var(--space-lg, 2rem) 0;">
   <iframe
