@@ -27,6 +27,7 @@ I will be glad if you find it useful or even better, inspiring.
 
 ### Contact
 
+- Consulting: [Cosmic Lift](https://cosmic-lift.com/)
 - Github: [@korya](https://github.com/korya)
 - X/Twitter: [@korya_dev](https://x.com/korya_dev)
 - LinkedIn: [kochelorov](https://www.linkedin.com/in/kochelorov/)`;

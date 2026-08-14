@@ -2,9 +2,45 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Figure from '../components/interactive/Figure.astro';
 import styles from '../styles/prose.module.css';
+import { SITE_CONFIG } from '../config';
+import { PROFILE } from '../data/resume';
+
+// The page a reader lands on to find out who Dmitri is, so it carries the canonical
+// Person node rather than only prose. Companies are affiliations, not sameAs: sameAs
+// is for other profiles of this same person. /resume describes the same node in more
+// depth; both use the id below, so the two pages describe one person, not two.
+const personSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'ProfilePage',
+  mainEntity: {
+    '@type': 'Person',
+    '@id': SITE_CONFIG.AUTHOR.id,
+    name: 'Dmitri Kochelorov',
+    alternateName: SITE_CONFIG.AUTHOR.name,
+    url: SITE_CONFIG.AUTHOR.url,
+    jobTitle: `${PROFILE.currentRole.title}, ${PROFILE.currentRole.company}`,
+    worksFor: {
+      '@type': 'Organization',
+      name: PROFILE.currentRole.company,
+      url: PROFILE.currentRole.href,
+    },
+    affiliation: {
+      '@type': 'Organization',
+      '@id': SITE_CONFIG.ORGS.COSMIC_LIFT.id,
+      name: SITE_CONFIG.ORGS.COSMIC_LIFT.name,
+      url: SITE_CONFIG.ORGS.COSMIC_LIFT.url,
+    },
+    sameAs: [
+      'https://github.com/korya',
+      'https://x.com/korya_dev',
+      'https://www.linkedin.com/in/kochelorov/',
+    ],
+  },
+};
 ---
 
 <BaseLayout title="About | Tech Scrolls">
+  <script type="application/ld+json" slot="head" set:html={JSON.stringify(personSchema)} />
   <article class="about">
     <h1 class="page-title">About</h1>
 
@@ -45,6 +81,7 @@ import styles from '../styles/prose.module.css';
 
       <h2>Contact</h2>
       <ul>
+        <li>Consulting: <a href="https://cosmic-lift.com/" target="_blank" rel="noopener noreferrer">Cosmic Lift</a></li>
         <li>Github: <a href="https://github.com/korya" target="_blank" rel="noopener noreferrer">@korya</a></li>
         <li>X/Twitter: <a href="https://x.com/korya_dev" target="_blank" rel="noopener noreferrer">@korya_dev</a></li>
         <li>LinkedIn: <a href="https://www.linkedin.com/in/kochelorov/" target="_blank" rel="noopener noreferrer">kochelorov</a></li>
