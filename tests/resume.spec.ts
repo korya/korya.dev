@@ -90,7 +90,7 @@ test.describe('resume page builds', () => {
     expect(schema.mainEntity.hasOccupation).toHaveLength(5);
     // One canonical node for Dmitri across the site, referenced by every page that
     // names him as author.
-    expect(schema.mainEntity['@id']).toBe('https://korya.dev/#person');
+    expect(schema.mainEntity['@id']).toBe('https://korya.dev/about#person');
     // Companies belong in worksFor/affiliation. sameAs is for other profiles of the
     // same person, so a company URL appearing here is the bug this guards against.
     expect(schema.mainEntity.sameAs).not.toContain('https://frontsail.ai/');

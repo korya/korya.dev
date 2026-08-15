@@ -12,9 +12,15 @@ export const SITE_CONFIG = {
     url: 'https://korya.dev/about',
     /** Canonical JSON-LD node id for Dmitri. Pages that name him as author reference
      *  this id instead of describing a fresh Person, so a crawler reading several
-     *  pages sees one node rather than a pile of lookalikes. The full description,
-     *  affiliations included, lives on /about and /resume. */
-    id: 'https://korya.dev/#person',
+     *  pages sees one node rather than a pile of lookalikes.
+     *
+     *  The fragment hangs off /about, not the site root, because that is the document
+     *  that describes him: anyone who takes the id literally and fetches it finds the
+     *  full node there. The root only ever references him, so naming the id after it
+     *  would point at a document that mentions the person without describing him.
+     *  The fragment matters too. https://korya.dev/about is a web page; Dmitri is not
+     *  a web page, and the "#person" suffix keeps the two from being conflated. */
+    id: 'https://korya.dev/about#person',
   },
   /** Organizations described elsewhere on the web. Reusing the id a site publishes
    *  for itself is what lets the two graphs join: cosmic-lift.com emits this exact
