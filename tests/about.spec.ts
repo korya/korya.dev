@@ -4,7 +4,7 @@ import { test, expect } from './fixtures';
 // canonical Person node. The prose is covered by resume.spec.ts through /llms.txt,
 // which mirrors this page by hand.
 
-const PERSON_ID = 'https://korya.dev/#person';
+const PERSON_ID = 'https://korya.dev/about#person';
 const COSMIC_LIFT_ID = 'https://cosmic-lift.com/#organization';
 
 test.describe('about page', () => {
