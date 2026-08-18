@@ -31,6 +31,34 @@ def ass_colour(rgb, scale):
     r, g, b = (min(255, round(c * scale)) for c in rgb)
     return f"&H00{b:02X}{g:02X}{r:02X}&"
 
+# Visible-correction annotation: the misheard word is struck through and the
+# correction is drawn above it, centred on the struck word. Centring needs real
+# glyph advances, so we measure with the same face libass will use.
+MEASURE_TTC = ("/System/Library/Fonts/Avenir Next.ttc", 8)   # index 8 = Heavy
+CORRECT_SIZE = 0.72    # of the caption font size
+CORRECT_TILT = 4       # degrees; reads as a proofreader's mark, not a 2nd line
+
+
+def text_width(text, size, spacing):
+    """Advance width in PlayRes px, matching libass's Spacing handling.
+
+    libass sizes fonts VSFilter-style: `fs` is the *cell height*
+    (ascent + descent), not the em size PIL uses — Avenir Next Heavy's cell is
+    1.37 em, so unscaled PIL advances run ~37% wide and centring lands off the
+    word. Scale by fs/cell. Spacing is added per char in ASS px, unscaled.
+    """
+    from PIL import ImageFont
+    key = (MEASURE_TTC, size)
+    font = text_width._cache.get(key)
+    if font is None:
+        font = ImageFont.truetype(MEASURE_TTC[0], size, index=MEASURE_TTC[1])
+        text_width._cache[key] = font
+    ascent, descent = font.getmetrics()
+    return font.getlength(text) * size / (ascent + descent) + spacing * len(text)
+
+
+text_width._cache = {}
+
 LAYOUTS = {
     # Phone-first: big type, parked high enough to clear the caption overlay and
     # button rail that Shorts puts over the lower frame. LinkedIn's feed chrome is
@@ -71,6 +99,7 @@ FILLER_WORDS = {"um", "uh", "erm", "basically", "actually"}
 # "like," is filler; "like a novel" is not.
 COMMA_FENCED = {"like", "well", "right", "so"}
 
+SPACING = 1          # ASS letter spacing; text_width must match the style
 GAP_BREAK = 0.45     # silence longer than this starts a new line
 HOLD_TAIL = 0.30     # keep a line's last word up this long after it ends
 
@@ -153,11 +182,12 @@ def clean_text(raw, respell):
     return t
 
 
-def group_lines(words, cfg, respell):
+def group_lines(words, cfg, respell, corrections=None):
     lines, cur = [], []
     for w in words:
         w = dict(w)
         w["text"] = clean_text(w["raw"], respell)
+        w["correct"] = (corrections or {}).get(w["start"])
         if not w["text"]:
             continue
         if cur:
@@ -209,14 +239,34 @@ YCbCr Matrix: TV.709
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Pop,{FONT},{cfg['font_size']},{white.rstrip('&')},{white.rstrip('&')},&H00000000,&H96000000,0,0,0,0,100,100,1,0,1,{cfg['outline']},{cfg['shadow']},2,{cfg['margin_lr']},{cfg['margin_lr']},{cfg['margin_v']},1
+Style: Pop,{FONT},{cfg['font_size']},{white.rstrip('&')},{white.rstrip('&')},&H00000000,&H96000000,0,0,0,0,100,100,{SPACING},0,1,{cfg['outline']},{cfg['shadow']},2,{cfg['margin_lr']},{cfg['margin_lr']},{cfg['margin_v']},1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 """
 
 
-def build_events(lines, white, accent):
+def correction_pos(line, ci, cfg):
+    """Centre of the struck word, and a y one line above it, in PlayRes px.
+
+    The style is bottom-centre with equal L/R margins, so the line is centred on
+    play_w regardless of its width — measure the line, the run before the word,
+    and the word itself, then walk in from the left edge of the line box.
+    """
+    size, spacing = cfg["font_size"], SPACING
+    texts = [w["text"] for w in line]
+    line_w = text_width(" ".join(texts), size, spacing)
+    prefix_w = text_width(" ".join(texts[:ci]) + " ", size, spacing) if ci else 0
+    word_w = text_width(texts[ci], size, spacing)
+
+    x = cfg["play_w"] / 2 - line_w / 2 + prefix_w + word_w / 2
+    # Caption cell spans fs px up from the bottom margin; park the correction's
+    # midline just above that so it kisses the ascenders without covering them.
+    y = cfg["play_h"] - cfg["margin_v"] - size - CORRECT_SIZE * size * 0.45
+    return round(x), round(y)
+
+
+def build_events(lines, white, accent, cfg):
     """One Dialogue per word: the whole line, with the active word recoloured."""
     ev = []
     for li, line in enumerate(lines):
@@ -230,11 +280,25 @@ def build_events(lines, white, accent):
             end = line[wi + 1]["start"] if wi + 1 < len(line) else line_end
             if end <= start:
                 end = start + 0.08
-            parts = [
-                f"{{\\c{accent}}}{x['text']}{{\\c{white}}}" if k == wi else x["text"]
-                for k, x in enumerate(line)
-            ]
+            parts = []
+            for k, x in enumerate(line):
+                t = x["text"]
+                # The strike lands only once the word has been said, so the
+                # correction reads as a live retraction rather than a footnote.
+                if x["correct"] and k <= wi:
+                    t = f"{{\\s1}}{t}{{\\s0}}"
+                parts.append(f"{{\\c{accent}}}{t}{{\\c{white}}}" if k == wi else t)
             ev.append(f"Dialogue: 0,{ts(start)},{ts(end)},Pop,,0,0,0,,{' '.join(parts)}")
+
+        for ci, w in enumerate(line):
+            if not w["correct"]:
+                continue
+            x, y = correction_pos(line, ci, cfg)
+            size = round(cfg["font_size"] * CORRECT_SIZE)
+            ev.append(
+                f"Dialogue: 1,{ts(w['start'])},{ts(line_end)},Pop,,0,0,0,,"
+                f"{{\\an5\\pos({x},{y})\\fs{size}\\frz{CORRECT_TILT}"
+                f"\\c{accent}}}{w['correct']}")
     return ev
 
 
@@ -252,24 +316,36 @@ def main():
                     help="word start times to protect from filler rules")
     ap.add_argument("--respell", nargs="*", default=[], metavar="WRONG=RIGHT",
                     help="fix mishearings, e.g. contacts=context")
+    ap.add_argument("--correct-at", nargs="*", default=[], metavar="TIME=WORD",
+                    help="strike the word at TIME and write WORD above it, "
+                         "e.g. 104.22=Bitcoin")
     args = ap.parse_args()
 
     cfg = LAYOUTS[args.layout]
     respell = dict(p.split("=", 1) for p in args.respell)
+    corrections = {float(k): v for k, v in
+                   (p.split("=", 1) for p in args.correct_at)}
     scale = TONE_SCALE[args.tone]
     white, accent = ass_colour(BASE_WHITE, scale), ass_colour(BASE_ACCENT, scale)
 
     words = strip_fillers(load_words(args.json_in), args.drop_at, args.keep_at)
-    lines = merge_orphans(group_lines(words, cfg, respell), cfg)
+    lines = merge_orphans(group_lines(words, cfg, respell, corrections), cfg)
+
+    seen = {w["start"] for line in lines for w in line if w["correct"]}
+    missing = sorted(set(corrections) - seen)
+    if missing:
+        raise SystemExit(f"--correct-at times not found in output: {missing}")
 
     with open(args.ass_out, "w") as f:
         f.write(header(cfg, white))
-        f.write("\n".join(build_events(lines, white, accent)) + "\n")
+        f.write("\n".join(build_events(lines, white, accent, cfg)) + "\n")
 
     print(f"{args.layout}/{args.tone}: {len(lines)} lines, {len(words)} words "
           f"-> {args.ass_out}\n")
     for line in lines:
-        print(f"  [{line[0]['start']:7.2f}] {' '.join(w['text'] for w in line)}")
+        text = ' '.join(f"[{w['text']} -> {w['correct']}]" if w['correct']
+                        else w['text'] for w in line)
+        print(f"  [{line[0]['start']:7.2f}] {text}")
 
 
 if __name__ == "__main__":
