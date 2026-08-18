@@ -5,7 +5,21 @@ date: 2026-08-18
 draft: false
 tags: ['agents', 'future', 'tiki-toki']
 toc: false
-videoLength: '2:25'
+takeaways:
+  - 'Agent-mediated browsing weakens an advertising model built around human attention.'
+  - 'Machine-readable payment protocols make per-request micropayments a plausible alternative.'
+  - 'Personal assistants will need explicit budgets, spending controls, and user trust.'
+videos:
+  - youtubeId: 'WiBjNSdeB4g'
+    title: 'Era of Agents: Your Assistant Will Ask for Allowance'
+    description: 'As agents browse and buy on our behalf, the web may shift from ads to machine-readable micropayments and assistant budgets.'
+    uploadDate: '2026-08-18T10:43:39-07:00'
+    duration: 'PT2M25S'
+    thumbnail:
+      src: '/images/posts/2026-08-18-era-of-agents-your-assistant-will-ask-for-allowance/WiBjNSdeB4g.jpg'
+      alt: 'Video thumbnail for Your Assistant Will Ask for Allowance'
+      width: 1280
+      height: 720
 ---
 
 <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; margin: var(--space-lg, 2rem) 0;">
@@ -54,5 +68,9 @@ to trust it to spend your money wisely.
 That's all.
 
 </details>
+
+## Sources and further reading
+
+- [The x402 protocol introduction](https://docs.x402.org/introduction) describes HTTP-native, machine-to-machine payments for APIs, content, and autonomous agents.
 
 X-Posted: [LinkedIn](https://www.linkedin.com/posts/kochelorov_in-the-era-of-agents-your-assistant-will-ugcPost-7495532639060221956-HOhd/), [X](https://x.com/korya_dev/status/2089770264997277818)

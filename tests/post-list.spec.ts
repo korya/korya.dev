@@ -23,9 +23,9 @@ test.describe('post type icons', () => {
     ).toBe(cards);
   });
 
-  test('the video icon tracks videoLength, not the tag', async ({ page }) => {
+  test('the video icon tracks structured videos, not the tag', async ({ page }) => {
     await page.goto('/');
-    // "Setting up a Mac in 2026" has no videoLength, so it must read as written
+    // "Setting up a Mac in 2026" has no videos, so it must read as written
     // even though it sits among the video posts.
     const written = page.locator('.post-card', {
       has: page.locator('.post-title', { hasText: 'Setting up a Mac in 2026' }),

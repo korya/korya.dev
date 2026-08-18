@@ -18,7 +18,8 @@ multiple choice) for:
 
 - **title** (required)
 - **YouTube link** (required) — extract the 11-char video ID from it (`youtu.be/<ID>`
-  or `watch?v=<ID>`)
+  or `watch?v=<ID>`). Collect additional links too when the post contains a
+  follow-up video; their order must match the iframes in the article.
 - **LinkedIn post URL** (optional)
 - **X post URL** (optional)
 - **local path to the video file** (optional) — used to cross-validate the
@@ -64,13 +65,22 @@ video posts:
   If a spoken fact seems off (e.g. "three years ago" for a ~30-year-old thing),
   render it coherently and flag it to the user in your summary at the end.
 
-## Step 4 — Get the video length
+## Step 4 — Get structured video metadata and the thumbnail
 
 ```
-ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 '<video-or-audio>'
+uvx yt-dlp --skip-download --dump-single-json '<YouTube URL>'
 ```
-No local file? Read the duration off the YouTube page. Format as `M:SS` for the
-`videoLength` frontmatter field.
+
+For each video, record the returned ID, title, duration in seconds, and upload
+timestamp. Convert the duration to ISO 8601 (`225` seconds → `PT3M45S`) and the
+timestamp to an ISO datetime (`new Date(timestamp * 1000).toISOString()`). Never
+substitute the blog publication date for the upload timestamp.
+
+Download a local 16:9 thumbnail to
+`public/images/posts/<slug>/<youtube-id>.jpg`. Try
+`https://i.ytimg.com/vi/<ID>/maxresdefault.jpg` first, verify it is a real image
+at least 1200 pixels wide, and fall back to the best thumbnail URL reported by
+`yt-dlp`. Record its actual width and height in frontmatter.
 
 ## Step 5 — Write the post
 
@@ -89,14 +99,28 @@ date: <YYYY-MM-DD>
 draft: false
 tags: ['agents', 'future', 'tiki-toki']
 toc: false
-videoLength: '<M:SS>'
+takeaways:
+  - '<standalone point one>'
+  - '<standalone point two>'
+  - '<optional point three>'
+videos:
+  - youtubeId: '<ID>'
+    title: '<video title>'
+    description: '<concise description of this video>'
+    uploadDate: '<ISO timestamp>'
+    duration: '<ISO 8601 duration>'
+    thumbnail:
+      src: '/images/posts/<slug>/<ID>.jpg'
+      alt: '<descriptive thumbnail alt text>'
+      width: 1280
+      height: 720
 ---
 
 <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; margin: var(--space-lg, 2rem) 0;">
   <iframe
     style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; border-radius: 8px;"
     src="https://www.youtube-nocookie.com/embed/<ID>"
-    title="<title, lowercased>"
+    title="<video title>"
     loading="lazy"
     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
     allowfullscreen
@@ -110,6 +134,10 @@ videoLength: '<M:SS>'
 
 </details>
 
+## Sources and further reading
+
+- [<primary-source title>](<url>) <why this source supports the factual claim>.
+
 X-Posted: [LinkedIn](<url>), [X](<url>)
 ```
 
@@ -117,8 +145,14 @@ Notes on the template:
 - `tags`: **always include `tiki-toki`** — it's what groups these video posts. The
   series default is `['agents', 'future', 'tiki-toki']`; the other tags can change
   with the topic, but `tiki-toki` stays.
-- `videoLength`: always set it (from Step 4). It's what makes the post render as a
-  video (watch time instead of reading time).
+- `takeaways`: include two to five concise points that can stand alone outside
+  the transcript. They render visibly near the top of the post.
+- `videos`: include one record per iframe, in the same order. The first video
+  controls the watch time and social image. Every record needs its real YouTube
+  upload timestamp, ISO duration, and committed local thumbnail.
+- `Sources and further reading`: cite primary sources for material factual claims.
+  Omit the section for a purely personal/opinion post rather than padding it with
+  weak citations.
 - `X-Posted:` line: include only the links the user gave. Strip tracking query
   params (`?utm_...`, `?s=20`) from the URLs. If neither LinkedIn nor X was
   provided, omit the line entirely.

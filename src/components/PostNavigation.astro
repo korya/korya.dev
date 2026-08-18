@@ -1,4 +1,6 @@
 ---
+import { postHref } from '../lib/urls';
+
 interface Props {
   prevPost?: {
     slug: string;
@@ -17,7 +19,7 @@ const { prevPost, nextPost } = Astro.props;
   <nav class="post-nav" aria-label="Post navigation">
     <div class="post-nav-item prev">
       {prevPost && (
-        <a href={`/posts/${prevPost.slug}`}>
+        <a href={postHref(prevPost.slug)}>
           <span class="post-nav-label">← Previous</span>
           <span class="post-nav-title">{prevPost.title}</span>
         </a>
@@ -25,7 +27,7 @@ const { prevPost, nextPost } = Astro.props;
     </div>
     <div class="post-nav-item next">
       {nextPost && (
-        <a href={`/posts/${nextPost.slug}`}>
+        <a href={postHref(nextPost.slug)}>
           <span class="post-nav-label">Next →</span>
           <span class="post-nav-title">{nextPost.title}</span>
         </a>

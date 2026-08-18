@@ -5,6 +5,11 @@ date: 2024-01-13
 draft: false
 tags: ['howto', 'macbook', 'setup']
 toc: true
+image:
+  src: '/images/posts/2024-01-13-setup-macbook/social.jpg'
+  alt: 'A freshly configured laptop surrounded by a checklist and developer tools'
+  width: 1200
+  height: 630
 ---
 
 I had to reset my old mac from scratch today. Here I am going to document the steps to reproduce my environment.

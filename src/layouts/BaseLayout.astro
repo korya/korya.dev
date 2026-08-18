@@ -3,11 +3,12 @@ import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import '../styles/global.css';
+import type { ContentImage } from '../lib/content';
 
 interface Props {
   title: string;
   description?: string;
-  image?: string;
+  image?: ContentImage;
   articleDate?: Date;
   articleTags?: string[];
 }

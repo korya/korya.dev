@@ -43,9 +43,10 @@ drifted, only that something is there.
 
 ## Posts
 
-Video posts carry a `videoLength` frontmatter field, which makes the post render
-as watch time rather than reading time, and tag `tiki-toki`, which groups the
-video series.
+Video posts carry a `videos` frontmatter array. The first entry is the primary
+video and supplies the watch time and social image; every entry must match a
+YouTube iframe in the post body in the same order. Video posts also use tag
+`tiki-toki`, which groups the series, and two to five visible `takeaways`.
 
 Two skills automate the flow: `widen-vertical-video` (portrait recording → 16:9
 for YouTube) and `create-video-post` (YouTube link → scaffolded post with a
@@ -55,5 +56,6 @@ cleaned transcript).
 
 - Post dates render one day early in any timezone west of UTC. The date is parsed
   as UTC midnight and formatted in local time.
-- Every post is emitted at two URLs, e.g. `/posts/2026-08-05-slug/` and
-  `/posts/2026-08-05---slug/`. Only the single-dash form is in the sitemap.
+- Astro's static redirect pages return `200` on DigitalOcean. Historical URL
+  moves therefore need matching App Platform ingress redirects; the generated
+  pages are only noindex fallbacks.

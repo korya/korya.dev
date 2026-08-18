@@ -5,7 +5,21 @@ date: 2026-07-07
 draft: false
 tags: ['agents', 'future', 'tiki-toki']
 toc: false
-videoLength: '4:03'
+takeaways:
+  - 'Agents can replace manual web journeys by finding, comparing, and booking services for a user.'
+  - 'Agent-facing interfaces will become as important as the human-facing UX we optimize today.'
+  - 'The transition creates opportunities for startups, along with new ways to steer or manipulate agents.'
+videos:
+  - youtubeId: 'e2X8i2pin8Y'
+    title: 'Era of Agents: The Internet Will Inevitably Become Agent-First'
+    description: "When agents act on our behalf, the web's UX shifts from human-focused to agent-focused, creating a new opening for small startups."
+    uploadDate: '2026-07-07T19:30:17-07:00'
+    duration: 'PT4M3S'
+    thumbnail:
+      src: '/images/posts/2026-07-07-era-of-agents-internet-agent-first/e2X8i2pin8Y.jpg'
+      alt: 'Video thumbnail for The Internet Will Inevitably Become Agent-First'
+      width: 1280
+      height: 720
 ---
 
 <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; margin: var(--space-lg, 2rem) 0;">
@@ -33,5 +47,10 @@ But essentially, what this means is that the whole internet as we know it will t
 These days capital is kind of not evenly distributed, and everyone is afraid that Anthropic, OpenAI, and Google will just eat the whole world. But I don't think this will happen. Worst case, they'll just buy you out — they'll acquire your startup, just because you're already there, you're more flexible, you're more advanced to some degree, and it's cheaper for them to buy you out than to develop it from scratch. And this will hopefully contribute to distributing wealth more equally in our society. So — time of big opportunities, guys. Use this time. Best of luck to you. See you.
 
 </details>
+
+## Sources and further reading
+
+- [The Model Context Protocol overview](https://modelcontextprotocol.io/docs/getting-started/intro) documents a standard way for agents to access tools, services, and data.
+- [Google's Agent2Agent protocol announcement](https://developers.googleblog.com/en/a2a-a-new-era-of-agent-interoperability/) describes interoperable agents coordinating multi-step work.
 
 X-Posted: [LinkedIn](https://www.linkedin.com/posts/kochelorov_the-internet-will-inevitably-become-agent-ugcPost-7480381165158420481-Ae4A/), [X](https://x.com/korya_dev/status/2075302753602068581)

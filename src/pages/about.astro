@@ -39,7 +39,10 @@ const personSchema = {
 };
 ---
 
-<BaseLayout title="About | Tech Scrolls">
+<BaseLayout
+  title="About Dmitri Kochelorov | Tech Scrolls"
+  description="Dmitri Kochelorov is a software engineer, co-founder of FrontSail AI, and fractional CTO writing about AI agents, engineering, and tools."
+>
   <script type="application/ld+json" slot="head" set:html={JSON.stringify(personSchema)} />
   <article class="about">
     <h1 class="page-title">About</h1>
@@ -64,7 +67,7 @@ const personSchema = {
         Before that I spent a decade at <a href="https://goiguide.com/" target="_blank" rel="noopener noreferrer">Planitar</a>.
         I joined as the first engineer and left as R&D director of a 20-person org,
         then went back to writing code full time so I could build AI agents myself.
-        The longer version is on my <a href="/resume">resume</a>.
+        The longer version is on my <a href="/resume/">resume</a>.
       </p>
 
       <p>

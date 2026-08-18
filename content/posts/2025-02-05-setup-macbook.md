@@ -5,9 +5,14 @@ date: 2025-02-05
 draft: false
 tags: ['howto', 'macbook', 'setup']
 toc: true
+image:
+  src: '/images/posts/2025-02-05-setup-macbook/social.jpg'
+  alt: 'A laptop surrounded by modular setup boxes, keys, and connected configuration nodes'
+  width: 1200
+  height: 630
 ---
 
-It is the time to reset my MacBook again. Last time was in 2024: [Setting up a Mac in 2024](./2024-01-13---setup-macbook.md).
+It is the time to reset my MacBook again. Last time was in 2024: [Setting up a Mac in 2024](/posts/2024-01-13-setup-macbook/).
 
 The main plan is as follows:
 

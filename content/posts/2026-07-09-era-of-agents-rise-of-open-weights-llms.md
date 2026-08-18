@@ -5,7 +5,21 @@ date: 2026-07-09
 draft: false
 tags: ['agents', 'future', 'tiki-toki']
 toc: false
-videoLength: '4:17'
+takeaways:
+  - 'Political restrictions on frontier models expose the risk of depending on a few closed providers.'
+  - 'Countries and companies that cannot train frontier models have a strategic reason to support open weights.'
+  - 'That pressure could accelerate smaller models that run on company-owned or personal hardware.'
+videos:
+  - youtubeId: 'D_0pfc3PgqA'
+    title: 'Era of Agents: The Rise of Open Weights LLMs'
+    description: 'Geopolitical pressure on frontier models strengthens the case for open weights and for smaller models that run on your own hardware.'
+    uploadDate: '2026-07-09T12:15:08-07:00'
+    duration: 'PT4M17S'
+    thumbnail:
+      src: '/images/posts/2026-07-09-era-of-agents-rise-of-open-weights-llms/D_0pfc3PgqA.jpg'
+      alt: 'Video thumbnail for The Rise of Open Weights LLMs'
+      width: 1280
+      height: 720
 ---
 
 <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; margin: var(--space-lg, 2rem) 0;">
@@ -37,5 +51,10 @@ And here's the interesting twist: the dream of a small company having its own mo
 I'll leave you with an analogy. Decades ago, this is exactly how Linux went from a hobby project to the operating system running the whole internet. More or less the same setup. So I'm very bullish on this, and I hope you are too. See you guys. Bye-bye.
 
 </details>
+
+## Sources and further reading
+
+- [Anthropic's statement on the Fable 5 and Mythos 5 suspension](https://www.anthropic.com/news/fable-mythos-access) documents the government directive discussed in the video.
+- [OpenAI's GPT-5.6 release page](https://openai.com/index/gpt-5-6/) records the model's later public release and safety work.
 
 X-Posted: [LinkedIn](https://www.linkedin.com/posts/kochelorov_everyone-is-talking-about-fable-5-some-are-ugcPost-7480961612690939905-1Unc/), [X](https://x.com/korya_dev/status/2081862265251172844)

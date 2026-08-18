@@ -1,0 +1,66 @@
+---
+import { postHref } from '../lib/urls';
+
+interface RelatedPost {
+  slug: string;
+  title: string;
+  description: string;
+}
+
+interface Props {
+  posts: RelatedPost[];
+}
+
+const { posts } = Astro.props;
+---
+
+{posts.length > 0 && (
+  <aside class="related" aria-labelledby="related-posts-title">
+    <h2 id="related-posts-title">Related posts</h2>
+    <ul>
+      {posts.map((post) => (
+        <li>
+          <a href={postHref(post.slug)}>{post.title}</a>
+          <p>{post.description}</p>
+        </li>
+      ))}
+    </ul>
+  </aside>
+)}
+
+<style>
+  .related {
+    margin-top: var(--space-xl);
+    padding-top: var(--space-xl);
+    border-top: 1px solid var(--color-border);
+  }
+
+  h2 {
+    margin: 0 0 var(--space-lg);
+    font-size: 1.25rem;
+  }
+
+  ul {
+    display: grid;
+    gap: var(--space-lg);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  a {
+    color: var(--color-text);
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  a:hover {
+    color: var(--color-accent);
+  }
+
+  p {
+    margin: var(--space-xs) 0 0;
+    color: var(--color-text-muted);
+    line-height: 1.5;
+  }
+</style>

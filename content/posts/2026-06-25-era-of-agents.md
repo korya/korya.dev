@@ -5,7 +5,21 @@ date: 2026-06-25
 draft: false
 tags: ['agents', 'future', 'tiki-toki']
 toc: false
-videoLength: '5:04'
+takeaways:
+  - 'More capable assistants should reduce how often people need to open and touch a phone screen.'
+  - 'The phone may split into a modular collection of glasses, watches, and other wearable interfaces.'
+  - 'As assistants mediate our actions, websites and APIs will increasingly be designed for agents first.'
+videos:
+  - youtubeId: 'EOUXEdl_g0M'
+    title: 'Era of Agents: Your Device Is Your Personal Assistant'
+    description: 'As assistants get more capable, the phone dissolves into modular wearables and the web gets rebuilt agent-first.'
+    uploadDate: '2026-06-25T18:08:10-07:00'
+    duration: 'PT5M4S'
+    thumbnail:
+      src: '/images/posts/2026-06-25-era-of-agents/EOUXEdl_g0M.jpg'
+      alt: 'Video thumbnail for Your Device Is Your Personal Assistant'
+      width: 1280
+      height: 720
 ---
 
 <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; margin: var(--space-lg, 2rem) 0;">
@@ -33,5 +47,10 @@ And the funniest part is that when Steve Jobs introduced the iPhone, he emphasiz
 And what that means — and that's a very nice, bright future I'm looking forward to — but what it means, and what's important at least for me, is that the way we interact with the web, the way we share knowledge, the way we source knowledge will completely change. The web will become agent-first. We will build APIs, websites, and whatever, first of all for agents rather than for humans — because humans will not be interacting with this directly. And that's actually the topic that fascinates me and doesn't let me sleep at night. This is a topic we'll try to explore in the next video. See you guys, and enjoy your weekend.
 
 </details>
+
+## Sources and further reading
+
+- [Apple's App Intents documentation](https://developer.apple.com/apple-intelligence/) shows how Apple Intelligence exposes app content and actions through natural language.
+- [Google's Agent2Agent protocol announcement](https://developers.googleblog.com/en/a2a-a-new-era-of-agent-interoperability/) covers secure coordination between agents built by different vendors.
 
 X-Posted: [LinkedIn](https://www.linkedin.com/posts/kochelorov_what-is-going-to-change-when-a-phone-turns-ugcPost-7475980770742824962-aI91/), [X](https://x.com/korya_dev/status/2074889741225374193)

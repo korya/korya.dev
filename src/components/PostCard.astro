@@ -1,18 +1,20 @@
 ---
 import PostTypeIcon from './PostTypeIcon.astro';
+import { postHref, tagHref } from '../lib/urls';
+import type { VideoMetadata } from '../lib/content';
 
 interface Props {
   title: string;
   date: Date;
   slug: string;
+  description: string;
   tags?: string[];
-  /** Present on video posts. Its absence is what marks a post as text. */
-  videoLength?: string;
+  videos?: VideoMetadata[];
 }
 
-const { title, date, slug, tags = [], videoLength } = Astro.props;
+const { title, date, slug, description, tags = [], videos = [] } = Astro.props;
 
-const isVideo = Boolean(videoLength);
+const isVideo = videos.length > 0;
 
 const formattedDate = date.toLocaleDateString('en-US', {
   year: 'numeric',
@@ -25,18 +27,19 @@ const formattedDate = date.toLocaleDateString('en-US', {
   {/* One link over both the icon and the title, rather than a second link on the
       icon: two links to the same post would be announced twice. The icon keeps its
       label, so the link reads as "Video post <title>". */}
-  <a href={`/posts/${slug}`} class="post-link">
+  <a href={postHref(slug)} class="post-link">
     <span class="post-icon" role="img" aria-label={isVideo ? 'Video post' : 'Written post'}>
       <PostTypeIcon type={isVideo ? 'video' : 'text'} />
     </span>
     <h2 class="post-title">{title}</h2>
   </a>
+  <p class="post-description">{description}</p>
   <div class="post-meta">
     <time datetime={date.toISOString()}>{formattedDate}</time>
     {tags.length > 0 && (
       <span class="tags">
         {tags.map((tag) => (
-          <a href={`/tags/${tag}`} class="tag">#{tag}</a>
+          <a href={tagHref(tag)} class="tag">#{tag}</a>
         ))}
       </span>
     )}
@@ -111,6 +114,12 @@ const formattedDate = date.toLocaleDateString('en-US', {
     margin-top: var(--space-sm);
     font-size: 0.875rem;
     color: var(--color-text-muted);
+  }
+
+  .post-description {
+    margin: var(--space-sm) 0 0 calc(var(--icon-col) + var(--space-md));
+    color: var(--color-text-muted);
+    line-height: 1.55;
   }
 
   .tags {

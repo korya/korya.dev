@@ -39,9 +39,10 @@ Adding a post:
 
 1. Create a new Markdown file in `content/posts/` named `YYYY-MM-DD-<title>.md` (single dashes only — the filename becomes the URL slug, so avoid spaces and `---`).
 2. Add the frontmatter (see fields below) and start with `draft: true`.
-3. Write a `description` — a concise 1–2 sentence summary. **Every post must have one**: it feeds the SEO meta description, the Open Graph / Twitter cards, the `JsonLd` structured data, and the post's summary in `llms.txt`.
-4. Write the content.
-5. Set `draft: false` to publish.
+3. Write a `description` — a concise 1–2 sentence summary. **Every post must have one**: it appears on the post and listing pages, and feeds the SEO meta description, social cards, `JsonLd`, and `llms.txt`.
+4. Add a content-specific `image`, or structured `videos` metadata for a video post. Assets live under `public/images/posts/<slug>/`.
+5. Write the content. Video posts also need two to five `takeaways` and matching YouTube iframes.
+6. Set `draft: false` to publish.
 
 ### Frontmatter
 
@@ -52,7 +53,26 @@ Adding a post:
 | `draft`       | no       | `true` hides the post from the build. Defaults to `false`.         |
 | `tags`        | no       | List of tags, e.g. `['agents', 'future']`. Defaults to `[]`.       |
 | `toc`         | no       | `true` shows a table of contents. Defaults to `false`.            |
-| `description` | **yes**  | 1–2 sentence summary. Feeds the SEO meta description, social cards, `JsonLd`, and the `llms.txt` post summary. |
-| `videoLength` | no       | `M:SS` duration for video posts; shows "N min watch" (floored) instead of read time. |
+| `description` | **yes**  | 1–2 sentence visible summary. Feeds metadata, cards, `JsonLd`, and `llms.txt`. |
+| `image`       | text posts | Local social image: `src`, descriptive `alt`, `width`, and `height`. |
+| `takeaways`   | video posts | Two to five concise, standalone points rendered above the transcript. |
+| `videos`      | video posts | Ordered video records: YouTube ID, title, description, ISO upload timestamp/duration, and local thumbnail metadata. The first video supplies watch time and the primary social image. |
 
 The schema is defined in `src/content/config.ts`.
+
+### Redirects in production
+
+Astro emits noindex meta-refresh pages for redirects in this static build. Those
+are useful fallbacks, but they are not HTTP redirects on DigitalOcean App
+Platform. The production app's ingress configuration must mirror the explicit
+historical mappings in `src/data/legacy-redirects.mjs`, redirect `www.korya.dev`
+and the default `*.ondigitalocean.app` hostname to the apex domain, and redirect
+both `/resume/offline` forms to the PDF. After changing ingress rules, run:
+
+```sh
+yarn test:production-indexing
+```
+
+The smoke check expects permanent `301` or `308` responses and exact `Location`
+headers. The active app spec is not committed here; export it from the account
+that owns korya.dev before introducing `.do/app.yaml`.

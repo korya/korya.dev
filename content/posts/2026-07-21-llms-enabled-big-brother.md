@@ -5,7 +5,21 @@ date: 2026-07-21
 draft: false
 tags: ['privacy', 'llms', 'tiki-toki']
 toc: false
-videoLength: '2:24'
+takeaways:
+  - 'Cloud LLM providers necessarily process the prompts, responses, and files users submit to their services.'
+  - 'Language models make it easier to analyze that material automatically and at large scale.'
+  - 'The ecosystem needs stronger user controls, data boundaries, and privacy-preserving alternatives.'
+videos:
+  - youtubeId: 'Q5QzDVj1wXM'
+    title: 'LLMs Enabled Big Brother'
+    description: 'LLM services can associate users with their prompts and files, creating a need for stronger privacy and security controls.'
+    uploadDate: '2026-07-21T05:27:22-07:00'
+    duration: 'PT2M24S'
+    thumbnail:
+      src: '/images/posts/2026-07-21-llms-enabled-big-brother/Q5QzDVj1wXM.jpg'
+      alt: 'Video thumbnail for LLMs Enabled Big Brother'
+      width: 1280
+      height: 720
 ---
 
 <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; margin: var(--space-lg, 2rem) 0;">
@@ -29,5 +43,10 @@ And the situation we're in right now is that the Big Brother ideas are turning f
 It's a big problem, and it's something we have to deal with. I believe it will eventually be resolved. The question is how long it takes. Computers had the same problem in the beginning. Everything was transparent. Back in the 80s, everyone on the same computer could see what everyone else was doing, and that was just a consequence of immature technology. As operating systems matured, all these security controls were added. Right now we're missing those controls for LLMs, and we should push for them as much as we can.
 
 </details>
+
+## Sources and further reading
+
+- [OpenAI's Data Controls FAQ](https://help.openai.com/en/articles/7730893-data-controls-faq) explains chat history, training controls, and temporary-chat retention.
+- [Anthropic's consumer-data deletion guidance](https://privacy.anthropic.com/en/articles/7996878-can-you-delete-data-sent-via-claude-ai) explains how prompts and conversations are retained and deleted.
 
 X-Posted: [LinkedIn](https://www.linkedin.com/posts/kochelorov_llms-made-possible-to-implement-the-big-brother-activity-7485279931002798081-PjDp), [X](https://x.com/korya_dev/status/2079544147967369224)
