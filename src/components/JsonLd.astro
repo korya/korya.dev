@@ -1,5 +1,6 @@
 ---
 import { SITE_CONFIG } from '../config';
+import type { ContentImage, VideoMetadata } from '../lib/content';
 
 interface Props {
   type: 'BlogPosting' | 'WebSite';
@@ -9,9 +10,12 @@ interface Props {
   tags?: string[];
   wordCount?: number;
   url?: string;
+  image?: ContentImage;
+  videos?: VideoMetadata[];
 }
 
-const { type, title, description, date, tags, wordCount, url } = Astro.props;
+const { type, title, description, date, tags, wordCount, url, image, videos = [] } = Astro.props;
+const absoluteURL = (path: string) => new URL(path, SITE_CONFIG.SITE_URL).href;
 
 function generateBlogPostingSchema() {
   return {
@@ -20,7 +24,7 @@ function generateBlogPostingSchema() {
     headline: title,
     description: description,
     datePublished: date?.toISOString(),
-    dateModified: date?.toISOString(),
+    ...(image && { image: [absoluteURL(image.src)] }),
     author: {
       '@type': 'Person',
       '@id': SITE_CONFIG.AUTHOR.id,
@@ -39,6 +43,18 @@ function generateBlogPostingSchema() {
     },
     ...(wordCount && { wordCount }),
     ...(tags && tags.length > 0 && { keywords: tags.join(', ') }),
+    ...(videos.length > 0 && {
+      video: videos.map((video, index) => ({
+        '@type': 'VideoObject',
+        '@id': `${url}#video-${index + 1}`,
+        name: video.title,
+        description: video.description,
+        thumbnailUrl: [absoluteURL(video.thumbnail.src)],
+        uploadDate: video.uploadDate,
+        duration: video.duration,
+        embedUrl: `https://www.youtube-nocookie.com/embed/${video.youtubeId}`,
+      })),
+    }),
   };
 }
 
@@ -69,17 +85,11 @@ function generateBreadcrumbSchema() {
         name: 'Home',
         item: SITE_CONFIG.SITE_URL,
       },
-      {
-        '@type': 'ListItem',
-        position: 2,
-        name: 'Posts',
-        item: `${SITE_CONFIG.SITE_URL}/`,
-      },
       ...(title
         ? [
             {
               '@type': 'ListItem',
-              position: 3,
+              position: 2,
               name: title,
               item: url,
             },

@@ -6,7 +6,7 @@ description: Compose a YouTube video description for a video blog post in this r
 # Compose YouTube Description
 
 Generate the text that goes in the description box of a video's YouTube page. One
-description per video post. Each has a brief summary written in Dmitri's voice,
+description per entry in a post's `videos` array. Each has a brief summary written in Dmitri's voice,
 followed by links to the blog post, the LinkedIn cross-post, and the X cross-post.
 
 ## Scope: which posts
@@ -25,14 +25,15 @@ Order video posts by the frontmatter `date` (newest first) to resolve "recent".
 
 ## What counts as a video post
 
-A markdown file under `content/posts/` whose frontmatter has a `videoLength` field
-and whose body embeds a YouTube iframe (`youtube-nocookie.com/embed/<ID>`). The
-`<ID>` in that iframe is the video's YouTube ID.
+A markdown file under `content/posts/` whose frontmatter has a non-empty `videos`
+array. Every `youtubeId` must have a matching YouTube iframe
+(`youtube-nocookie.com/embed/<ID>`) in the body, in the same order.
 
 ## Steps
 
 1. **Read the post.** Grab from the frontmatter/body:
-   - The YouTube ID (from the iframe `src`).
+   - Each video's ID, title, and description from `videos` frontmatter, checked
+     against the iframe `src` values.
    - The `<details><summary>Transcript</summary>` block — this is your source for the summary.
    - The `X-Posted:` footer line (usually the last line). It contains the LinkedIn
      and/or X links, e.g. `X-Posted: [LinkedIn](url), [X](url)`.
@@ -42,7 +43,8 @@ and whose body embeds a YouTube iframe (`youtube-nocookie.com/embed/<ID>`). The
    (`SITE_URL`). Example: `content/posts/2026-07-09-era-of-agents-rise-of-open-weights-llms.md`
    → `https://korya.dev/posts/2026-07-09-era-of-agents-rise-of-open-weights-llms/`.
 
-3. **Write the summary.** 3–5 sentences drawn from the transcript. First person,
+3. **Write the summary.** 3–5 sentences drawn from the transcript associated
+   with that video. First person,
    casual, the way Dmitri actually talks in the video. It should make someone want
    to watch, not read like a press release.
 

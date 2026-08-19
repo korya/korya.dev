@@ -5,7 +5,21 @@ date: 2026-08-05
 draft: false
 tags: ['privacy', 'llms', 'tiki-toki']
 toc: false
-videoLength: '3:31'
+takeaways:
+  - 'Removing or replacing sensitive entities can make documents safer to send to an external model.'
+  - 'A useful transformation must preserve enough structure to recover a meaningful answer afterward.'
+  - 'Anonymizing content does not hide the account that submitted it, so it is only one privacy layer.'
+videos:
+  - youtubeId: 'qc8ETjbIWJ8'
+    title: 'Hiding Meaning from LLMs, the Obvious Approach'
+    description: 'Transform sensitive queries before sending them to an LLM, then map the answer back into the original context.'
+    uploadDate: '2026-08-05T12:58:29-07:00'
+    duration: 'PT3M31S'
+    thumbnail:
+      src: '/images/posts/2026-08-05-hiding-meaning-from-llms-obvious-approach/qc8ETjbIWJ8.jpg'
+      alt: 'Video thumbnail for Hiding Meaning from LLMs, the Obvious Approach'
+      width: 1280
+      height: 720
 ---
 
 <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; margin: var(--space-lg, 2rem) 0;">
@@ -61,5 +75,9 @@ because it seems like this is something that we desperately need.
 That's all for today. Thank you guys, and enjoy your day.
 
 </details>
+
+## Sources and further reading
+
+- [NIST's review of de-identification](https://www.nist.gov/publications/de-identification-personal-information) explains both its privacy benefits and the possibility of re-identification.
 
 X-Posted: [LinkedIn](https://www.linkedin.com/posts/kochelorov_how-do-you-protect-your-right-for-privacy-ugcPost-7490850677959573504-KYCg), [X](https://x.com/korya_dev/status/2085096273640620477)

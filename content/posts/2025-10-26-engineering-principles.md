@@ -5,6 +5,11 @@ date: 2025-10-26
 draft: false
 tags: ['software development', 'engineering']
 toc: false
+image:
+  src: '/images/posts/2025-10-26-engineering-principles/social.jpg'
+  alt: 'Five connected engineering modules forming one repeatable system'
+  width: 1200
+  height: 630
 ---
 
 In the last year, I had the pleasure to work in multiple great teams. Each

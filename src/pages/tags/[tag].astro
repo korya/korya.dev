@@ -2,32 +2,37 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PostCard from '../../components/PostCard.astro';
+import { getTagDescription } from '../../data/tags';
+import { assertUniqueTagSlugs, tagSlug } from '../../lib/urls';
 
 export async function getStaticPaths() {
   const posts = await getCollection('posts');
+  const publishedPosts = posts.filter((post) => !post.data.draft);
 
-  // Get all unique tags
-  const tags = [...new Set(posts.flatMap((post) => post.data.tags || []))];
+  const tags = [...new Set(publishedPosts.flatMap((post) => post.data.tags))];
+  assertUniqueTagSlugs(tags);
 
   return tags.map((tag) => ({
-    params: { tag },
+    params: { tag: tagSlug(tag) },
     props: {
       tag,
-      posts: posts
-        .filter((post) => !post.data.draft && post.data.tags?.includes(tag))
+      description: getTagDescription(tag),
+      posts: publishedPosts
+        .filter((post) => post.data.tags.includes(tag))
         .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf()),
     },
   }));
 }
 
-const { tag, posts } = Astro.props;
+const { tag, description, posts } = Astro.props;
 ---
 
-<BaseLayout title={`Posts tagged "${tag}" | Tech Scrolls`}>
+<BaseLayout title={`${tag} posts | Tech Scrolls`} description={description}>
   <section class="tag-page">
     <h1 class="page-title">
       Posts tagged <span class="tag-name">#{tag}</span>
     </h1>
+    <p class="tag-description">{description}</p>
     <p class="post-count">{posts.length} post{posts.length !== 1 ? 's' : ''}</p>
     <div class="post-list">
       {posts.map((post: any) => (
@@ -35,8 +40,9 @@ const { tag, posts } = Astro.props;
           title={post.data.title}
           date={post.data.date}
           slug={post.slug}
+          description={post.data.description}
           tags={post.data.tags}
-          videoLength={post.data.videoLength}
+          videos={post.data.videos}
         />
       ))}
     </div>
@@ -62,5 +68,11 @@ const { tag, posts } = Astro.props;
     color: var(--color-text-muted);
     font-size: 0.875rem;
     margin-bottom: var(--space-lg);
+  }
+
+  .tag-description {
+    margin: 0 0 var(--space-sm);
+    color: var(--color-text-muted);
+    line-height: 1.6;
   }
 </style>

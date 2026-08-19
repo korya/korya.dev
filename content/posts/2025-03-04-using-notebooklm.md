@@ -4,6 +4,11 @@ description: "How I use Google's NotebookLM as an interactive RAG to skim ML pap
 date: 2025-03-04
 draft: false
 tags: ['howto', 'tools', 'efficiency']
+image:
+  src: '/images/posts/2025-03-04-using-notebooklm/social.jpg'
+  alt: 'Research papers flowing through an audio waveform into an organized knowledge network'
+  width: 1200
+  height: 630
 ---
 
 Recently, I talked to my friend and was surprised that he was not aware of [NotebookLM](https://notebooklm.google.com/) by Google. Hence decided to write this brief note describing how I use it.

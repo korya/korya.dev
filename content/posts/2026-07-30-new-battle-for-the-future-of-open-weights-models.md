@@ -5,7 +5,21 @@ date: 2026-07-30
 draft: false
 tags: ['llms', 'future', 'tiki-toki']
 toc: false
-videoLength: '2:50'
+takeaways:
+  - 'Open-weight models align with NVIDIA’s interest in a broad market for AI hardware and software.'
+  - 'Safety regulation can have competitive effects even when its stated purpose is legitimate.'
+  - 'The future of open weights will be shaped by coalitions among labs, hardware vendors, and governments.'
+videos:
+  - youtubeId: 'GNwimwM4tJo'
+    title: 'New Battle for the Future of Open Weights Models'
+    description: 'The open-weights debate is also a contest among AI labs, hardware vendors, and regulators over who gets to lead.'
+    uploadDate: '2026-07-30T03:30:11-07:00'
+    duration: 'PT2M50S'
+    thumbnail:
+      src: '/images/posts/2026-07-30-new-battle-for-the-future-of-open-weights-models/GNwimwM4tJo.jpg'
+      alt: 'Video thumbnail for New Battle for the Future of Open Weights Models'
+      width: 1280
+      height: 720
 ---
 
 <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; margin: var(--space-lg, 2rem) 0;">
@@ -57,5 +71,10 @@ no one wants Anthropic to be at the top, and Anthropic wants to stay there. So w
 see how it develops.
 
 </details>
+
+## Sources and further reading
+
+- [NVIDIA's open models, data, and tools announcement](https://blogs.nvidia.com/blog/open-models-data-tools-accelerate-ai/) lays out the company's investment in an open model ecosystem.
+- [Anthropic's Responsible Scaling Policy](https://www.anthropic.com/responsible-scaling-policy) is the company's own account of its risk-governance and safeguard position.
 
 X-Posted: [LinkedIn](https://www.linkedin.com/posts/kochelorov_new-battle-for-the-future-of-open-weights-activity-7488537637931151360-IfSx), [X](https://x.com/korya_dev/status/2082806250455077137)

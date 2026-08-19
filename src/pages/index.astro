@@ -5,15 +5,20 @@ import PostCard from '../components/PostCard.astro';
 import PostFilter from '../components/PostFilter.astro';
 import JsonLd from '../components/JsonLd.astro';
 import { SITE_CONFIG } from '../config';
+import { DEFAULT_SOCIAL_IMAGE } from '../lib/content';
 
 const posts = (await getCollection('posts'))
   .filter((post) => !post.data.draft)
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 
-const videoCount = posts.filter((post) => Boolean(post.data.videoLength)).length;
+const videoCount = posts.filter((post) => post.data.videos.length > 0).length;
 ---
 
-<BaseLayout title={SITE_CONFIG.SITE_TITLE}>
+<BaseLayout
+  title={`${SITE_CONFIG.SITE_TITLE} | Software Engineering, AI Agents, and Tools`}
+  description="Essays and short videos by Dmitri Kochelorov about software engineering, AI agents, LLMs, tools, privacy, and practical workflows."
+  image={DEFAULT_SOCIAL_IMAGE}
+>
   <JsonLd slot="head" type="WebSite" />
   <section class="posts">
     <div class="posts-head">
@@ -26,8 +31,9 @@ const videoCount = posts.filter((post) => Boolean(post.data.videoLength)).length
           title={post.data.title}
           date={post.data.date}
           slug={post.slug}
+          description={post.data.description}
           tags={post.data.tags}
-          videoLength={post.data.videoLength}
+          videos={post.data.videos}
         />
       ))}
     </div>

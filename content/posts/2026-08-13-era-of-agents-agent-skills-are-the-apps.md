@@ -5,7 +5,31 @@ date: 2026-08-13
 draft: false
 tags: ['agents', 'future', 'tiki-toki']
 toc: false
-videoLength: '3:15'
+takeaways:
+  - 'Agents are becoming an execution environment alongside operating systems, browsers, and mobile platforms.'
+  - 'Skills package instructions, code, and tool use into reusable application logic for agents.'
+  - 'The same pattern already makes this site’s video post-processing repeatable and shareable.'
+videos:
+  - youtubeId: 'LGP3P4cr5Xo'
+    title: 'Era of Agents: Agent Skills Are the Apps'
+    description: 'The application layer is moving into reusable skills that agents load and execute when a task requires them.'
+    uploadDate: '2026-08-12T19:29:34-07:00'
+    duration: 'PT3M15S'
+    thumbnail:
+      src: '/images/posts/2026-08-13-era-of-agents-agent-skills-are-the-apps/LGP3P4cr5Xo.jpg'
+      alt: 'Video thumbnail for Agent Skills Are the Apps'
+      width: 1280
+      height: 720
+  - youtubeId: '9kJIgLb-OII'
+    title: 'Using Claude Code to Post-process Videos'
+    description: 'A reusable coding-agent skill turns vertical recordings into horizontal videos, adds subtitles, and handles transcoding.'
+    uploadDate: '2026-08-12T20:14:23-07:00'
+    duration: 'PT1M22S'
+    thumbnail:
+      src: '/images/posts/2026-08-13-era-of-agents-agent-skills-are-the-apps/9kJIgLb-OII.jpg'
+      alt: 'Video thumbnail for Using Claude Code to Post-process Videos'
+      width: 1280
+      height: 720
 ---
 
 <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; margin: var(--space-lg, 2rem) 0;">
@@ -85,5 +109,10 @@ Moreover, you can go to my GitHub — it's the source code of my personal websit
 take the skill, use it as well, and generate a similar video. Amazing.
 
 </details>
+
+## Sources and further reading
+
+- [Anthropic's Agent Skills overview](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview) describes skills as reusable packages of instructions, scripts, and resources.
+- [The prepare-video skill used for these posts](https://github.com/korya/korya.dev/blob/a9479ffc722b335b9fd937f93586d6aed05fe12a/.claude/skills/prepare-video/SKILL.md) is a concrete implementation of that pattern.
 
 X-Posted: [LinkedIn](https://www.linkedin.com/posts/kochelorov_in-the-era-of-agents-the-agents-become-the-ugcPost-7493494576427610113-ipV2), [X](https://x.com/korya_dev/status/2087729522611200406)

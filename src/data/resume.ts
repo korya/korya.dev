@@ -365,5 +365,5 @@ export const FOOTER_LINKS = [
     href: 'https://www.linkedin.com/in/kochelorov/',
   },
   { prefix: 'More evidence on', label: 'GitHub', href: 'https://github.com/korya' },
-  { prefix: 'More recursion', label: 'in here', href: '/resume' },
+  { prefix: 'More recursion', label: 'in here', href: '/resume/' },
 ];

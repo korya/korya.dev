@@ -6,8 +6,11 @@ import Comments from '../../components/Comments.astro';
 import CodeCopyButton from '../../components/CodeCopyButton.astro';
 import BackToTop from '../../components/BackToTop.astro';
 import PostNavigation from '../../components/PostNavigation.astro';
+import RelatedPosts from '../../components/RelatedPosts.astro';
 import JsonLd from '../../components/JsonLd.astro';
 import { SITE_CONFIG } from '../../config';
+import { durationToWatchMinutes, getPostImage } from '../../lib/content';
+import { postHref, tagHref } from '../../lib/urls';
 import styles from '../../styles/prose.module.css';
 
 export async function getStaticPaths() {
@@ -19,6 +22,20 @@ export async function getStaticPaths() {
   return publishedPosts.map((post, index) => {
     const prevPost = publishedPosts[index + 1];
     const nextPost = publishedPosts[index - 1];
+    const relatedPosts = publishedPosts
+      .filter((candidate) => candidate.slug !== post.slug)
+      .map((candidate) => ({
+        candidate,
+        score: candidate.data.tags.filter((tag) => post.data.tags.includes(tag)).length,
+      }))
+      .filter(({ score }) => score > 0)
+      .sort((a, b) => b.score - a.score || b.candidate.data.date.getTime() - a.candidate.data.date.getTime())
+      .slice(0, 3)
+      .map(({ candidate }) => ({
+        slug: candidate.slug,
+        title: candidate.data.title,
+        description: candidate.data.description,
+      }));
 
     return {
       params: { slug: post.slug },
@@ -26,12 +43,13 @@ export async function getStaticPaths() {
         post,
         prevPost: prevPost ? { slug: prevPost.slug, title: prevPost.data.title } : undefined,
         nextPost: nextPost ? { slug: nextPost.slug, title: nextPost.data.title } : undefined,
+        relatedPosts,
       },
     };
   });
 }
 
-const { post, prevPost, nextPost } = Astro.props;
+const { post, prevPost, nextPost, relatedPosts } = Astro.props;
 const { Content, headings } = await post.render();
 
 const formattedDate = post.data.date.toLocaleDateString('en-US', {
@@ -44,17 +62,17 @@ const formattedDate = post.data.date.toLocaleDateString('en-US', {
 const words = post.body.split(/\s+/).length;
 const readingTime = Math.ceil(words / 200);
 
-// Video posts show watch time (floored to the nearest minute) instead of reading time
-const watchMinutes = post.data.videoLength
-  ? Math.floor(post.data.videoLength.split(':').reduce((acc, part) => acc * 60 + Number(part), 0) / 60)
-  : null;
+// Video posts show the primary video's watch time instead of reading time.
+const watchMinutes = durationToWatchMinutes(post.data.videos[0]?.duration);
 
-const postUrl = `${SITE_CONFIG.SITE_URL}/posts/${post.slug}/`;
+const postUrl = new URL(postHref(post.slug), SITE_CONFIG.SITE_URL).href;
+const postImage = getPostImage(post.data);
 ---
 
 <BaseLayout
   title={`${post.data.title} | ${SITE_CONFIG.SITE_TITLE}`}
   description={post.data.description}
+  image={postImage}
   articleDate={post.data.date}
   articleTags={post.data.tags}
 >
@@ -67,10 +85,13 @@ const postUrl = `${SITE_CONFIG.SITE_URL}/posts/${post.slug}/`;
     tags={post.data.tags}
     wordCount={words}
     url={postUrl}
+    image={postImage}
+    videos={post.data.videos}
   />
   <article class="post">
     <header class="post-header">
       <h1 class="post-title">{post.data.title}</h1>
+      <p class="post-description">{post.data.description}</p>
       <div class="post-meta">
         <time datetime={post.data.date.toISOString()}>{formattedDate}</time>
         <span class="separator">·</span>
@@ -80,13 +101,22 @@ const postUrl = `${SITE_CONFIG.SITE_URL}/posts/${post.slug}/`;
             <span class="separator">·</span>
             <span class="tags">
               {post.data.tags.map((tag: string) => (
-                <a href={`/tags/${tag}`} class="tag">#{tag}</a>
+                <a href={tagHref(tag)} class="tag">#{tag}</a>
               ))}
             </span>
           </>
         )}
       </div>
     </header>
+
+    {post.data.takeaways.length > 0 && (
+      <section class="takeaways" aria-labelledby="takeaways-title">
+        <h2 id="takeaways-title">Key takeaways</h2>
+        <ul>
+          {post.data.takeaways.map((takeaway) => <li>{takeaway}</li>)}
+        </ul>
+      </section>
+    )}
 
     {post.data.toc && <TableOfContents headings={headings} />}
 
@@ -95,6 +125,7 @@ const postUrl = `${SITE_CONFIG.SITE_URL}/posts/${post.slug}/`;
     </div>
 
     <PostNavigation prevPost={prevPost} nextPost={nextPost} />
+    <RelatedPosts posts={relatedPosts} />
 
     <Comments title={post.data.title} />
   </article>
@@ -127,6 +158,36 @@ const postUrl = `${SITE_CONFIG.SITE_URL}/posts/${post.slug}/`;
     margin-top: var(--space-md);
     font-size: 0.875rem;
     color: var(--color-text-muted);
+  }
+
+  .post-description {
+    max-width: 46rem;
+    margin: var(--space-md) 0 0;
+    color: var(--color-text-muted);
+    font-size: 1.1rem;
+    line-height: 1.6;
+  }
+
+  .takeaways {
+    margin-bottom: var(--space-xl);
+    padding: var(--space-lg);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    background: var(--color-bg-elevated);
+  }
+
+  .takeaways h2 {
+    margin: 0 0 var(--space-md);
+    font-size: 1.125rem;
+  }
+
+  .takeaways ul {
+    margin: 0;
+    padding-left: 1.25rem;
+  }
+
+  .takeaways li + li {
+    margin-top: var(--space-sm);
   }
 
   .separator {

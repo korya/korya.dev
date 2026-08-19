@@ -1,6 +1,8 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getTagDescription } from '../../data/tags';
+import { assertUniqueTagSlugs, tagHref } from '../../lib/urls';
 
 const posts = await getCollection('posts');
 
@@ -16,16 +18,23 @@ const tagCounts = posts
 // Sort by count descending, then alphabetically
 const sortedTags = Object.entries(tagCounts)
   .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+assertUniqueTagSlugs(sortedTags.map(([tag]) => tag));
 ---
 
-<BaseLayout title="Tags | Tech Scrolls">
+<BaseLayout
+  title="Topics | Tech Scrolls"
+  description="Browse Tech Scrolls by topic: AI agents, LLMs, privacy, software engineering, development tools, and repeatable workflows."
+>
   <section class="tags-page">
-    <h1 class="page-title">Tags</h1>
+    <h1 class="page-title">Topics</h1>
     <div class="tag-list">
       {sortedTags.map(([tag, count]) => (
-        <a href={`/tags/${tag}`} class="tag-link">
-          <span class="tag-name">#{tag}</span>
-          <span class="tag-count">{count}</span>
+        <a href={tagHref(tag)} class="tag-link">
+          <span class="tag-heading">
+            <span class="tag-name">#{tag}</span>
+            <span class="tag-count">{count}</span>
+          </span>
+          <span class="tag-description">{getTagDescription(tag)}</span>
         </a>
       ))}
     </div>
@@ -44,21 +53,31 @@ const sortedTags = Object.entries(tagCounts)
   }
 
   .tag-list {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
     gap: var(--space-md);
   }
 
   .tag-link {
-    display: flex;
-    align-items: center;
-    gap: var(--space-xs);
+    display: block;
     padding: var(--space-sm) var(--space-md);
     background: var(--color-bg-elevated);
     border: 1px solid var(--color-border);
-    border-radius: 9999px;
+    border-radius: 8px;
     text-decoration: none;
     transition: border-color 0.15s ease, color 0.15s ease;
+  }
+
+  .tag-heading {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+  }
+
+  .tag-description {
+    display: block;
+    margin-top: var(--space-xs);
+    color: var(--color-text-muted);
+    line-height: 1.5;
   }
 
   .tag-link:hover {

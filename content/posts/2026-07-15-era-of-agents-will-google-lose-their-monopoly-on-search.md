@@ -5,7 +5,21 @@ date: 2026-07-15
 draft: false
 tags: ['agents', 'future', 'tiki-toki']
 toc: false
-videoLength: '4:16'
+takeaways:
+  - 'Agent-mediated search can weaken the direct relationship between users and a traditional search interface.'
+  - 'LLM providers have a strong incentive to own discovery instead of leaving Google in the middle.'
+  - 'Local businesses show how costly dependence on one dominant discovery channel can become.'
+videos:
+  - youtubeId: 'KuJRTz1sHUk'
+    title: 'Era of Agents: Will Google Lose Their Monopoly on Search?'
+    description: "As search shifts from Google to agents, new LLM providers have a chance to challenge Google's grip on discovery."
+    uploadDate: '2026-07-20T13:20:06-07:00'
+    duration: 'PT4M16S'
+    thumbnail:
+      src: '/images/posts/2026-07-15-era-of-agents-will-google-lose-their-monopoly-on-search/KuJRTz1sHUk.jpg'
+      alt: 'Video thumbnail for Will Google Lose Their Monopoly on Search?'
+      width: 1280
+      height: 720
 ---
 
 <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; margin: var(--space-lg, 2rem) 0;">
@@ -35,5 +49,9 @@ The reason is that they tried it in the past. They changed something trivial, so
 So I think all of these small businesses will be happy to get rid of Google. And the new big players will be just as happy to take a larger piece of the pie. It's a time of great opportunities. Whoever is into search optimization, or indexing, or building search APIs for agents, it won't be easy, but these are definitely interesting times for you. Okay, that's all I had to say. See you.
 
 </details>
+
+## Sources and further reading
+
+- [The U.S. Department of Justice's Google search remedies summary](https://www.justice.gov/opa/pr/department-justice-wins-significant-remedies-against-google) describes the court's monopoly finding and the measures intended to restore competition.
 
 X-Posted: [LinkedIn](https://www.linkedin.com/posts/kochelorov_the-internet-is-changing-finally-there-activity-7483193115122561024-Ishy), [X](https://x.com/korya_dev/status/2079300422737506690)

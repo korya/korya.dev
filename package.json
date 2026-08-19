@@ -9,6 +9,7 @@
     "preview": "astro preview",
     "check": "astro check",
     "test": "playwright test",
+    "test:production-indexing": "node scripts/check-production-indexing.mjs",
     "test:ui": "playwright test --ui",
     "pdf": "node scripts/generate-resume-pdf.mjs"
   },

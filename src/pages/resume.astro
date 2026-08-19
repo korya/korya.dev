@@ -45,7 +45,7 @@ const personSchema = {
     alternateName: SITE_CONFIG.AUTHOR.name,
     jobTitle: `${PROFILE.currentRole.title}, ${PROFILE.currentRole.company}`,
     description: `${PROFILE.headline} ${PROFILE.headlineAccent}`,
-    url: `${SITE_CONFIG.SITE_URL}/resume`,
+    url: `${SITE_CONFIG.SITE_URL}/resume/`,
     // Profiles of this same person only. The companies are affiliations, which is the
     // distinction the LINKS comment in resume.ts already draws for the print links.
     sameAs: LINKS.filter((l) => l.href.startsWith('http')).map((l) => l.href),

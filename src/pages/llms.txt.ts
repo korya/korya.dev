@@ -88,7 +88,7 @@ ${PROFILE.headline} ${PROFILE.headlineAccent}
 
 ${PROFILE.doctrine}
 
-Full resume: ${SITE_CONFIG.SITE_URL}/resume
+Full resume: ${SITE_CONFIG.SITE_URL}/resume/
 
 ## Experience
 
@@ -117,8 +117,8 @@ ${postsList}
 ## Navigation
 
 - [All Posts](${SITE_CONFIG.SITE_URL}/)
-- [About](${SITE_CONFIG.SITE_URL}/about)
-- [Resume](${SITE_CONFIG.SITE_URL}/resume)
+- [About](${SITE_CONFIG.SITE_URL}/about/)
+- [Resume](${SITE_CONFIG.SITE_URL}/resume/)
 - [RSS Feed](${SITE_CONFIG.SITE_URL}/rss.xml)
 `;
 
