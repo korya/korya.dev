@@ -115,6 +115,11 @@ python3 <skill>/scripts/make_ass.py /tmp/pv/audio.json out.ass \
 
 - `--layout` sets frame size, font size, margins and words-per-line. A caption tuned
   for a phone is the wrong size for a 16:9 frame; never reuse one file for both.
+- `--anim` defaults to `fade,ease,pop` — a line fade-in, a white→amber colour ease,
+  and a 120% vertical bounce on the highlighted word. Leave it alone unless asked;
+  `--anim none` restores static captions. **Never tune an animation by eye in the
+  `.ass`** — durations are clamped per event and the numbers are unobvious. See
+  *Animation* in `reference/subtitles.md` before changing any of it.
 - `--tone hlg` for **any HDR source** — which, under the quality policy, is every
   deliverable from an iPhone recording. Non-negotiable, and the reason is unobvious:
   libass renders SDR-referenced RGB, so `#FFFFFF` burned into an HLG frame lands at
