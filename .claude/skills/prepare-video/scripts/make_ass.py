@@ -38,6 +38,35 @@ MEASURE_TTC = ("/System/Library/Fonts/Avenir Next.ttc", 8)   # index 8 = Heavy
 CORRECT_SIZE = 0.72    # of the caption font size
 CORRECT_TILT = 4       # degrees; reads as a proofreader's mark, not a 2nd line
 
+# --- Animation ---------------------------------------------------------------
+# Events are emitted one-per-word (see build_events), so a line-level effect
+# must fire only on the first word-event of a line -- applied per event it would
+# re-trigger on every word and strobe the whole line.
+# Durations are targets, not guarantees: an effect lives inside a single
+# Dialogue event, so it dies the moment the next word starts. Median word event
+# is ~340ms but the 10th percentile is ~140ms, so every duration below is
+# clamped to its own event (see _budget) -- unclamped, a short line would snap
+# from half-faded to full when the next word rendered. Anything under ~150ms is
+# 4 frames at 30fps and reads as an instant cut, which is why these are large.
+FADE_MS = 300          # line fade-in
+EASE_MS = 260          # white -> accent colour ease on the active word
+POP_UP, POP_MS = 130, 340  # active-word bounce: up by POP_UP ms, home by POP_MS
+POP_PCT = 120          # peak \fscy. VERTICAL ONLY: \fscx would change the
+                       # glyph advance and shove the rest of the line sideways.
+                       # \fscy still nudges the baseline ~0.5px (line box grows).
+RISE_PX, RISE_MS = 28, 300  # line slides up into place
+BLUR_START, BLUR_MS = 12, 280
+ANIMS = ("fade", "pop", "ease", "rise", "blur")
+# Chosen by eye against rendered samples: fade+ease+pop reads as "alive" without
+# reading as "animated". rise and blur are real but stay opt-in -- rise is the
+# most visible single effect and gets busy over a caption-dense cut.
+DEFAULT_ANIM = "fade,ease,pop"
+
+
+def _budget(ms, event_ms):
+    """Clamp an effect to the event that hosts it, so it always completes."""
+    return max(1, int(min(ms, event_ms)))
+
 
 def text_width(text, size, spacing):
     """Advance width in PlayRes px, matching libass's Spacing handling.
@@ -65,18 +94,18 @@ LAYOUTS = {
     # lighter, so a Shorts-safe margin is safe there too.
     "vertical": {
         "play_w": 1080, "play_h": 1920,
-        "font_size": 78, "outline": 6, "shadow": 4,
-        "margin_v": 420, "margin_lr": 80,
-        "max_words": 4, "max_chars": 24,
+        "font_size": 152, "outline": 12, "shadow": 7,
+        "margin_v": 420, "margin_lr": 40,
+        "max_words": 4, "max_chars": 10,
     },
     # 16:9: the subject occupies only the centre ~608px strip, so captions may
     # run wider than the strip and sit over the blurred panels. That reads as
     # deliberate. Smaller type: 1080px of height is half the vertical frame.
     "horizontal": {
         "play_w": 1920, "play_h": 1080,
-        "font_size": 62, "outline": 5, "shadow": 3,
-        "margin_v": 90, "margin_lr": 260,
-        "max_words": 6, "max_chars": 40,
+        "font_size": 122, "outline": 9, "shadow": 6,
+        "margin_v": 90, "margin_lr": 120,
+        "max_words": 6, "max_chars": 30,
     },
 }
 
@@ -266,7 +295,7 @@ def correction_pos(line, ci, cfg):
     return round(x), round(y)
 
 
-def build_events(lines, white, accent, cfg):
+def build_events(lines, white, accent, cfg, anim=(), pop_pct=POP_PCT):
     """One Dialogue per word: the whole line, with the active word recoloured."""
     ev = []
     for li, line in enumerate(lines):
@@ -280,6 +309,7 @@ def build_events(lines, white, accent, cfg):
             end = line[wi + 1]["start"] if wi + 1 < len(line) else line_end
             if end <= start:
                 end = start + 0.08
+            ev_ms = (end - start) * 1000
             parts = []
             for k, x in enumerate(line):
                 t = x["text"]
@@ -287,8 +317,36 @@ def build_events(lines, white, accent, cfg):
                 # correction reads as a live retraction rather than a footnote.
                 if x["correct"] and k <= wi:
                     t = f"{{\\s1}}{t}{{\\s0}}"
-                parts.append(f"{{\\c{accent}}}{t}{{\\c{white}}}" if k == wi else t)
-            ev.append(f"Dialogue: 0,{ts(start)},{ts(end)},Pop,,0,0,0,,{' '.join(parts)}")
+                if k == wi:
+                    on = (f"\\c{white}\\t(0,{_budget(EASE_MS, ev_ms)},"
+                          f"\\c{accent})" if "ease" in anim
+                          else f"\\c{accent}")
+                    off = f"\\c{white}"
+                    if "pop" in anim:
+                        # Scale the whole bounce so it lands home in time.
+                        f = min(1.0, ev_ms / POP_MS)
+                        up, home = max(1, int(POP_UP * f)), _budget(POP_MS, ev_ms)
+                        on += (f"\\fscy100\\t(0,{up},\\fscy{pop_pct})"
+                               f"\\t({up},{home},\\fscy100)")
+                        off += "\\fscy100"
+                    t = f"{{{on}}}{t}{{{off}}}"
+                parts.append(t)
+            pre = ""
+            if wi == 0:
+                if "fade" in anim:
+                    pre += f"\\fad({_budget(FADE_MS, ev_ms)},0)"
+                if "blur" in anim:
+                    pre += (f"\\blur{BLUR_START}"
+                            f"\\t(0,{_budget(BLUR_MS, ev_ms)},\\blur0)")
+                if "rise" in anim:
+                    cx, cy = cfg["play_w"] // 2, cfg["play_h"] - cfg["margin_v"]
+                    pre += (f"\\move({cx},{cy + RISE_PX},{cx},{cy},"
+                            f"0,{_budget(RISE_MS, ev_ms)})")
+            elif "rise" in anim:
+                cx, cy = cfg["play_w"] // 2, cfg["play_h"] - cfg["margin_v"]
+                pre += f"\\pos({cx},{cy})"
+            body = (f"{{{pre}}}" if pre else "") + " ".join(parts)
+            ev.append(f"Dialogue: 0,{ts(start)},{ts(end)},Pop,,0,0,0,,{body}")
 
         for ci, w in enumerate(line):
             if not w["correct"]:
@@ -319,7 +377,18 @@ def main():
     ap.add_argument("--correct-at", nargs="*", default=[], metavar="TIME=WORD",
                     help="strike the word at TIME and write WORD above it, "
                          "e.g. 104.22=Bitcoin")
+    ap.add_argument("--anim", default=DEFAULT_ANIM,
+                    help="comma-separated: " + ",".join(ANIMS) +
+                         f" (default: {DEFAULT_ANIM}; 'none' = static)")
+    ap.add_argument("--pop-pct", type=int, default=POP_PCT,
+                    help=f"peak vertical scale for the pop bounce "
+                         f"(default {POP_PCT})")
     args = ap.parse_args()
+
+    anim = tuple(a for a in args.anim.split(",") if a and a != "none")
+    bad = [a for a in anim if a not in ANIMS]
+    if bad:
+        raise SystemExit(f"unknown --anim: {bad}; choose from {list(ANIMS)}")
 
     cfg = LAYOUTS[args.layout]
     respell = dict(p.split("=", 1) for p in args.respell)
@@ -338,7 +407,8 @@ def main():
 
     with open(args.ass_out, "w") as f:
         f.write(header(cfg, white))
-        f.write("\n".join(build_events(lines, white, accent, cfg)) + "\n")
+        f.write("\n".join(build_events(lines, white, accent, cfg, anim,
+                                        args.pop_pct)) + "\n")
 
     print(f"{args.layout}/{args.tone}: {len(lines)} lines, {len(words)} words "
           f"-> {args.ass_out}\n")

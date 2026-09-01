@@ -25,3 +25,7 @@ npm-debug.log*
 # Playwright
 test-results/
 playwright-report/
+
+# Python bytecode from skill scripts
+__pycache__/
+*.pyc

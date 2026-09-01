@@ -20,11 +20,11 @@ full styling freedom, at the cost of a larger file (~38 KB for 3.5 minutes — f
 | | vertical | horizontal |
 |---|---|---|
 | PlayRes | 1080×1920 | 1920×1080 |
-| Font size | 78 | 62 |
-| Outline / shadow | 6 / 4 | 5 / 3 |
+| Font size | 152 | 122 |
+| Outline / shadow | 12 / 7 | 9 / 6 |
 | Margin V (from bottom) | 420 | 90 |
-| Margin L/R | 80 | 260 |
-| Max words / chars per line | 4 / 24 | 6 / 40 |
+| Margin L/R | 40 | 120 |
+| Max words / chars per line | 4 / 10 | 6 / 30 |
 
 **Font: Avenir Next Heavy.** A macOS system font, so no bundling. libass resolves it
 via coretext — confirm with `-v info` and look for
@@ -34,12 +34,92 @@ back to a lighter face the captions look weedy, and nothing errors.
 **Margin V 420 in vertical** keeps captions clear of the Reels/TikTok caption overlay
 and button rail. Lower than that and the platform UI covers them.
 
-**Margin L/R 260 in horizontal** gives 1400 px usable — wider than the 608 px video
+**Margin L/R 120 in horizontal** gives 1680 px usable — far wider than the 608 px video
 strip, so captions overhang onto the blurred panels. That is intentional and looks
-deliberate. Verified: a 44-character line spans ~1140 px, comfortably inside.
+deliberate. Verified: at font 122 the widest line spans 1632 px, inside 1680.
+
+**Deliberately large type.** These sizes were settled by rendering and eyeballing, not
+derived: captions are read on a phone, at arm's length, usually while scrolling. If a
+size looks too big in a desktop preview it is probably right. Do not shrink them back
+toward "tasteful" without being asked.
+
+**Font size, `max_chars` and `margin_lr` are one setting in three parts.** Vertical has
+only 1080 px of width, so type size and characters-per-line trade against each other
+directly — you cannot change one alone. Worked example, the 101 → 152 step:
+
+| | usable | max_chars | widest line | lines |
+|---|---|---|---|---|
+| 101, margin 60 | 960 | 18 | 938 | 153 |
+| 152, margin 60, chars unchanged | 960 | 18 | 1399 — **60 lines overflow** | 153 |
+| 152, margin 40, chars 10 | 976 | 10 | 944 | 245 |
+
+**Budget the outline, not just the advance.** `text_width` returns the glyph advance;
+the outline bleeds `outline` px past it on each side. At 152 that is 12 px a side, and
+ignoring it puts a line that "fits" at 982/1000 actually over the edge.
+
+**The failure mode is silent.** `WrapStyle: 0` wraps an over-long line to two lines
+rather than erroring — which breaks the single-line karaoke rhythm and shoves captions
+upward, and you only find out on screen. **Re-measure every line with `text_width`
+before rendering whenever you touch a size.**
+
+**Cadence is the real cost.** Vertical went 153 → 245 lines: a line every 0.88 s, and at
+10 chars most lines hold one or two words. That makes the per-word amber highlight
+nearly a one-word-at-a-time flasher rather than a sweep across a phrase. Accepted
+deliberately here — but if someone asks for the big type *and* the karaoke sweep back,
+the lever is the frame, not the font. Horizontal has 1680 px and absorbed the same +50 %
+for six extra lines (91 → 97), so it keeps the sweep.
 
 **`WrapStyle: 0`**, not 2. With 2 (no wrapping) an over-long line runs off-screen
 instead of wrapping. Grouping should prevent that anyway; this is the safety net.
+
+## Animation
+
+Default `--anim fade,ease,pop` (`--anim none` for static):
+
+| | What | Target | Amplitude |
+|---|---|---|---|
+| `fade` | line fade-in | 300 ms | — |
+| `ease` | white → amber on the active word | 260 ms | fixed by the palette |
+| `pop` | active word `\fscy` bounce | 340 ms | 120 % (`--pop-pct`) |
+| `rise` | line slides up into place | 300 ms | 28 px |
+| `blur` | focus-in | 280 ms | `\blur` 12 → 0 |
+
+`rise` and `blur` work but stay opt-in: `rise` is the most visible single effect and
+turns busy over a caption-dense cut.
+
+**Three things here are easy to get wrong.**
+
+**1. A line-level effect must fire only on the first word-event of a line.** Events are
+one-per-word, so `\fad` applied to every event re-triggers on every word and strobes the
+whole line. `fade`, `blur` and `rise` are gated on `wi == 0`; `rise` also needs an
+explicit `\pos` on the remaining events, or they snap back to margin positioning.
+
+**2. Every duration is clamped to its own event** (`_budget`). An effect cannot outlive
+the Dialogue event hosting it — it dies the moment the next word starts. The median word
+event is ~340 ms but the 10th percentile is ~140 ms, so an unclamped 300 ms fade leaves
+short lines jumping from half-faded to full. The `pop` bounce scales both legs so it
+still lands home.
+
+**3. Durations must be large.** Sub-100 ms is 2–3 frames at 30 fps and reads as a cut,
+not as motion. The first version used 70–120 ms and was invisible on playback even
+though it was provably rendering. Verify by differencing frames against an `--anim none`
+render, not by eye:
+
+```
+ffmpeg -ss <t> -i clip.mp4 -t 0.5 -vf "crop=1080:300:0:1300,scale=540:-2" seq/%02d.png
+```
+
+Count frames scoring above the ~0.5 mean-|diff| noise floor. Under ~6 live frames, it
+will not be noticed. `ease` peaks at only ~1.9 no matter the duration — its amplitude is
+capped by the luma distance between white and amber, so it is felt rather than seen.
+
+**`pop` must be `\fscy`, never `\fscx` or `\fsc`.** `\fscx` scales the glyph advance,
+so popping a mid-line word shoves the rest of the line sideways and back on every word.
+`\fscy` grows the word upward off the baseline with no horizontal reflow — verified by
+offset-sweeping a rendered frame against the static one (minimum at dx=0). It is not
+completely free: the taller line box nudges the bottom-anchored baseline of trailing
+words by under a pixel at 120 %. Invisible in motion, but it is why trailing pixels
+differ at all if you go measuring.
 
 ## HDR: the non-obvious part
 
