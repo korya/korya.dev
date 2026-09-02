@@ -77,3 +77,5 @@ of making ads a possibility without contaminating the content.
 ## Sources and further reading
 
 - [OWASP's Top 10 for LLM Applications](https://genai.owasp.org/llmrisk/llm01-prompt-injection/) ranks prompt injection as the top risk for LLM applications, which is the mechanism that makes third-party ad copy inside a prompt dangerous rather than merely annoying.
+
+X-Posted: [LinkedIn](https://www.linkedin.com/posts/kochelorov_another-way-to-monetize-an-agent-skill-is-ugcPost-7500680161894346754-pb0W), [X](https://x.com/korya_dev/status/2095244050999758911)
