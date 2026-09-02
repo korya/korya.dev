@@ -10,9 +10,15 @@ interface Props {
   description: string;
   tags?: string[];
   videos?: VideoMetadata[];
+  /* The card is an h2 in a list of posts, where the page title is the only h1.
+     Nested under another heading -- "Related posts" on a post page -- it has to
+     drop a level, or the section heading and its own entries read as siblings. */
+  headingLevel?: 2 | 3;
 }
 
-const { title, date, slug, description, tags = [], videos = [] } = Astro.props;
+const { title, date, slug, description, tags = [], videos = [], headingLevel = 2 } = Astro.props;
+
+const Heading = `h${headingLevel}` as 'h2' | 'h3';
 
 const isVideo = videos.length > 0;
 
@@ -31,7 +37,7 @@ const formattedDate = date.toLocaleDateString('en-US', {
     <span class="post-icon" role="img" aria-label={isVideo ? 'Video post' : 'Written post'}>
       <PostTypeIcon type={isVideo ? 'video' : 'text'} />
     </span>
-    <h2 class="post-title">{title}</h2>
+    <Heading class="post-title">{title}</Heading>
   </a>
   <p class="post-description">{description}</p>
   <div class="post-meta">

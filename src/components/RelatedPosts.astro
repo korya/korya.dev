@@ -1,10 +1,14 @@
 ---
-import { postHref } from '../lib/urls';
+import PostCard from './PostCard.astro';
+import type { VideoMetadata } from '../lib/content';
 
 interface RelatedPost {
   slug: string;
   title: string;
   description: string;
+  date: Date;
+  tags: string[];
+  videos?: VideoMetadata[];
 }
 
 interface Props {
@@ -17,14 +21,25 @@ const { posts } = Astro.props;
 {posts.length > 0 && (
   <aside class="related" aria-labelledby="related-posts-title">
     <h2 id="related-posts-title">Related posts</h2>
-    <ul>
+    {/* The same PostCard the index and tag pages use, so a related entry carries
+        the type icon, date and tags rather than a reduced title-and-blurb.
+        Reusing the component keeps the two previews from drifting apart; the
+        wrapper is a plain div so PostCard's own :last-child rule still drops the
+        trailing separator, which an li would break by making every card a last
+        child of its own parent. */}
+    <div class="related-list">
       {posts.map((post) => (
-        <li>
-          <a href={postHref(post.slug)}>{post.title}</a>
-          <p>{post.description}</p>
-        </li>
+        <PostCard
+          title={post.title}
+          date={post.date}
+          slug={post.slug}
+          description={post.description}
+          tags={post.tags}
+          videos={post.videos}
+          headingLevel={3}
+        />
       ))}
-    </ul>
+    </div>
   </aside>
 )}
 
@@ -36,31 +51,7 @@ const { posts } = Astro.props;
   }
 
   h2 {
-    margin: 0 0 var(--space-lg);
+    margin: 0 0 var(--space-sm);
     font-size: 1.25rem;
-  }
-
-  ul {
-    display: grid;
-    gap: var(--space-lg);
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  a {
-    color: var(--color-text);
-    font-weight: 600;
-    text-decoration: none;
-  }
-
-  a:hover {
-    color: var(--color-accent);
-  }
-
-  p {
-    margin: var(--space-xs) 0 0;
-    color: var(--color-text-muted);
-    line-height: 1.5;
   }
 </style>

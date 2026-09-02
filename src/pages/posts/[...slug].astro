@@ -35,6 +35,9 @@ export async function getStaticPaths() {
         slug: candidate.slug,
         title: candidate.data.title,
         description: candidate.data.description,
+        date: candidate.data.date,
+        tags: candidate.data.tags,
+        videos: candidate.data.videos,
       }));
 
     return {
