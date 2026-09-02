@@ -84,7 +84,9 @@ test.describe('social and structured metadata', () => {
         expect(video.duration, href).toMatch(/^PT(?=.*\d)[\dHMS]+$/);
       }
 
-      await expect(page.locator('.post-description')).toBeVisible();
+      // Scoped to the header: related-post cards reuse .post-description, so a
+      // bare selector matches them too and this asserts nothing about the post.
+      await expect(page.locator('.post-header .post-description')).toBeVisible();
       expect(await page.locator('.takeaways li').count(), href).toBeGreaterThanOrEqual(2);
       videoObjects += videos.length;
     }
