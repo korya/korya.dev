@@ -87,4 +87,4 @@ Here's my thoughts. Enjoy your day.
 
 - [Anthropic's Agent Skills overview](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview) describes a skill as a folder of instructions and resources that an agent loads when a task calls for it — which is exactly why its contents are readable by whoever has it.
 
-X-Posted: [LinkedIn](https://lnkd.in/p/gCr_nQ3E)
+X-Posted: [LinkedIn](https://www.linkedin.com/posts/kochelorov_one-way-to-monetize-an-agent-skill-is-subscription-ugcPost-7500663894206681088-nxIE), [X](https://x.com/korya_dev/status/2094899012973343190)

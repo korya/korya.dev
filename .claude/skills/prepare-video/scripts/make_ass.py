@@ -157,15 +157,20 @@ def strip_fillers(words, drop_at=(), keep_at=(), respell=None):
     ("your query, your text, your question"), and silently ate the latter.
     Per-video false starts go in drop_at instead.
     """
-    drop_at, keep_at = set(drop_at), set(keep_at)
+    # Match on 2dp, not exact floats. Whisper emits values like
+    # 206.82000000000002, so an exact `in` test silently misses the word the
+    # caller asked to drop -- and a silent miss looks like the flag was ignored.
+    drop_at = {round(t, 2) for t in drop_at}
+    keep_at = {round(t, 2) for t in keep_at}
     out, i = [], 0
     while i < len(words):
         w = words[i]
+        at = round(w["start"], 2)
 
-        if w["start"] in drop_at:
+        if at in drop_at:
             i += 1
             continue
-        if w["start"] in keep_at:
+        if at in keep_at:
             out.append(dict(w))
             i += 1
             continue
