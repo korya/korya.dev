@@ -1,4 +1,5 @@
 import { test, expect } from './fixtures';
+import { createRouteDependencyMap } from '../scripts/sitemap-lastmod.mjs';
 
 const VIDEO_POST_WITH_FOLLOWUP =
   '/posts/2026-08-13-era-of-agents-agent-skills-are-the-apps/';
@@ -139,7 +140,37 @@ test.describe('indexing signals', () => {
     expect(sitemap).not.toContain('coding-agents');
     expect(sitemap).not.toContain('---');
     expect(sitemap).not.toContain('<changefreq>');
-    expect(sitemap).not.toContain('<lastmod>');
+
+    const entries = [...sitemap.matchAll(/<url>([\s\S]*?)<\/url>/g)].map((match) => match[1]);
+    expect(entries.length).toBeGreaterThan(0);
+    for (const entry of entries) {
+      const locations = [...entry.matchAll(/<loc>([^<]+)<\/loc>/g)];
+      const lastModified = [...entry.matchAll(/<lastmod>([^<]+)<\/lastmod>/g)];
+      expect(locations, entry).toHaveLength(1);
+      expect(lastModified, locations[0]?.[1]).toHaveLength(1);
+
+      const timestamp = Date.parse(lastModified[0][1]);
+      expect(Number.isNaN(timestamp), locations[0][1]).toBe(false);
+      expect(timestamp, locations[0][1]).toBeLessThanOrEqual(Date.now() + 5 * 60 * 1000);
+    }
+  });
+
+  test('tracks every post source rendered in navigation and related previews', async ({ page }) => {
+    const route = '/posts/2026-09-02-era-of-agents-ads-to-monetize-skills-not-really/';
+    const dependencies = createRouteDependencyMap().get(route);
+    expect(dependencies).toBeTruthy();
+
+    await page.goto(route);
+    const linkedPosts = await page
+      .locator('.post-nav a, .related .post-link')
+      .evaluateAll((links) => links.map((link) => (link as HTMLAnchorElement).pathname));
+    expect(linkedPosts.length).toBeGreaterThan(0);
+
+    for (const pathname of linkedPosts) {
+      const slug = pathname.match(/^\/posts\/([^/]+)\/$/)?.[1];
+      expect(slug, pathname).toBeTruthy();
+      expect(dependencies).toContain(`content/posts/${slug}.md`);
+    }
   });
 
   test('generates fallbacks only for routes that actually existed', async ({ request }) => {
