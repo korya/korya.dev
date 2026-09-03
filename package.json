@@ -19,6 +19,7 @@
     "@astrojs/rss": "^4.0.14",
     "@astrojs/sitemap": "^3.6.1",
     "astro": "^5.16.9",
+    "js-yaml": "^4.1.1",
     "preact": "^10.24.0"
   },
   "devDependencies": {

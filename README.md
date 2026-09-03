@@ -33,6 +33,20 @@ Posts are authored in `content/posts/` and copied into `src/content/posts/` by `
 
 The site is hosted as a static app on [DigitalOcean](https://www.digitalocean.com/products/app-platform). The build runs `yarn build` and publishes the generated `dist/` directory.
 
+Sitemap `lastmod` values come from the latest Git commit among each page's
+content, metadata, links, and referenced assets. In the DigitalOcean static
+component, define this build-time environment variable so the build is pinned
+to the exact deployed revision even when App Platform does not expose `.git`:
+
+```text
+SOURCE_COMMIT=${_self.COMMIT_HASH}
+```
+
+The build recovers a shallow checkout when possible and otherwise reads the
+public repository history into a temporary bare clone. It fails rather than
+publishing checkout-time or build-time dates when the requested commit history
+is unavailable.
+
 ## Blog Management
 
 Adding a post:

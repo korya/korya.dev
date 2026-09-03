@@ -2,6 +2,7 @@ import { defineConfig } from 'astro/config';
 import mdx from '@astrojs/mdx';
 import preact from '@astrojs/preact';
 import sitemap from '@astrojs/sitemap';
+import { createSitemapSerializer } from './scripts/sitemap-lastmod.mjs';
 import { pdfRedirects } from './src/lib/pdf-targets.mjs';
 import { devResumePdf } from './src/lib/dev-resume-pdf.mjs';
 import { legacyPostRedirects, legacyTagRedirects } from './src/data/legacy-redirects.mjs';
@@ -24,7 +25,7 @@ export default defineConfig({
     // Dev only: re-renders /resume/offline.pdf per request. In production the
     // committed copy under public/ is served as a static file.
     devResumePdf(),
-    sitemap(),
+    sitemap({ serialize: createSitemapSerializer() }),
   ],
   markdown: {
     shikiConfig: {

@@ -52,6 +52,19 @@ Two skills automate the flow: `widen-vertical-video` (portrait recording → 16:
 for YouTube) and `create-video-post` (YouTube link → scaffolded post with a
 cleaned transcript).
 
+## Keep sitemap freshness dependencies complete
+
+`scripts/sitemap-lastmod.mjs` maps every canonical page to the tracked files
+that materially affect its content, metadata, or links, then uses the newest
+Git commit time as that page's sitemap `lastmod`. When adding a page type or a
+new shared content dependency, update that route map and its tests. Do not use
+the build time as a fallback: inaccurate `lastmod` values are worse than a
+failed build.
+
+DigitalOcean must expose its exact revision through the build-time variable
+`SOURCE_COMMIT=${_self.COMMIT_HASH}`. CI checks out full history; local shallow
+clones are automatically deepened when the remote is available.
+
 ## Known issues
 
 - Post dates render one day early in any timezone west of UTC. The date is parsed

@@ -17,7 +17,10 @@ jobs:
     timeout-minutes: 15
 
     steps:
+      # Sitemap lastmod values come from per-file Git history, not checkout time.
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       # 24, not the current LTS: Astro pulls in fontkitten transitively, which
       # declares engines.node >=24.12, and yarn --frozen-lockfile refuses to install
