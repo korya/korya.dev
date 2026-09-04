@@ -2,6 +2,7 @@
 title: 'LLMs Enabled Big Brother'
 description: "Your LLM provider knows who you are and sees every query, response, and file you upload. That turns Big Brother from a conspiracy theory into working reality, and we're missing the security controls to push back."
 date: 2026-07-21
+updated: 2026-08-19
 draft: false
 tags: ['privacy', 'llms', 'tiki-toki']
 toc: false

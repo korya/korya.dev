@@ -10,6 +10,7 @@ import RelatedPosts from '../../components/RelatedPosts.astro';
 import JsonLd from '../../components/JsonLd.astro';
 import { SITE_CONFIG } from '../../config';
 import { durationToWatchMinutes, getPostImage } from '../../lib/content';
+import { formatPostDate } from '../../lib/dates';
 import { postHref, tagHref } from '../../lib/urls';
 import styles from '../../styles/prose.module.css';
 
@@ -55,11 +56,10 @@ export async function getStaticPaths() {
 const { post, prevPost, nextPost, relatedPosts } = Astro.props;
 const { Content, headings } = await post.render();
 
-const formattedDate = post.data.date.toLocaleDateString('en-US', {
-  year: 'numeric',
-  month: 'long',
-  day: 'numeric',
-});
+const formattedDate = formatPostDate(post.data.date);
+const formattedUpdatedDate = post.data.updated
+  ? formatPostDate(post.data.updated)
+  : undefined;
 
 // Calculate reading time (roughly 200 words per minute)
 const words = post.body.split(/\s+/).length;
@@ -77,6 +77,7 @@ const postImage = getPostImage(post.data);
   description={post.data.description}
   image={postImage}
   articleDate={post.data.date}
+  articleModifiedDate={post.data.updated}
   articleTags={post.data.tags}
 >
   <JsonLd
@@ -85,6 +86,7 @@ const postImage = getPostImage(post.data);
     title={post.data.title}
     description={post.data.description}
     date={post.data.date}
+    updated={post.data.updated}
     tags={post.data.tags}
     wordCount={words}
     url={postUrl}
@@ -96,7 +98,17 @@ const postImage = getPostImage(post.data);
       <h1 class="post-title">{post.data.title}</h1>
       <p class="post-description">{post.data.description}</p>
       <div class="post-meta">
-        <time datetime={post.data.date.toISOString()}>{formattedDate}</time>
+        <span class="post-date">
+          Published <time datetime={post.data.date.toISOString()}>{formattedDate}</time>
+        </span>
+        {formattedUpdatedDate && (
+          <>
+            <span class="separator">·</span>
+            <span class="post-date">
+              Updated <time datetime={post.data.updated!.toISOString()}>{formattedUpdatedDate}</time>
+            </span>
+          </>
+        )}
         <span class="separator">·</span>
         <span>{watchMinutes !== null ? `${watchMinutes} min watch` : `${readingTime} min read`}</span>
         {post.data.tags && post.data.tags.length > 0 && (
@@ -161,6 +173,10 @@ const postImage = getPostImage(post.data);
     margin-top: var(--space-md);
     font-size: 0.875rem;
     color: var(--color-text-muted);
+  }
+
+  .post-date {
+    white-space: nowrap;
   }
 
   .post-description {

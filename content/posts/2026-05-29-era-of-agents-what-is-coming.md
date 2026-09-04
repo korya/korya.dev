@@ -2,6 +2,7 @@
 title: 'Era of Agents: What Is Coming'
 description: "Why AI agents are a new kind of software rather than hype, and how phones turn into personal assistants that handle real-world tasks. Plus the infrastructure and legal changes it will take."
 date: 2026-05-29
+updated: 2026-08-19
 draft: false
 tags: ['agents', 'future', 'tiki-toki']
 toc: false

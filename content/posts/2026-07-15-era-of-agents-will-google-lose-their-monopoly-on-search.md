@@ -2,6 +2,7 @@
 title: 'Era of Agents: Will Google Lose Their Monopoly on Search?'
 description: "As search shifts from Google to agents, new players like OpenAI, Anthropic, and Perplexity finally have a shot at breaking Google's grip. Good news for the local businesses too scared to even edit their Google profile."
 date: 2026-07-15
+updated: 2026-08-19
 draft: false
 tags: ['agents', 'future', 'tiki-toki']
 toc: false

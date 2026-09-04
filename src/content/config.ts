@@ -22,6 +22,7 @@ const posts = defineCollection({
     .object({
       title: z.string(),
       date: z.coerce.date(),
+      updated: z.coerce.date().optional(),
       draft: z.boolean().default(false),
       tags: z.array(z.string()).default([]),
       toc: z.boolean().default(false),
@@ -31,6 +32,14 @@ const posts = defineCollection({
       videos: z.array(videoSchema).default([]),
     })
     .superRefine((post, context) => {
+      if (post.updated && post.updated < post.date) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['updated'],
+          message: 'Updated date must not precede publication date',
+        });
+      }
+
       if (post.draft) return;
 
       if (!post.image && post.videos.length === 0) {

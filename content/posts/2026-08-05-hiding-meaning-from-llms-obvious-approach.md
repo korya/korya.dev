@@ -2,6 +2,7 @@
 title: 'Hiding Meaning from LLMs, the Obvious Approach'
 description: "If LLM providers can read every query, the obvious defence is to stop sending them meaning: transform the query into something else, get the answer, transform it back. Call it semantic homomorphism — anonymization is its simplest form."
 date: 2026-08-05
+updated: 2026-08-19
 draft: false
 tags: ['privacy', 'llms', 'tiki-toki']
 toc: false

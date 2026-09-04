@@ -2,6 +2,7 @@
 title: 'New Battle for the Future of Open Weights Models'
 description: "NVIDIA came out with an initiative to back open weight models, and OpenAI, xAI and Google lined up behind it — against Anthropic's push for safety regulation. What reads as a safety debate is also a fight over who gets to stay at the top."
 date: 2026-07-30
+updated: 2026-08-19
 draft: false
 tags: ['llms', 'future', 'tiki-toki']
 toc: false

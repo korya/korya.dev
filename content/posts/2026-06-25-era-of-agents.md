@@ -2,6 +2,7 @@
 title: 'Era of Agents: Your Device Is Your Personal Assistant'
 description: "As assistants get more capable, the phone dissolves into modular wearables and the web gets rebuilt agent-first, for machines rather than humans."
 date: 2026-06-25
+updated: 2026-08-19
 draft: false
 tags: ['agents', 'future', 'tiki-toki']
 toc: false

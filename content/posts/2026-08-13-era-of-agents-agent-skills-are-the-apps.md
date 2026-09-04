@@ -2,6 +2,7 @@
 title: 'Era of Agents: Agent Skills Are the Apps'
 description: "Agents are becoming the new execution environment — after the OS, the browser, and mobile — and the application layer is moving into agent skills. Instead of writing ad-hoc software, we encode the logic into skills that agents run when needed."
 date: 2026-08-13
+updated: 2026-08-19
 draft: false
 tags: ['agents', 'future', 'tiki-toki']
 toc: false

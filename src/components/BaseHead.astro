@@ -9,6 +9,7 @@ interface Props {
   description?: string;
   image?: ContentImage;
   articleDate?: Date;
+  articleModifiedDate?: Date;
   articleTags?: string[];
   /** Load the site's Manrope stylesheet. /resume sets its own serif stack and never
    *  renders a glyph in Manrope, so it opts out rather than paying for the request. */
@@ -25,6 +26,7 @@ const {
   description = `${SITE_CONFIG.SITE_TITLE} - ${SITE_CONFIG.SITE_DESCRIPTION}`,
   image = DEFAULT_SOCIAL_IMAGE,
   articleDate,
+  articleModifiedDate,
   articleTags,
   siteFonts = true,
 } = Astro.props;
@@ -75,6 +77,9 @@ const imageType = image.src.endsWith('.png') ? 'image/png' : 'image/jpeg';
 {isArticle && (
   <>
     <meta property="article:published_time" content={articleDate.toISOString()} />
+    {articleModifiedDate && (
+      <meta property="article:modified_time" content={articleModifiedDate.toISOString()} />
+    )}
     <meta property="article:author" content={SITE_CONFIG.AUTHOR.url} />
     {articleTags?.map((tag) => (
       <meta property="article:tag" content={tag} />
