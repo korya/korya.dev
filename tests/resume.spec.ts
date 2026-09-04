@@ -133,7 +133,7 @@ test.describe('llms.txt', () => {
   test('carries the about prose, not just a link to it', async ({ request }) => {
     const body = await fetchBody(request);
     // The point of inlining is that a crawler never has to fetch /about.
-    expect(body).toContain("I'm Dmitri. I co-founded FrontSail AI");
+    expect(body).toContain("I'm Dmitri, a 0→1 builder. I co-founded FrontSail AI");
     expect(body).toContain('- LinkedIn: [kochelorov](https://www.linkedin.com/in/kochelorov/)');
   });
 
