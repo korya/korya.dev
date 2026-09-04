@@ -149,7 +149,7 @@ export function createRouteDependencyMap({ root = ROOT, posts = loadPublishedPos
     'src/pages/about.astro',
     'src/components/interactive/Figure.astro',
     'src/data/resume.ts',
-    'public/profile.png',
+    'public/profile.jpg',
     'public/images/social/site.jpg',
   ));
 

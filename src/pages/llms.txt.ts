@@ -14,7 +14,7 @@ import {
 /** Copied by hand from /about, which holds the same words as markup. Keep the two
  *  in step: see AGENTS.md. The resume sections below need no such care, since they
  *  read the same src/data/resume.ts that /resume renders from. */
-const ABOUT = `I'm Dmitri. I co-founded FrontSail AI, where we build an agentic operating system that takes the repetitive back-office work off small businesses' hands.
+const ABOUT = `I'm Dmitri, a 0→1 builder. I co-founded FrontSail AI, where we build an agentic operating system that takes the repetitive back-office work off small businesses' hands.
 
 Alongside that I run Cosmic Lift (https://cosmic-lift.com/), my consulting practice. Fractional CTO work, training, and product architecture and development for companies going AI-first, or making what they already have AI-ready.
 
