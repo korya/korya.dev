@@ -10,10 +10,11 @@ interface Props {
   description?: string;
   image?: ContentImage;
   articleDate?: Date;
+  articleModifiedDate?: Date;
   articleTags?: string[];
 }
 
-const { title, description, image, articleDate, articleTags } = Astro.props;
+const { title, description, image, articleDate, articleModifiedDate, articleTags } = Astro.props;
 ---
 
 <!doctype html>
@@ -24,6 +25,7 @@ const { title, description, image, articleDate, articleTags } = Astro.props;
       description={description}
       image={image}
       articleDate={articleDate}
+      articleModifiedDate={articleModifiedDate}
       articleTags={articleTags}
     />
     <slot name="head" />

@@ -156,6 +156,17 @@ test.describe('llms.txt', () => {
     expect(body).toContain('](https://korya.dev/posts/');
   });
 
+  test('carries publication and substantive update dates for posts', async ({ request }) => {
+    const body = await fetchBody(request);
+
+    expect(body).toContain(
+      '](https://korya.dev/posts/2026-06-25-era-of-agents/) — Published 2026-06-25, updated 2026-08-19:'
+    );
+    expect(body).toContain(
+      '](https://korya.dev/posts/2026-09-02-era-of-agents-ads-to-monetize-skills-not-really/) — Published 2026-09-02:'
+    );
+  });
+
   test('inlines role blurbs without leaking link markup', async ({ request }) => {
     const body = await fetchBody(request);
     // Planitar's blurb is the one built from linked Segments; flatten() must drop

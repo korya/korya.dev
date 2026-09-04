@@ -58,12 +58,18 @@ Adding a post:
 5. Write the content. Video posts also need two to five `takeaways` and matching YouTube iframes.
 6. Set `draft: false` to publish.
 
+When substantially revising an existing post, add `updated: YYYY-MM-DD`. Use it
+for new conclusions, corrected facts, rewritten sections, or meaningful new
+examples—not for typo fixes, styling, related links, or deployments. New posts
+omit `updated`, and the original `date` never changes.
+
 ### Frontmatter
 
 | Field         | Required | Description                                                        |
 | ------------- | -------- | ------------------------------------------------------------------ |
 | `title`       | yes      | Post title.                                                        |
 | `date`        | yes      | Publication date (`YYYY-MM-DD`).                                   |
+| `updated`     | no       | Date of the latest substantive revision (`YYYY-MM-DD`). Must not precede `date`. |
 | `draft`       | no       | `true` hides the post from the build. Defaults to `false`.         |
 | `tags`        | no       | List of tags, e.g. `['agents', 'future']`. Defaults to `[]`.       |
 | `toc`         | no       | `true` shows a table of contents. Defaults to `false`.            |

@@ -2,6 +2,7 @@
 title: 'Era of Agents: Your Assistant Will Ask for Allowance'
 description: "Ads can't pay for the internet once agents do the browsing — micropayments will, powered by crypto and new protocols like x402. Your agent will get an allowance, and you'll have to trust it to spend your money wisely."
 date: 2026-08-18
+updated: 2026-08-19
 draft: false
 tags: ['agents', 'future', 'tiki-toki']
 toc: false

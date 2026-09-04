@@ -3,6 +3,9 @@ import { createRouteDependencyMap } from '../scripts/sitemap-lastmod.mjs';
 
 const VIDEO_POST_WITH_FOLLOWUP =
   '/posts/2026-08-13-era-of-agents-agent-skills-are-the-apps/';
+const UPDATED_POST = '/posts/2026-06-25-era-of-agents/';
+const NEVER_UPDATED_POST =
+  '/posts/2026-09-02-era-of-agents-ads-to-monetize-skills-not-really/';
 
 async function blogPostingSchema(page: import('@playwright/test').Page) {
   const scripts = await page.locator('script[type="application/ld+json"]').allInnerTexts();
@@ -43,6 +46,60 @@ test.describe('social and structured metadata', () => {
       'content',
       ''
     );
+  });
+
+  test('keeps visible and machine-readable article dates in agreement', async ({ page }) => {
+    await page.goto(UPDATED_POST);
+
+    const dates = page.locator('.post-header .post-date');
+    await expect(dates).toHaveCount(2);
+    await expect(dates.nth(0)).toHaveText('Published June 25, 2026');
+    await expect(dates.nth(0).locator('time')).toHaveAttribute(
+      'datetime',
+      '2026-06-25T00:00:00.000Z'
+    );
+    await expect(dates.nth(1)).toHaveText('Updated August 19, 2026');
+    await expect(dates.nth(1).locator('time')).toHaveAttribute(
+      'datetime',
+      '2026-08-19T00:00:00.000Z'
+    );
+
+    await expect(page.locator('meta[property="article:published_time"]')).toHaveAttribute(
+      'content',
+      '2026-06-25T00:00:00.000Z'
+    );
+    await expect(page.locator('meta[property="article:modified_time"]')).toHaveAttribute(
+      'content',
+      '2026-08-19T00:00:00.000Z'
+    );
+
+    const schema = await blogPostingSchema(page);
+    expect(schema.datePublished).toBe('2026-06-25T00:00:00.000Z');
+    expect(schema.dateModified).toBe('2026-08-19T00:00:00.000Z');
+  });
+
+  test('does not invent an update date for an unchanged post', async ({ page }) => {
+    await page.goto(NEVER_UPDATED_POST);
+
+    await expect(page.locator('.post-header .post-date')).toHaveCount(1);
+    await expect(page.locator('.post-header .post-date')).toHaveText(
+      'Published September 2, 2026'
+    );
+    await expect(page.locator('meta[property="article:modified_time"]')).toHaveCount(0);
+
+    const schema = await blogPostingSchema(page);
+    expect(schema.dateModified).toBeUndefined();
+  });
+
+  test('wraps both article dates without overflowing a phone viewport', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto(UPDATED_POST);
+
+    await expect(page.locator('.post-header .post-date')).toHaveCount(2);
+    const overflows = await page.evaluate(
+      () => document.documentElement.scrollWidth > document.documentElement.clientWidth
+    );
+    expect(overflows).toBe(false);
   });
 
   test('models every embedded video and its visible answer-ready content', async ({ page }) => {

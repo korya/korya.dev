@@ -2,6 +2,7 @@
 import PostTypeIcon from './PostTypeIcon.astro';
 import { postHref, tagHref } from '../lib/urls';
 import type { VideoMetadata } from '../lib/content';
+import { formatPostDate } from '../lib/dates';
 
 interface Props {
   title: string;
@@ -22,11 +23,7 @@ const Heading = `h${headingLevel}` as 'h2' | 'h3';
 
 const isVideo = videos.length > 0;
 
-const formattedDate = date.toLocaleDateString('en-US', {
-  year: 'numeric',
-  month: 'long',
-  day: 'numeric',
-});
+const formattedDate = formatPostDate(date);
 ---
 
 <article class="post-card" data-type={isVideo ? 'video' : 'text'}>

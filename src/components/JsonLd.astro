@@ -7,6 +7,7 @@ interface Props {
   title?: string;
   description?: string;
   date?: Date;
+  updated?: Date;
   tags?: string[];
   wordCount?: number;
   url?: string;
@@ -14,7 +15,18 @@ interface Props {
   videos?: VideoMetadata[];
 }
 
-const { type, title, description, date, tags, wordCount, url, image, videos = [] } = Astro.props;
+const {
+  type,
+  title,
+  description,
+  date,
+  updated,
+  tags,
+  wordCount,
+  url,
+  image,
+  videos = [],
+} = Astro.props;
 const absoluteURL = (path: string) => new URL(path, SITE_CONFIG.SITE_URL).href;
 
 function generateBlogPostingSchema() {
@@ -24,6 +36,7 @@ function generateBlogPostingSchema() {
     headline: title,
     description: description,
     datePublished: date?.toISOString(),
+    ...(updated && { dateModified: updated.toISOString() }),
     ...(image && { image: [absoluteURL(image.src)] }),
     author: {
       '@type': 'Person',

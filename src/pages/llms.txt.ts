@@ -1,6 +1,7 @@
 import { getCollection } from 'astro:content';
 import type { APIContext } from 'astro';
 import { SITE_CONFIG } from '../config';
+import { serializePostDate } from '../lib/dates';
 import {
   ALONGSIDE,
   EDUCATION,
@@ -48,8 +49,12 @@ export async function GET(context: APIContext) {
 
   const postsList = posts
     .map((post) => {
+      const updated = post.data.updated
+        ? `, updated ${serializePostDate(post.data.updated)}`
+        : '';
+      const dates = ` — Published ${serializePostDate(post.data.date)}${updated}`;
       const description = post.data.description ? `: ${post.data.description}` : '';
-      return `- [${post.data.title}](${SITE_CONFIG.SITE_URL}/posts/${post.slug}/)${description}`;
+      return `- [${post.data.title}](${SITE_CONFIG.SITE_URL}/posts/${post.slug}/)${dates}${description}`;
     })
     .join('\n');
 

@@ -48,6 +48,12 @@ video and supplies the watch time and social image; every entry must match a
 YouTube iframe in the post body in the same order. Video posts also use tag
 `tiki-toki`, which groups the series, and two to five visible `takeaways`.
 
+Existing posts may carry an `updated: YYYY-MM-DD` field only after a substantive
+revision such as corrected facts, new conclusions, rewritten sections, or
+meaningful examples. Do not set it on initial publication or refresh it for typo,
+style, related-link, or deployment-only changes. Never replace the original
+publication `date`.
+
 Two skills automate the flow: `widen-vertical-video` (portrait recording → 16:9
 for YouTube) and `create-video-post` (YouTube link → scaffolded post with a
 cleaned transcript).
@@ -67,8 +73,6 @@ clones are automatically deepened when the remote is available.
 
 ## Known issues
 
-- Post dates render one day early in any timezone west of UTC. The date is parsed
-  as UTC midnight and formatted in local time.
 - Astro's static redirect pages return `200` on DigitalOcean. Historical URL
   moves therefore need matching App Platform ingress redirects; the generated
   pages are only noindex fallbacks.

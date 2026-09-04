@@ -2,6 +2,7 @@
 title: 'Era of Agents: The Rise of Open Weights LLMs'
 description: "When governments started blocking and pausing frontier model releases, everyone realized how dependent they are on a handful of labs. The geopolitical response points straight at open weights — and a real shot at your own LLM on your own device."
 date: 2026-07-09
+updated: 2026-08-19
 draft: false
 tags: ['agents', 'future', 'tiki-toki']
 toc: false

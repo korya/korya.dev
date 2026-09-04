@@ -73,6 +73,18 @@ test.describe('sitemap lastmod dependencies', () => {
       'public/images/posts/2026-09-02-era-of-agents-ads-to-monetize-skills-not-really/ePov3BYfv_c.jpg'
     );
   });
+
+  test('tracks date rendering only on routes that display post dates', () => {
+    const routes = createRouteDependencyMap();
+    const dateDependency = 'src/lib/dates.ts';
+
+    for (const route of ['/', '/tags/agents/', '/posts/2026-06-25-era-of-agents/']) {
+      expect(routes.get(route), route).toContain(dateDependency);
+    }
+    for (const route of ['/about/', '/resume/', '/tags/']) {
+      expect(routes.get(route), route).not.toContain(dateDependency);
+    }
+  });
 });
 
 test.describe('Git timestamp resolution', () => {
