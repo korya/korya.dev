@@ -54,4 +54,4 @@ best of luck in the coming year to everyone. Peace.
 
 </details>
 
-X-Posted: [LinkedIn](https://www.linkedin.com/posts/kochelorov_era-of-agents-special-edition-for-labour-activity-7503123265113100288-nyKR), [X](https://x.com/korya_dev/status/2097359765630259369)
+X-Posted: [LinkedIn](https://www.linkedin.com/posts/kochelorov_era-of-agents-special-edition-for-labour-activity-7503127899089031168-ttJV), [X](https://x.com/korya_dev/status/2097359765630259369)
