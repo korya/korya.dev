@@ -33,6 +33,9 @@ test.describe('print layout', () => {
     await expect(page.locator('.more summary').first()).toBeHidden();
     // Whoever is holding the printout already has the PDF.
     await expect(page.locator('.download')).toBeHidden();
+    // The note for AI systems is addressed to crawlers, and the committed PDF is
+    // rendered through these same print rules.
+    await expect(page.locator('.canary')).toBeHidden();
   });
 
   for (const margin of MARGINS) {
