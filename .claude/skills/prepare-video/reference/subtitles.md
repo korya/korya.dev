@@ -181,6 +181,54 @@ near-homophones (it wrote "contacts" for "context", and "Entropiq" for "Anthropi
 another video). **Read the printed line list every time** — this is where errors hide,
 and they are invisible once burned into pixels.
 
+## Visible corrections and retractions
+
+Three flags mark up what was said rather than silently rewriting it. All are
+keyed by **word start time**, so they hit one word and never its namesakes —
+unlike `--respell`, which rewrites every instance of a word in the video.
+
+| Flag | Effect |
+|---|---|
+| `--correct-at T=WORD` | strike the word at T, write WORD above it in accent |
+| `--strike-at T` | strike the word at T with nothing above it (a retraction) |
+| `--retext-at T=TEXT` | replace that word's on-screen text; TEXT may be several words |
+| `--break-at T` | force a line break *before* the word at T |
+
+`--break-at` exists because grouping will otherwise glue a struck false start to
+the phrase that replaced it. To isolate a two-word retraction onto its own line
+you need a break before it *and* before the word that follows it.
+
+A mistimed `--correct-at`/`--strike-at` is a hard error listing the times that
+matched nothing — it cannot silently no-op.
+
+### The strike is drawn, not `\s1`
+
+libass supports `\s1`, and it positions the rule correctly, but it draws it in
+**the text's own colour**. On a 152 px heavy face that means the rule only shows
+in the gaps between letters and reads as a rendering artifact, not a deletion —
+and on the accent-coloured active word it vanishes outright. ASS has no separate
+strikeout colour, so `make_ass.py` draws its own bar as a `\p1` rectangle on
+layer 1.
+
+Two consequences worth knowing:
+
+**A struck word never takes the karaoke highlight.** It stays white while the
+bar and the correction above it carry the accent, so accent consistently means
+"this is the edit" and the eye follows the correction rather than the mistake.
+
+**The bar geometry is measured, not guessed.** `STRIKE_MID` (0.546 of font size
+below the top of the caption cell) and `STRIKE_THICK` (0.046) were read off a
+libass `\s1` render by differencing it against the same frame without the tag,
+so the drawn bar lands exactly where libass would have put it. Re-measure if the
+font ever changes — these are face metrics, not round numbers. A run of adjacent
+struck words is drawn as one unbroken rule: each bar reaches on to the next
+word's left edge, so the line closes up as the run is spoken.
+
+> **Measuring anything with `subtitles=`:** put `-ss` *after* `-i`. Input seeking
+> rewrites the frame's PTS to ~0, so the filter renders whatever caption is at
+> the start of the video — the frame looks caption-free and a diff against it
+> reads as "the tag does nothing". This cost an hour once.
+
 ## Punctuation
 
 Commas and full stops are stripped; `?` and `!` are kept. Original capitalisation is
