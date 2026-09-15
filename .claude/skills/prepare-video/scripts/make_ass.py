@@ -38,6 +38,15 @@ MEASURE_TTC = ("/System/Library/Fonts/Avenir Next.ttc", 8)   # index 8 = Heavy
 CORRECT_SIZE = 0.72    # of the caption font size
 CORRECT_TILT = 4       # degrees; reads as a proofreader's mark, not a 2nd line
 
+# libass's own \s1 draws the strike in the *text's* colour, so on a 150px heavy
+# face it only peeks through the letter gaps and reads as an artifact rather
+# than a deletion. We draw the bar ourselves instead, in the accent colour, and
+# hold the struck word at white -- so accent consistently means "the edit".
+# Fractions of font size, measured off a libass \s1 render (see reference).
+STRIKE_MID = 0.546     # bar midline below the top of the caption cell
+STRIKE_THICK = 0.046   # bar thickness
+STRIKE_PAD = 0.05      # overhang each side, so the bar clears the glyphs
+
 # --- Animation ---------------------------------------------------------------
 # Events are emitted one-per-word (see build_events), so a line-level effect
 # must fire only on the first word-event of a line -- applied per event it would
@@ -216,14 +225,28 @@ def clean_text(raw, respell):
     return t
 
 
-def group_lines(words, cfg, respell, corrections=None):
+def group_lines(words, cfg, respell, corrections=None, retext=None,
+                break_at=()):
+    """retext/break_at are keyed by word start time, so they hit one word only.
+
+    A global --respell would rewrite every instance of a word; these do not.
+    break_at forces a line break *before* its word, which is the only way to
+    isolate a struck false start onto its own line -- grouping would otherwise
+    glue it to the phrase that replaced it.
+    """
+    retext = {round(k, 2): v for k, v in (retext or {}).items()}
+    break_at = {round(t, 2) for t in break_at}
     lines, cur = [], []
     for w in words:
         w = dict(w)
-        w["text"] = clean_text(w["raw"], respell)
-        w["correct"] = (corrections or {}).get(w["start"])
+        at = round(w["start"], 2)
+        w["text"] = retext.get(at) or clean_text(w["raw"], respell)
+        w["correct"] = (corrections or {}).get(at)
         if not w["text"]:
             continue
+        if cur and at in break_at:
+            lines.append(cur)
+            cur = []
         if cur:
             gap = w["start"] - cur[-1]["end"]
             width = sum(len(x["text"]) + 1 for x in cur) + len(w["text"])
@@ -280,8 +303,8 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 """
 
 
-def correction_pos(line, ci, cfg):
-    """Centre of the struck word, and a y one line above it, in PlayRes px.
+def word_box(line, ci, cfg):
+    """Centre x and advance width of word ci, in PlayRes px.
 
     The style is bottom-centre with equal L/R margins, so the line is centred on
     play_w regardless of its width — measure the line, the run before the word,
@@ -292,8 +315,35 @@ def correction_pos(line, ci, cfg):
     line_w = text_width(" ".join(texts), size, spacing)
     prefix_w = text_width(" ".join(texts[:ci]) + " ", size, spacing) if ci else 0
     word_w = text_width(texts[ci], size, spacing)
+    return cfg["play_w"] / 2 - line_w / 2 + prefix_w + word_w / 2, word_w
 
-    x = cfg["play_w"] / 2 - line_w / 2 + prefix_w + word_w / 2
+
+def strike_bar(line, ci, cfg, accent):
+    r"""An accent-coloured rule across the word, replacing libass's \s1.
+
+    A run of struck words gets one unbroken rule: each bar reaches on to the
+    next word's left edge, so the line closes up as the run is spoken instead
+    of leaving a gap at every space.
+    """
+    size, pad = cfg["font_size"], STRIKE_PAD * cfg["font_size"]
+    x, word_w = word_box(line, ci, cfg)
+    left, right = x - word_w / 2 - pad, x + word_w / 2 + pad
+    nxt = ci + 1
+    if nxt < len(line) and line[nxt]["correct"] is not None:
+        nx, nw = word_box(line, nxt, cfg)
+        right = nx - nw / 2 + pad
+    w = round(right - left)
+    t = max(2, round(STRIKE_THICK * size))
+    y = round(cfg["play_h"] - cfg["margin_v"] - size + STRIKE_MID * size)
+    return (f"{{\\an5\\pos({round((left + right) / 2)},{y})\\c{accent}"
+            f"\\bord{max(2, t // 3)}\\shad0\\p1}}"
+            f"m 0 0 l {w} 0 l {w} {t} l 0 {t}{{\\p0}}")
+
+
+def correction_pos(line, ci, cfg):
+    """Centre of the struck word, and a y one line above it, in PlayRes px."""
+    size = cfg["font_size"]
+    x, _ = word_box(line, ci, cfg)
     # Caption cell spans fs px up from the bottom margin; park the correction's
     # midline just above that so it kisses the ascenders without covering them.
     y = cfg["play_h"] - cfg["margin_v"] - size - CORRECT_SIZE * size * 0.45
@@ -318,14 +368,14 @@ def build_events(lines, white, accent, cfg, anim=(), pop_pct=POP_PCT):
             parts = []
             for k, x in enumerate(line):
                 t = x["text"]
-                # The strike lands only once the word has been said, so the
-                # correction reads as a live retraction rather than a footnote.
-                if x["correct"] and k <= wi:
-                    t = f"{{\\s1}}{t}{{\\s0}}"
                 if k == wi:
+                    # A struck word is retracted, so it never takes the karaoke
+                    # highlight -- accent is reserved for the strike and the
+                    # correction, which is what the eye should follow.
+                    hit = accent if x["correct"] is None else white
                     on = (f"\\c{white}\\t(0,{_budget(EASE_MS, ev_ms)},"
-                          f"\\c{accent})" if "ease" in anim
-                          else f"\\c{accent}")
+                          f"\\c{hit})" if "ease" in anim
+                          else f"\\c{hit}")
                     off = f"\\c{white}"
                     if "pop" in anim:
                         # Scale the whole bounce so it lands home in time.
@@ -353,6 +403,13 @@ def build_events(lines, white, accent, cfg, anim=(), pop_pct=POP_PCT):
             body = (f"{{{pre}}}" if pre else "") + " ".join(parts)
             ev.append(f"Dialogue: 0,{ts(start)},{ts(end)},Pop,,0,0,0,,{body}")
 
+        # The bar lands only once the word has been said, so it reads as a
+        # live retraction rather than a footnote.
+        for ci, w in enumerate(line):
+            if w["correct"] is None:
+                continue
+            ev.append(f"Dialogue: 1,{ts(w['start'])},{ts(line_end)},Pop,,0,0,0,,"
+                      + strike_bar(line, ci, cfg, accent))
         for ci, w in enumerate(line):
             if not w["correct"]:
                 continue
@@ -382,6 +439,16 @@ def main():
     ap.add_argument("--correct-at", nargs="*", default=[], metavar="TIME=WORD",
                     help="strike the word at TIME and write WORD above it, "
                          "e.g. 104.22=Bitcoin")
+    ap.add_argument("--strike-at", type=float, nargs="*", default=[],
+                    metavar="TIME",
+                    help="strike the word at TIME with no correction above it "
+                         "(a retracted false start)")
+    ap.add_argument("--retext-at", nargs="*", default=[], metavar="TIME=TEXT",
+                    help="replace the text of the word at TIME, e.g. "
+                         "51.64=we'll -- unlike --respell, hits that word only")
+    ap.add_argument("--break-at", type=float, nargs="*", default=[],
+                    metavar="TIME",
+                    help="force a line break before the word at TIME")
     ap.add_argument("--anim", default=DEFAULT_ANIM,
                     help="comma-separated: " + ",".join(ANIMS) +
                          f" (default: {DEFAULT_ANIM}; 'none' = static)")
@@ -397,18 +464,32 @@ def main():
 
     cfg = LAYOUTS[args.layout]
     respell = dict(p.split("=", 1) for p in args.respell)
-    corrections = {float(k): v for k, v in
+    corrections = {round(float(k), 2): v for k, v in
                    (p.split("=", 1) for p in args.correct_at)}
+    for t in args.strike_at:                 # strike with nothing written above
+        corrections.setdefault(round(t, 2), "")
+    retext = {float(k): v for k, v in
+              (p.split("=", 1) for p in args.retext_at)}
     scale = TONE_SCALE[args.tone]
     white, accent = ass_colour(BASE_WHITE, scale), ass_colour(BASE_ACCENT, scale)
 
     words = strip_fillers(load_words(args.json_in), args.drop_at, args.keep_at)
-    lines = merge_orphans(group_lines(words, cfg, respell, corrections), cfg)
+    lines = merge_orphans(group_lines(words, cfg, respell, corrections,
+                                      retext, args.break_at), cfg)
 
-    seen = {w["start"] for line in lines for w in line if w["correct"]}
-    missing = sorted(set(corrections) - seen)
-    if missing:
-        raise SystemExit(f"--correct-at times not found in output: {missing}")
+    # Every time-keyed flag is validated: a mistyped timestamp that silently
+    # no-ops is the worst outcome -- the render succeeds and the edit is simply
+    # absent, which you only notice once it is burned into pixels.
+    kept = {round(w["start"], 2) for line in lines for w in line}
+    struck = {round(w["start"], 2) for line in lines for w in line
+              if w["correct"] is not None}
+    for flag, want, got in (("--correct-at/--strike-at", set(corrections), struck),
+                            ("--retext-at", {round(k, 2) for k in retext}, kept),
+                            ("--break-at", {round(t, 2) for t in args.break_at},
+                             kept)):
+        missing = sorted(want - got)
+        if missing:
+            raise SystemExit(f"{flag} times not found in output: {missing}")
 
     with open(args.ass_out, "w") as f:
         f.write(header(cfg, white))
@@ -418,8 +499,10 @@ def main():
     print(f"{args.layout}/{args.tone}: {len(lines)} lines, {len(words)} words "
           f"-> {args.ass_out}\n")
     for line in lines:
-        text = ' '.join(f"[{w['text']} -> {w['correct']}]" if w['correct']
-                        else w['text'] for w in line)
+        text = ' '.join(
+            (f"[{w['text']} -> {w['correct']}]" if w['correct']
+             else f"[{w['text']} XX]") if w['correct'] is not None
+            else w['text'] for w in line)
         print(f"  [{line[0]['start']:7.2f}] {text}")
 
 
