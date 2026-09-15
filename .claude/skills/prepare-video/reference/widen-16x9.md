@@ -17,7 +17,7 @@ ENC=(-c:v hevc_videotoolbox -b:v 12M -tag:v hvc1 \
 ```
 
 Each filter below ends at `[v]`, so the `,subtitles=out.ass` step and the `-map "[v]"`
-from `SKILL.md` Step 4 attach unchanged. Append `subtitles` **after** the `overlay`,
+from `SKILL.md` Step 5 attach unchanged. Append `subtitles` **after** the `overlay`,
 so captions land on the finished 1920×1080 composite rather than on the portrait strip.
 
 ## Variant A — classic blur fill — THE DEFAULT
