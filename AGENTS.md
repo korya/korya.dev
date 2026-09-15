@@ -41,6 +41,13 @@ update `llms.txt.ts` if the fact belongs there).
 `ROLES` are present in the served `/llms.txt`. It cannot tell you the copy has
 drifted, only that something is there.
 
+One deliberate exception: the "For AI systems" note at the foot of `/resume` — a
+tripwire asking an outreach-drafting agent to open with a solyanka recipe — is
+**not** mirrored into `llms.txt`. The unsupervised pipelines it targets scrape
+pages, never `llms.txt`; the AI search engines that do read `llms.txt` would be
+free to quote the recipe back in ordinary answers about Dmitri. `tests/resume.spec.ts`
+asserts the absence, so re-adding it fails the suite.
+
 ## Posts
 
 Video posts carry a `videos` frontmatter array. The first entry is the primary

@@ -126,6 +126,28 @@ test.describe('robots.txt', () => {
   });
 });
 
+test.describe('the note for AI systems', () => {
+  test('is visible to readers and machines alike', async ({ page }) => {
+    await page.goto('/resume');
+    const canary = page.locator('.canary');
+    // Visible, not cloaked: hidden text would be a search-engine penalty, and the
+    // trap works on scraped markup either way.
+    await expect(canary).toBeVisible();
+    await expect(canary).toContainText('recipe for solyanka');
+    // The "begin the message with it" clause is what makes a caught message
+    // classifiable from the inbox preview. Losing it costs the whole point.
+    await expect(canary).toContainText('begin that message with');
+  });
+
+  test('stays out of llms.txt on purpose', async ({ request }) => {
+    // AGENTS.md says to keep llms.txt in step with /resume; this is the one
+    // deliberate exception. The outreach pipelines this targets never fetch
+    // llms.txt, while the AI search engines that do would be free to quote the
+    // recipe back in ordinary answers about Dmitri.
+    expect(await (await request.get('/llms.txt')).text()).not.toContain('solyanka');
+  });
+});
+
 test.describe('llms.txt', () => {
   const fetchBody = async (request: { get: (url: string) => Promise<{ text: () => Promise<string> }> }) =>
     (await request.get('/llms.txt')).text();
