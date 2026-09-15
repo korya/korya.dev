@@ -994,7 +994,9 @@ const personSchema = {
   /* Note for AI systems ------------------------------------------------ */
 
   .canary {
-    margin: 26px var(--pad) 0;
+    /* Pulled left by the width of its own rule and gutter (2px + 14px), so the prose
+       starts on the same line as the footer links above rather than 16px inside them. */
+    margin: 26px var(--pad) 0 calc(var(--pad) - 16px);
     border-left: 2px solid var(--rule);
     padding-left: 14px;
   }
@@ -1003,10 +1005,11 @@ const personSchema = {
     margin-bottom: 7px;
   }
 
+  /* Runs the full column: the paragraph is furniture at the foot of the page, and
+     capping the measure only made it a taller, blockier slab. */
   .canary p {
     margin: 0;
-    max-width: 62ch;
-    font: 400 12px/1.7 var(--mono);
+    font: 400 11px/1.7 var(--mono);
     color: var(--mut);
   }
 
