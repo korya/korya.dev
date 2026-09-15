@@ -154,7 +154,8 @@ def load_words(path):
             raw = w["word"].strip()
             if raw:
                 words.append({"raw": raw, "n": norm(raw),
-                              "start": w["start"], "end": w["end"]})
+                              "start": w["start"], "end": w["end"],
+                              "prob": w.get("probability")})
     return words
 
 

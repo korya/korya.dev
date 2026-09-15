@@ -76,7 +76,7 @@ genuinely-landscape source needs different handling.
 
 **Colour.** `color_transfer=arib-std-b67` (HLG) or `smpte2084` (PQ) with
 `color_primaries=bt2020` means HDR. This changes both the encoder flags *and* the
-subtitle colours — see Step 3. A `DOVI configuration record` means Dolby Vision; its
+subtitle colours — see Step 4. A `DOVI configuration record` means Dolby Vision; its
 RPU layer **cannot survive an ffmpeg re-encode**. For profile 8.4 the base layer is
 plain HLG so nothing visible is lost — say so rather than letting the user find out.
 
@@ -106,7 +106,59 @@ uvx --from mlx-whisper mlx_whisper --model mlx-community/whisper-large-v3-turbo 
 Extract audio first — feeding whisper a 400 MB video wastes minutes for identical
 output. First run downloads ~1.5 GB of model; later runs are seconds.
 
-## Step 3 — Generate the subtitle file
+## Step 3 — Review the transcript with the user, and wait
+
+**Never render captions the user has not signed off.** Once a word is burned into
+pixels, fixing it costs a full re-encode and a re-upload, so the cheap moment to catch
+it is now. Run:
+
+```
+python3 <skill>/scripts/review_transcript.py /tmp/pv/audio.json
+```
+
+It prints four buckets: **A** low-confidence words, **B** filler the rules will strip,
+**C** stutters and long-pause restarts, **D** the full text to read for sense.
+
+Put the candidates to the user and **wait for the answers**. Every item gets one of
+four dispositions, and the user chooses — you propose, they decide:
+
+| Disposition | Flag | Use when |
+|---|---|---|
+| **Visible correction** | `--correct-at T=WORD` | the slip is worth showing: the wrong word is struck and the right one sits above it |
+| **Silent correction** | `--retext-at T=TEXT` | a plain mishearing nobody needs to see flagged |
+| **Remove** | `--drop-at T` | a false start or filler that adds nothing |
+| **Leave** | `--keep-at T` if a rule would strip it | deliberate repetition, emphasis, load-bearing phrasing |
+
+Ask in batches of related items rather than one question per word — a three-minute
+video routinely yields thirty candidates, and thirty prompts is not a review, it is an
+interrogation. Group them, show each in context, and recommend a disposition for each
+so the user is confirming a judgement rather than making thirty from scratch.
+
+**Bucket D is where the dangerous errors live, and it is the one that takes real
+attention.** Whisper's confidence finds garble; it does not find a *confident* wrong
+word. Measured on the video this step was built for, two errors that changed the
+meaning of a sentence both sat in the top third by confidence:
+
+| Heard | Should have been | Confidence | Rank |
+|---|---|---|---|
+| "taught" | "studied" | 0.957 | 50 / 330 |
+| "they will just degrade" | "we'll just degrade" | 0.995 | 96 / 330 |
+
+Neither is detectable mechanically. Read the transcript for passages that do not parse,
+pronouns that contradict their own sentence, and words that are ordinary English but
+wrong in context. If a second transcription is available — YouTube's auto-captions for
+an already-uploaded video, or a second whisper model — diff the two; disagreements land
+almost exactly on this class of error.
+
+**Distinguish a slip from a style.** The tool flags "why not, why not" and "destroy us,
+destroy the humanity" as repeats, but those are rhetoric, not stumbles. This is the same
+reason the generic false-start rule was tried and reverted (see `reference/subtitles.md`):
+no rule separates a stumble from deliberate parallel phrasing. A person has to look.
+
+Carry every agreed disposition into the Step 4 command. Re-run Step 4 as often as you
+like: it costs seconds and needs no re-transcription.
+
+## Step 4 — Generate the subtitle file
 
 ```
 python3 <skill>/scripts/make_ass.py /tmp/pv/audio.json out.ass \
@@ -128,15 +180,22 @@ python3 <skill>/scripts/make_ass.py /tmp/pv/audio.json out.ass \
   text and the karaoke cue disappears entirely. `--tone hlg` scales colours to 60%,
   which is verified to survive `tonemap=hable`.
 
-**Always read the printed line list before rendering.** It shows the cleaned text, and
-filler-stripping is the part most likely to need per-video correction. Fix mishearings
-and false starts with `--respell wrong=right`, `--drop-at <times>`, `--keep-at <times>`
-rather than editing the `.ass` by hand — the `.ass` is regenerated, hand edits are lost.
+Pass the dispositions agreed in Step 3: `--correct-at T=WORD` and `--strike-at T` for
+visible corrections, `--retext-at T=TEXT` for silent ones, `--drop-at T` to remove,
+`--keep-at T` to protect. `--respell wrong=right` also exists but is keyed by word text,
+so it rewrites *every* instance in the video — reach for `--retext-at` unless you
+genuinely mean all of them.
+
+**Read the printed line list against what the user approved**, then show it to them if
+anything moved: grouping shifts when words are dropped, so a correction can land on a
+different line than it did in review. Never hand-edit the `.ass` — it is regenerated on
+every run and the edits vanish. Mistyped timestamps are a hard error listing what matched
+nothing, so a flag can never silently do nothing.
 
 Full detail on the style, the filler policy and the tuning knobs:
 **`reference/subtitles.md`** — read it before changing any caption look.
 
-## Step 4 — Render
+## Step 5 — Render
 
 ### Vertical
 
@@ -200,7 +259,7 @@ Write output **next to the source**. Never overwrite the original.
 `hevc_videotoolbox` is hardware-accelerated — a 3.5-minute render takes well under a
 minute, so there is no reason to background it.
 
-## Step 5 — Verify, then report
+## Step 6 — Verify, then report
 
 ```
 ffprobe -v error -select_streams v:0 \

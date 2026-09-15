@@ -130,7 +130,7 @@ the karaoke cue vanishes completely.
 
 Verified with `tonemap=hable`: at 100 % the highlight is invisible; at 60 % it survives
 clearly. `--tone hlg` scales both colours by 0.60. Use it for **every HDR source**, and
-check a tone-mapped still afterwards (`SKILL.md` Step 5, check 4).
+check a tone-mapped still afterwards (`SKILL.md` Step 6, check 4).
 
 Deepening the accent hue instead does *not* fix it — tested `#FF9500` at 88 % white and
 the highlight was still weak. Luminance is the lever, not hue.
@@ -200,6 +200,27 @@ you need a break before it *and* before the word that follows it.
 
 A mistimed `--correct-at`/`--strike-at` is a hard error listing the times that
 matched nothing — it cannot silently no-op.
+
+### Three classes of correction, and who decides
+
+A slip has three possible fates, and the difference is editorial, not technical. The
+user picks; the tool only carries it out.
+
+| Class | Flag | When it is right |
+|---|---|---|
+| Shown | `--correct-at T=WORD`, `--strike-at T` | the slip is part of the content. Struck word, correction above it. Honest, and often funnier than hiding it |
+| Silent | `--retext-at T=TEXT` | a plain mishearing. Nobody gains from seeing that whisper misheard a word the speaker said correctly |
+| Gone | `--drop-at T` | filler and false starts. Nothing is lost by deleting what the speaker abandoned |
+
+The line between *shown* and *silent* is whether the speaker said it or the transcriber
+invented it. A word the speaker actually got wrong can be worth striking on screen. A
+word only whisper got wrong should be fixed quietly, because striking it would be
+staging a mistake that never happened.
+
+`scripts/review_transcript.py` finds the candidates; `SKILL.md` Step 3 is the workflow.
+Do not skip the asking. Every automatic rule in this file was written because a human
+looked at a real transcript, and the two rules that were tried *without* asking — generic
+false-start detection, and trusting whisper confidence — both shipped errors.
 
 ### The strike is drawn, not `\s1`
 
