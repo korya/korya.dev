@@ -11,6 +11,11 @@ shared subtitle style. Everything runs locally — no upload, no third-party ser
 Pipeline position: shoot → **prepare-video** → upload to YouTube → `create-video-post`
 → `compose-youtube-description`.
 
+The handoff to `create-video-post` is a **sidecar** written beside the source video
+(Step 4). It carries the transcript and every correction agreed in Step 3, so the next
+stage neither re-transcribes nor re-derives your decisions from memory. Skipping it
+means the post gets written from a second, different transcription of the same audio.
+
 | Mode | Output | Destination |
 |---|---|---|
 | **vertical** | 1080×1920 + captions | LinkedIn (and YouTube Shorts, a future target) |
@@ -56,6 +61,14 @@ ls /opt/homebrew/opt/ffmpeg-full/bin/ffmpeg || brew install ffmpeg-full
 
 Use that absolute path for **every** ffmpeg call in this skill. It is keg-only, so it
 never shadows the slim build. Set `FF=/opt/homebrew/opt/ffmpeg-full/bin/ffmpeg` once.
+
+**Changing anything under `scripts/`? Run `yarn test:skills` first and last.** Golden
+`.ass` files make the geometry safe to refactor, and the suite guards the two documented
+silent failures: a caption that overflows the frame and wraps instead of erroring, and a
+mistimed flag that renders successfully with the edit missing. If output changes
+deliberately, `python3 tests/run_tests.py --update` and review the diff before
+committing. CI runs a partial version of this (Ubuntu has no Avenir Next Heavy, so the
+font-metric cases skip); the full run is macOS-only, which means yours.
 
 ## Step 1 — Probe the source
 
@@ -161,9 +174,20 @@ like: it costs seconds and needs no re-transcription.
 ## Step 4 — Generate the subtitle file
 
 ```
+cp /tmp/pv/audio.json '<video dir>/<stem>.words.json'     # survives /tmp being cleared
+
 python3 <skill>/scripts/make_ass.py /tmp/pv/audio.json out.ass \
-    --layout vertical|horizontal --tone sdr|hlg
+    --layout vertical|horizontal --tone sdr|hlg \
+    --sidecar '<video dir>/<stem>.captions.json' \
+    --source '<video>' --render '<the mp4 this .ass gets burned into>'
 ```
+
+**Always pass `--sidecar`.** It is merged across the two layout runs, so pass the same
+path to both. It records the transcript, every disposition from Step 3, and two texts:
+`caption_text` (what the pixels say) and `spoken_text` (what the speaker is taken to have
+meant). Those differ exactly at the visible corrections, and `create-video-post` needs
+both — one to write the post transcript from, the other to detect that the published
+video disagrees with it.
 
 - `--layout` sets frame size, font size, margins and words-per-line. A caption tuned
   for a phone is the wrong size for a 16:9 frame; never reuse one file for both.
@@ -286,10 +310,28 @@ Four checks that actually matter:
 Report as a source → output table (geometry, codec/colour, audio, duration) and state
 plainly what was dropped: Dolby Vision RPU, the spatial audio track, data streams.
 
+**Name the sidecar and its neighbours in the report**, and check they exist:
+
+```
+ls '<video dir>'/<stem>.{captions,words}.json
+```
+
+Tell the user these travel with the video: `create-video-post` finds them by looking
+beside whatever path it is given, so moving the mp4 without them silently costs a second
+transcription and every correction agreed in Step 3.
+
+Also add the `-ss` warning to anything you extract for checking: put `-ss` **after**
+`-i` when the `subtitles` filter is in the chain (see Gotchas).
+
 ## Gotchas
 
 - **`scale=-1` is a trap.** It can produce an odd dimension, which 4:2:0 rejects, and
   the failure prints only "No filtered frames for output stream". Always `-2`.
+- **`-ss` before `-i` renders the wrong caption.** Input seeking rewrites the frame's
+  PTS to ~0, so a `subtitles=` filter draws whatever caption sits at the start of the
+  video. The frame comes back looking caption-free, and a diff against it reads as "the
+  subtitle tag does nothing". Put `-ss` *after* `-i` whenever `subtitles=` is in the
+  chain. Cost an hour once.
 - **`-copyts` on a sample file shifts its PTS.** A 6-second sample cut from t=42 has
   `start_time=42`, so seeking it later with `-ss 2` finds nothing. Seek relative to
   `start_time`, or omit `-copyts` when the sample is only for eyeballing.
