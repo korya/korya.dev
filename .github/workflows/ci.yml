@@ -52,6 +52,14 @@ jobs:
       - name: Install Chromium and its system dependencies
         run: npx playwright install --with-deps chromium
 
+      # The subtitle generator in .claude/skills is not exercised by the site suite,
+      # and its output is fiddly geometry that is easy to break silently. Runs before
+      # the slow job so a broken generator fails in seconds. Ubuntu has no Avenir Next,
+      # so the font-metric cases skip here and the run reports itself as partial; the
+      # full suite runs on macOS via `yarn test:skills`.
+      - name: Run skill tests
+        run: yarn test:skills
+
       # playwright.config.ts builds the site and serves it before the suite runs, so
       # the tests exercise dist/ rather than the dev server.
       - name: Run end-to-end tests

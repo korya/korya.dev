@@ -3,6 +3,7 @@
   "type": "module",
   "version": "1.0.0",
   "scripts": {
+    "test:skills": "python3 .claude/skills/prepare-video/tests/run_tests.py",
     "sync": "node scripts/sync-content.js",
     "dev": "yarn sync && astro dev",
     "build": "yarn sync && astro build",

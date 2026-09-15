@@ -1,0 +1,446 @@
+{
+ "text": " hey guys the last couple of weeks are a little bit pessimistic on the ai front and i wanted to also let's say my two cents on that why not why not i got the camera i can post it why not but i i think the danger of ai is not that it's gonna conquer us or will destroy us destroy the humanity right the danger of",
+ "segments": [
+  {
+   "id": 0,
+   "start": 0.6200000000000007,
+   "end": 8.1,
+   "text": " hey guys the last couple of weeks are a little bit pessimistic on the ai front and i wanted to",
+   "words": [
+    {
+     "word": " hey",
+     "start": 0.6200000000000007,
+     "end": 0.84,
+     "probability": 0.224365234375
+    },
+    {
+     "word": " guys",
+     "start": 0.84,
+     "end": 1.2,
+     "probability": 0.99267578125
+    },
+    {
+     "word": " the",
+     "start": 1.2,
+     "end": 1.66,
+     "probability": 0.927734375
+    },
+    {
+     "word": " last",
+     "start": 1.66,
+     "end": 1.84,
+     "probability": 0.99951171875
+    },
+    {
+     "word": " couple",
+     "start": 1.84,
+     "end": 2.06,
+     "probability": 1.0
+    },
+    {
+     "word": " of",
+     "start": 2.06,
+     "end": 2.2,
+     "probability": 1.0
+    },
+    {
+     "word": " weeks",
+     "start": 2.2,
+     "end": 2.42,
+     "probability": 0.99951171875
+    },
+    {
+     "word": " are",
+     "start": 2.42,
+     "end": 2.64,
+     "probability": 0.99755859375
+    },
+    {
+     "word": " a",
+     "start": 2.64,
+     "end": 2.76,
+     "probability": 1.0
+    },
+    {
+     "word": " little",
+     "start": 2.76,
+     "end": 2.88,
+     "probability": 1.0
+    },
+    {
+     "word": " bit",
+     "start": 2.88,
+     "end": 3.06,
+     "probability": 0.9990234375
+    },
+    {
+     "word": " pessimistic",
+     "start": 3.06,
+     "end": 3.74,
+     "probability": 0.99951171875
+    },
+    {
+     "word": " on",
+     "start": 3.74,
+     "end": 3.9,
+     "probability": 0.99951171875
+    },
+    {
+     "word": " the",
+     "start": 3.9,
+     "end": 4.02,
+     "probability": 0.99853515625
+    },
+    {
+     "word": " ai",
+     "start": 4.02,
+     "end": 4.32,
+     "probability": 0.6337890625
+    },
+    {
+     "word": " front",
+     "start": 4.32,
+     "end": 5.4,
+     "probability": 0.71826171875
+    },
+    {
+     "word": " and",
+     "start": 5.4,
+     "end": 7.32,
+     "probability": 0.98779296875
+    },
+    {
+     "word": " i",
+     "start": 7.32,
+     "end": 7.54,
+     "probability": 0.98583984375
+    },
+    {
+     "word": " wanted",
+     "start": 7.54,
+     "end": 7.82,
+     "probability": 0.9990234375
+    },
+    {
+     "word": " to",
+     "start": 7.82,
+     "end": 8.1,
+     "probability": 0.99951171875
+    }
+   ]
+  },
+  {
+   "id": 1,
+   "start": 8.1,
+   "end": 14.88,
+   "text": " also let's say my two cents on that why not why not i got the camera i can post it why not but",
+   "words": [
+    {
+     "word": " also",
+     "start": 8.1,
+     "end": 8.58,
+     "probability": 0.9990234375
+    },
+    {
+     "word": " let's",
+     "start": 8.58,
+     "end": 8.94,
+     "probability": 0.853515625
+    },
+    {
+     "word": " say",
+     "start": 8.94,
+     "end": 9.04,
+     "probability": 0.8759765625
+    },
+    {
+     "word": " my",
+     "start": 9.04,
+     "end": 9.24,
+     "probability": 0.9990234375
+    },
+    {
+     "word": " two",
+     "start": 9.24,
+     "end": 9.44,
+     "probability": 0.986328125
+    },
+    {
+     "word": " cents",
+     "start": 9.44,
+     "end": 9.7,
+     "probability": 0.99853515625
+    },
+    {
+     "word": " on",
+     "start": 9.7,
+     "end": 9.88,
+     "probability": 1.0
+    },
+    {
+     "word": " that",
+     "start": 9.88,
+     "end": 10.06,
+     "probability": 1.0
+    },
+    {
+     "word": " why",
+     "start": 10.06,
+     "end": 10.28,
+     "probability": 0.9921875
+    },
+    {
+     "word": " not",
+     "start": 10.28,
+     "end": 10.54,
+     "probability": 1.0
+    },
+    {
+     "word": " why",
+     "start": 10.54,
+     "end": 12.14,
+     "probability": 0.60205078125
+    },
+    {
+     "word": " not",
+     "start": 12.14,
+     "end": 12.26,
+     "probability": 0.9189453125
+    },
+    {
+     "word": " i",
+     "start": 12.26,
+     "end": 12.38,
+     "probability": 0.994140625
+    },
+    {
+     "word": " got",
+     "start": 12.38,
+     "end": 12.52,
+     "probability": 0.9990234375
+    },
+    {
+     "word": " the",
+     "start": 12.52,
+     "end": 12.64,
+     "probability": 1.0
+    },
+    {
+     "word": " camera",
+     "start": 12.64,
+     "end": 12.96,
+     "probability": 1.0
+    },
+    {
+     "word": " i",
+     "start": 12.96,
+     "end": 13.22,
+     "probability": 0.9990234375
+    },
+    {
+     "word": " can",
+     "start": 13.22,
+     "end": 13.36,
+     "probability": 1.0
+    },
+    {
+     "word": " post",
+     "start": 13.36,
+     "end": 13.7,
+     "probability": 0.982421875
+    },
+    {
+     "word": " it",
+     "start": 13.7,
+     "end": 13.82,
+     "probability": 1.0
+    },
+    {
+     "word": " why",
+     "start": 13.82,
+     "end": 13.98,
+     "probability": 0.99853515625
+    },
+    {
+     "word": " not",
+     "start": 13.98,
+     "end": 14.18,
+     "probability": 0.99951171875
+    },
+    {
+     "word": " but",
+     "start": 14.18,
+     "end": 14.88,
+     "probability": 0.9990234375
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "start": 15.360000000000003,
+   "end": 22.72,
+   "text": " i i think the danger of ai is not that it's gonna conquer us or will destroy us destroy the humanity",
+   "words": [
+    {
+     "word": " i",
+     "start": 15.360000000000003,
+     "end": 15.8,
+     "probability": 0.46240234375
+    },
+    {
+     "word": " i",
+     "start": 15.8,
+     "end": 15.96,
+     "probability": 0.80224609375
+    },
+    {
+     "word": " think",
+     "start": 15.96,
+     "end": 16.16,
+     "probability": 1.0
+    },
+    {
+     "word": " the",
+     "start": 16.16,
+     "end": 16.3,
+     "probability": 1.0
+    },
+    {
+     "word": " danger",
+     "start": 16.3,
+     "end": 16.6,
+     "probability": 0.99951171875
+    },
+    {
+     "word": " of",
+     "start": 16.6,
+     "end": 16.8,
+     "probability": 0.99951171875
+    },
+    {
+     "word": " ai",
+     "start": 16.8,
+     "end": 17.0,
+     "probability": 0.947265625
+    },
+    {
+     "word": " is",
+     "start": 17.0,
+     "end": 17.2,
+     "probability": 0.99951171875
+    },
+    {
+     "word": " not",
+     "start": 17.2,
+     "end": 17.34,
+     "probability": 0.99755859375
+    },
+    {
+     "word": " that",
+     "start": 17.34,
+     "end": 17.48,
+     "probability": 0.94677734375
+    },
+    {
+     "word": " it's",
+     "start": 17.48,
+     "end": 17.68,
+     "probability": 0.998046875
+    },
+    {
+     "word": " gonna",
+     "start": 17.68,
+     "end": 17.84,
+     "probability": 0.9013671875
+    },
+    {
+     "word": " conquer",
+     "start": 17.84,
+     "end": 18.3,
+     "probability": 0.99853515625
+    },
+    {
+     "word": " us",
+     "start": 18.3,
+     "end": 18.72,
+     "probability": 0.99755859375
+    },
+    {
+     "word": " or",
+     "start": 18.72,
+     "end": 19.14,
+     "probability": 0.99951171875
+    },
+    {
+     "word": " will",
+     "start": 19.14,
+     "end": 19.9,
+     "probability": 0.98291015625
+    },
+    {
+     "word": " destroy",
+     "start": 19.9,
+     "end": 21.08,
+     "probability": 0.986328125
+    },
+    {
+     "word": " us",
+     "start": 21.08,
+     "end": 21.58,
+     "probability": 0.99951171875
+    },
+    {
+     "word": " destroy",
+     "start": 21.58,
+     "end": 22.02,
+     "probability": 0.95751953125
+    },
+    {
+     "word": " the",
+     "start": 22.02,
+     "end": 22.18,
+     "probability": 0.93115234375
+    },
+    {
+     "word": " humanity",
+     "start": 22.18,
+     "end": 22.72,
+     "probability": 0.9990234375
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "start": 22.72,
+   "end": 25.1,
+   "text": " right the danger of",
+   "words": [
+    {
+     "word": " right",
+     "start": 22.72,
+     "end": 23.08,
+     "probability": 0.44677734375
+    },
+    {
+     "word": " the",
+     "start": 23.08,
+     "end": 24.24,
+     "probability": 0.39111328125
+    },
+    {
+     "word": " danger",
+     "start": 24.24,
+     "end": 24.66,
+     "probability": 0.99658203125
+    },
+    {
+     "word": " of",
+     "start": 24.66,
+     "end": 25.1,
+     "probability": 1.0
+    }
+   ]
+  }
+ ],
+ "language": "en"
+}
