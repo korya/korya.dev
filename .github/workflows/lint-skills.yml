@@ -1,0 +1,60 @@
+name: Lint skills
+
+# A separate workflow rather than a job in ci.yml because `paths` filters a whole
+# workflow, not a job. Gating a job with `if:` would still spin up a runner and
+# report a skipped check on every PR; this way a PR that does not touch the skills
+# never starts the job at all.
+#
+# Safe to path-filter only while master has no required status checks: a required
+# check that never runs leaves a PR waiting forever. If branch protection is added
+# later, do not mark this one required.
+on:
+  push:
+    branches: [master]
+    paths:
+      - '.claude/skills/**'
+      - '.github/workflows/lint-skills.yml'
+  pull_request:
+    paths:
+      - '.claude/skills/**'
+      - '.github/workflows/lint-skills.yml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  avocetta:
+    name: Lint agent skills
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # The action is a composite that runs a bundled CLI on the runner's own node,
+      # so there is nothing to install and no setup-node step.
+      - uses: korya/avocetta@v2
+        with:
+          # Required, despite the action defaulting to the repo root: avocetta
+          # discovers `skills/`, a plugin manifest or a marketplace, and finds none
+          # of those here. From the root it exits with "nothing to lint at .", so
+          # the zero-config form in its README would fail this repo.
+          path: .claude/skills
+
+          # Also required. Pointed at a bare directory, avocetta selects only the
+          # two spec dialects; Claude Code rules are added by auto-detection, which
+          # keys off a layout this repo does not have. Without this the runtime
+          # these skills actually run on would go unchecked, and the job would pass
+          # while proving less than it appears to.
+          dialect: spec,claude
+
+          # The skills pass strict today, so this costs nothing now and prevents the
+          # class of defect it catches from accumulating: strict turns silent
+          # degradation into a blocker, such as a description the runtime truncates
+          # or a body past the size a runtime loads. Those fail invisibly at
+          # activation time, which is the worst place to find them.
+          strict: "true"
+
+          # `pedantic` also passes today but stays off: it is opinion-tier, and
+          # opinions that block a merge should be adopted deliberately, not inherited.
