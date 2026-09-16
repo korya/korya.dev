@@ -9,6 +9,7 @@ size and shape for a 1920x1080 YouTube frame. See LAYOUTS below.
 
 import argparse
 import json
+import os
 import re
 
 # --- Look -------------------------------------------------------------------
@@ -423,6 +424,70 @@ def build_events(lines, white, accent, cfg, anim=(), pop_pct=POP_PCT):
     return ev
 
 
+def sidecar_texts(lines):
+    """What the screen shows, and what the speaker is taken to have meant.
+
+    They differ wherever a correction was made, and that difference is the whole
+    point of the file: `caption` is the claim burned into the pixels, `spoken` is
+    the reading a transcript should be written from.
+    """
+    caption, spoken = [], []
+    for line in lines:
+        for w in line:
+            caption.append(w["text"])
+            if w["correct"] is None:
+                spoken.append(w["text"])
+            elif w["correct"]:
+                spoken.append(w["correct"])   # struck word, corrected above it
+            # else: struck with nothing above it -- retracted, so not spoken
+    return " ".join(caption), " ".join(spoken)
+
+
+def write_sidecar(path, args, lines, raw_at, retext, corrections):
+    """Record the dispositions beside the video so later stages can reuse them.
+
+    Merged rather than overwritten: make_ass runs once per layout, and each run
+    knows only its own .ass and render path.
+    """
+    import datetime
+    doc = {}
+    if os.path.exists(path):
+        with open(path) as f:
+            doc = json.load(f)
+
+    caption, spoken = sidecar_texts(lines)
+    items = []
+    for at, word in sorted(corrections.items()):
+        items.append({"at": at, "heard": raw_at.get(at),
+                      "shown": word or None,
+                      "class": "shown" if word else "struck"})
+    for at, text in sorted(retext.items()):
+        items.append({"at": round(at, 2), "heard": raw_at.get(round(at, 2)),
+                      "shown": text, "class": "silent"})
+    for at in sorted({round(t, 2) for t in args.drop_at}):
+        items.append({"at": at, "heard": raw_at.get(at),
+                      "shown": None, "class": "dropped"})
+    items.sort(key=lambda x: x["at"])
+
+    doc.update({
+        "schema": 1,
+        "generated": datetime.datetime.now().astimezone().isoformat(timespec="seconds"),
+        "words_json": os.path.basename(args.json_in),
+        "source": os.path.basename(args.source) if args.source else doc.get("source"),
+        "caption_text": caption,
+        "spoken_text": spoken,
+        "corrections": items,
+    })
+    doc.setdefault("layouts", {})[args.layout] = {
+        "ass": os.path.basename(args.ass_out),
+        "render": os.path.basename(args.render) if args.render else None,
+    }
+    with open(path, "w") as f:
+        json.dump(doc, f, indent=2, ensure_ascii=False)
+        f.write("\n")
+    return path
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("json_in")
@@ -450,6 +515,15 @@ def main():
     ap.add_argument("--break-at", type=float, nargs="*", default=[],
                     metavar="TIME",
                     help="force a line break before the word at TIME")
+    ap.add_argument("--sidecar", metavar="PATH",
+                    help="write/merge the corrections sidecar that "
+                         "create-video-post reads, so the dispositions agreed "
+                         "here are not re-litigated from memory later")
+    ap.add_argument("--source", metavar="PATH",
+                    help="source video, recorded in the sidecar")
+    ap.add_argument("--render", metavar="PATH",
+                    help="the file this .ass will be burned into, recorded "
+                         "in the sidecar under this layout")
     ap.add_argument("--anim", default=DEFAULT_ANIM,
                     help="comma-separated: " + ",".join(ANIMS) +
                          f" (default: {DEFAULT_ANIM}; 'none' = static)")
@@ -497,8 +571,14 @@ def main():
         f.write("\n".join(build_events(lines, white, accent, cfg, anim,
                                         args.pop_pct)) + "\n")
 
+    if args.sidecar:
+        raw_at = {round(w["start"], 2): w["raw"]
+                  for w in load_words(args.json_in)}
+        write_sidecar(args.sidecar, args, lines, raw_at, retext, corrections)
+
     print(f"{args.layout}/{args.tone}: {len(lines)} lines, {len(words)} words "
-          f"-> {args.ass_out}\n")
+          f"-> {args.ass_out}"
+          + (f"\n  sidecar -> {args.sidecar}" if args.sidecar else "") + "\n")
     for line in lines:
         text = ' '.join(
             (f"[{w['text']} -> {w['correct']}]" if w['correct']

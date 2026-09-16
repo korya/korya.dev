@@ -29,41 +29,82 @@ The post is dated **today** (`date +%Y-%m-%d`). Don't ask for the date.
 
 ## Step 2 — Get the transcript
 
-Two sources. Use whichever are available and reconcile them.
+**First look for a sidecar.** `prepare-video` writes one beside the source video, and it
+carries the transcript plus every correction the user already approved. Using it avoids
+transcribing the same audio a second time with a second model, and avoids re-deciding
+from memory what was already decided.
 
-1. **YouTube captions** (always try first):
-   ```
-   uvx yt-dlp --write-auto-subs --sub-langs en --skip-download \
-     --sub-format vtt -o '/tmp/ytpost/%(id)s.%(ext)s' '<YouTube URL>'
-   ```
-   Then read the `.vtt` and strip timestamps/markup down to plain text.
+```
+# strip _captioned / _16x9 first, so pointing at a render also finds it
+ls '<video dir>'/<stem>.captions.json '<video dir>'/<stem>.words.json
+```
 
-2. **Local whisper** (only if the user gave a local video path) — more accurate,
-   and the source of truth for cross-validation:
-   ```
-   ffmpeg -y -i '<video>' -ar 16000 -ac 1 -c:a pcm_s16le /tmp/ytpost/audio.wav
-   uvx --from mlx-whisper mlx_whisper --model mlx-community/whisper-large-v3-mlx \
-     --output-format txt --output-dir /tmp/ytpost /tmp/ytpost/audio.wav
-   ```
-   Run this in the background — the model download + transcription takes a couple
-   minutes.
+Found → read `spoken_text` (the reading to write the post transcript from) and
+`corrections`. **Do not re-transcribe.**
 
-**Cross-validate.** If both exist, prefer the local whisper text (cleaner), but
-use YouTube's captions to catch mishearings — proper nouns especially. Whisper
-tends to mangle brand/model names (e.g. it wrote "Entropiq" for "Anthropic"). Fix
-those against what makes sense in context. If only YouTube captions exist, clean
-those. If neither tool works, tell the user and ask them to paste a transcript.
+Not found → transcribe locally, with the **same model `prepare-video` uses**, so the
+project has one transcriber rather than two that disagree:
+
+```
+ffmpeg -y -i '<video>' -ar 16000 -ac 1 -c:a pcm_s16le /tmp/ytpost/audio.wav
+uvx --from mlx-whisper mlx_whisper --model mlx-community/whisper-large-v3-turbo \
+  --output-format json --output-dir /tmp/ytpost --word-timestamps True \
+  --language en /tmp/ytpost/audio.wav
+```
+
+**Then always fetch YouTube's captions**, sidecar or not. They are a second, independent
+transcription of the same audio, and the only cross-check available on a published video:
+
+```
+uvx yt-dlp --write-auto-subs --sub-langs en --skip-download \
+  --sub-format vtt -o '/tmp/ytpost/%(id)s.%(ext)s' '<YouTube URL>'
+```
+
+### Compare them, and report what you find
+
+```
+python3 <skill>/scripts/check_captions.py '<stem>.captions.json' /tmp/ytpost/<ID>.en.vtt
+```
+
+It aligns the two and prints only what is not already explained: filler the captions
+strip by design and corrections made on purpose are excused, so what remains is a real
+disagreement about what was said.
+
+**Never silently resolve one.** Preferring the better-sounding wording is how a post ends
+up on the site disagreeing with the video above it, with nobody told. Put each
+unexplained item to the user with the two options, and record the choice in your summary:
+
+- **the video is wrong** → re-render via `prepare-video`, re-upload, then write the post
+- **YouTube is wrong** → write the post from the video, and say so
+
+**Parse the VTT with the script, never by eye.** YouTube's auto-captions are *rolling*:
+each cue repeats the tail of the previous one, so a naive de-duplication silently splices
+two half-lines into a sentence nobody said. That has already produced a confident,
+wrong "the video says X" claim in this project. The script handles it; ad-hoc `grep`
+does not.
+
+If there is no local video and no sidecar, clean YouTube's captions and say in your
+summary that the transcript has only one source.
 
 ## Step 3 — Clean the transcript
 
-Turn raw spoken words into readable prose in Dmitri's voice, matching the existing
-video posts:
+Turn raw spoken words into readable prose in Dmitri's voice:
 - First person, casual, keep the "Hey guys" / "See you guys" bookends if present.
 - Remove disfluencies, false starts, and spoken repetition. Keep the meaning and
   the personality. Don't over-polish it into a press release.
 - Fix obvious transcription errors (proper nouns, model names, garbled numbers).
   If a spoken fact seems off (e.g. "three years ago" for a ~30-year-old thing),
   render it coherently and flag it to the user in your summary at the end.
+- **Never "fix" a word Step 2 settled.** The transcript has to match the video; a
+  disagreement already had a decision made about it, and quietly overruling that here
+  puts the site and the video back out of step.
+
+**Do not calibrate voice against the other posts in `content/posts/`.** Every one of
+them carries a Claude co-author trailer, so matching them teaches the assistant's habits
+back to itself: that is what produced a draft full of em dashes and "it isn't X, it's Y"
+that had to be rewritten. The genuine samples of how Dmitri writes and talks are the
+transcript in front of you and his own LinkedIn copy for the video: short declaratives,
+plain words, repetition for rhythm, sentences opening with "And", no em dashes.
 
 ## Step 4 — Get structured video metadata and the thumbnail
 
