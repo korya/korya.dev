@@ -55,8 +55,8 @@ An annoyance, or maybe some cute animal living in their stone jungles. The same
 way that we treat animals today. That's what we'll become for AI.
 
 With evolution we'll move forward with a new form of intelligence and a new form
-of life, and we'll just stay behind, and we'll just degrade. That's the real fear
-that I have.
+of life, and we'll just stay behind, and they will just degrade. That's the real
+fear that I have.
 
 And because of that, AI has to be studied and used by everyone. It has to be
 approachable and accessible to everyone, so that the risk of it happening gets
