@@ -57,6 +57,14 @@ jobs:
       # the slow job so a broken generator fails in seconds. Ubuntu has no Avenir Next,
       # so the font-metric cases skip here and the run reports itself as partial; the
       # full suite runs on macOS via `yarn test:skills`.
+      # The subtitle generator needs Pillow for glyph metrics, pinned because the
+      # golden .ass files are byte-compared and advances move between releases.
+      # uv declares it per invocation, so no interpreter on the runner has to
+      # carry it -- the same reason an ambient python3 broke this once.
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
       - name: Run skill tests
         run: yarn test:skills
 

@@ -80,5 +80,5 @@ Dialogue: 0,0:00:22.72,0:00:23.08,Pop,,0,0,0,,the humanity {\c&H00999999&\t(0,26
 Dialogue: 0,0:00:23.08,0:00:24.24,Pop,,0,0,0,,the humanity right {\c&H00999999&\t(0,260,\c&H001F7999&)\fscy100\t(0,130,\fscy120)\t(130,340,\fscy100)}the{\c&H00999999&\fscy100} danger of
 Dialogue: 0,0:00:24.24,0:00:24.66,Pop,,0,0,0,,the humanity right the {\c&H00999999&\t(0,260,\c&H001F7999&)\fscy100\t(0,130,\fscy120)\t(130,340,\fscy100)}danger{\c&H00999999&\fscy100} of
 Dialogue: 0,0:00:24.66,0:00:25.40,Pop,,0,0,0,,the humanity right the danger {\c&H00999999&\t(0,260,\c&H001F7999&)\fscy100\t(0,130,\fscy120)\t(130,340,\fscy100)}of{\c&H00999999&\fscy100}
-Dialogue: 1,0:00:22.18,0:00:25.40,Pop,,0,0,0,,{\an5\pos(590,935)\c&H001F7999&\bord2\shad0\p1}m 0 0 l 462 0 l 462 6 l 0 6{\p0}
+Dialogue: 1,0:00:22.18,0:00:25.40,Pop,,0,0,0,,{\an5\pos(590,935)\c&H001F7999&\bord2\shad0\p1}m 0 0 l 461 0 l 461 6 l 0 6{\p0}
 Dialogue: 1,0:00:22.18,0:00:25.40,Pop,,0,0,0,,{\an5\pos(590,828)\fs88\frz4\c&H001F7999&}humankind

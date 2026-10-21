@@ -11,6 +11,8 @@ import argparse
 import json
 import os
 import re
+import sys
+import tempfile
 
 # --- Look -------------------------------------------------------------------
 
@@ -97,6 +99,28 @@ def text_width(text, size, spacing):
 
 
 text_width._cache = {}
+
+
+def require_text_metrics():
+    """Fail before writing anything if the glyph-metrics dependency is absent.
+
+    Pillow is needed only to position a correction, so an install that lacks it
+    renders drop-only and retext-only videos perfectly and then dies partway
+    through the first visible correction. Checking up front turns that into one
+    actionable line instead of a traceback, and -- because it runs before the
+    output file is opened -- stops a half-written .ass reaching ffmpeg.
+    """
+    try:
+        import PIL  # noqa: F401
+    except ImportError:
+        raise SystemExit(
+            "visible corrections need Pillow for glyph metrics, and this "
+            "interpreter does not have it.\n"
+            f"  interpreter: {sys.executable}\n"
+            "  fix: run this script through uv, which declares the dependency "
+            "per invocation:\n"
+            "    uv run --with Pillow python <skill>/scripts/make_ass.py ...\n"
+            "  (drop-only and retext-only runs do not need it and still work.)")
 
 LAYOUTS = {
     # Phone-first: big type, parked high enough to clear the caption overlay and
@@ -482,10 +506,27 @@ def write_sidecar(path, args, lines, raw_at, retext, corrections):
         "ass": os.path.basename(args.ass_out),
         "render": os.path.basename(args.render) if args.render else None,
     }
-    with open(path, "w") as f:
-        json.dump(doc, f, indent=2, ensure_ascii=False)
-        f.write("\n")
+    write_atomic(path, json.dumps(doc, indent=2, ensure_ascii=False) + "\n")
     return path
+
+
+def write_atomic(path, text):
+    """Write via a temp file in the same directory, then rename.
+
+    A crash mid-write must leave no file at all. A truncated .ass is the worst
+    outcome available: ffmpeg accepts a header with no Dialogue lines without a
+    word of complaint, so the render succeeds and silently carries no captions.
+    """
+    d = os.path.dirname(os.path.abspath(path)) or "."
+    fd, tmp = tempfile.mkstemp(dir=d, suffix=".tmp")
+    try:
+        with os.fdopen(fd, "w") as f:
+            f.write(text)
+        os.replace(tmp, path)
+    except BaseException:
+        if os.path.exists(tmp):
+            os.unlink(tmp)
+        raise
 
 
 def main():
@@ -548,6 +589,9 @@ def main():
     scale = TONE_SCALE[args.tone]
     white, accent = ass_colour(BASE_WHITE, scale), ass_colour(BASE_ACCENT, scale)
 
+    if corrections:
+        require_text_metrics()
+
     words = strip_fillers(load_words(args.json_in), args.drop_at, args.keep_at)
     lines = merge_orphans(group_lines(words, cfg, respell, corrections,
                                       retext, args.break_at), cfg)
@@ -566,10 +610,10 @@ def main():
         if missing:
             raise SystemExit(f"{flag} times not found in output: {missing}")
 
-    with open(args.ass_out, "w") as f:
-        f.write(header(cfg, white))
-        f.write("\n".join(build_events(lines, white, accent, cfg, anim,
-                                        args.pop_pct)) + "\n")
+    write_atomic(args.ass_out,
+                 header(cfg, white)
+                 + "\n".join(build_events(lines, white, accent, cfg, anim,
+                                           args.pop_pct)) + "\n")
 
     if args.sidecar:
         raw_at = {round(w["start"], 2): w["raw"]
