@@ -62,12 +62,33 @@ ls /opt/homebrew/opt/ffmpeg-full/bin/ffmpeg || brew install ffmpeg-full
 Use that absolute path for **every** ffmpeg call in this skill. It is keg-only, so it
 never shadows the slim build. Set `FF=/opt/homebrew/opt/ffmpeg-full/bin/ffmpeg` once.
 
+**Visible corrections need Pillow, and `python3` is the wrong way to get it.** Only
+`--correct-at` and `--strike-at` touch it, through `text_width`, so an interpreter
+without Pillow renders drop-only and retext-only videos perfectly and fails on the first
+visible correction. That is precisely what happened once: a Homebrew bump repointed
+`python3` at a new interpreter, Pillow was not there, and nothing had ever declared it.
+
+So run `make_ass.py` through `uv`, which declares the dependency per invocation the same
+way this skill already runs whisper and yt-dlp:
+
+```
+uv run --with 'Pillow==13.0.0' python <skill>/scripts/make_ass.py ...
+```
+
+**The version is pinned on purpose.** The golden `.ass` files are byte-compared, and
+glyph advances move between Pillow releases: 12.3.0 → 13.0.0 shifted one strike bar by a
+pixel. Unpinned, the tests fail on a machine that merely resolved a newer wheel. Bumping
+the pin is fine, but regenerate the goldens in the same commit.
+
+`review_transcript.py` and `check_captions.py` are standard library only; plain `python3`
+is correct for those.
+
 **Changing anything under `scripts/`? Run `yarn test:skills` first and last.** Golden
 `.ass` files make the geometry safe to refactor, and the suite guards the two documented
 silent failures: a caption that overflows the frame and wraps instead of erroring, and a
 mistimed flag that renders successfully with the edit missing. If output changes
-deliberately, `python3 tests/run_tests.py --update` and review the diff before
-committing. CI runs a partial version of this (Ubuntu has no Avenir Next Heavy, so the
+deliberately, `uv run --with 'Pillow==13.0.0' python tests/run_tests.py --update` and
+review the diff before committing. CI runs a partial version of this (Ubuntu has no Avenir Next Heavy, so the
 font-metric cases skip); the full run is macOS-only, which means yours.
 
 ## Step 1 — Probe the source
@@ -176,7 +197,7 @@ like: it costs seconds and needs no re-transcription.
 ```
 cp /tmp/pv/audio.json '<video dir>/<stem>.words.json'     # survives /tmp being cleared
 
-python3 <skill>/scripts/make_ass.py /tmp/pv/audio.json out.ass \
+uv run --with 'Pillow==13.0.0' python <skill>/scripts/make_ass.py /tmp/pv/audio.json out.ass \
     --layout vertical|horizontal --tone sdr|hlg \
     --sidecar '<video dir>/<stem>.captions.json' \
     --source '<video>' --render '<the mp4 this .ass gets burned into>'

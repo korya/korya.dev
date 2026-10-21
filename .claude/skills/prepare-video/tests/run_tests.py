@@ -51,15 +51,35 @@ CASES = [
 ]
 
 PASS, FAIL, SKIP = [], [], []
+SKIP_REASON = "Avenir Next Heavy not installed"
 
 
-def have_font():
+def metrics_status():
+    """(ok, reason) -- and the reason matters more than it looks.
+
+    These two conditions used to share one `except Exception` and one hardcoded
+    message, "needs Avenir Next Heavy". They are not the same thing:
+
+      no font   -- an unsupported platform. Linux CI has no Avenir Next, and
+                   skipping there is correct and permanent.
+      no Pillow -- a broken install on a platform that *can* run these cases.
+                   Skipping there silently drops coverage of exactly the code
+                   that a missing Pillow breaks, and blames a font that is
+                   sitting on disk. That happened: a Homebrew interpreter bump
+                   removed Pillow, corrections broke, and this suite went green
+                   while reporting the wrong cause.
+    """
+    if not pathlib.Path(M.MEASURE_TTC[0]).exists():
+        return False, "font"
     try:
         from PIL import ImageFont
+    except ImportError:
+        return False, "pillow"
+    try:
         ImageFont.truetype(M.MEASURE_TTC[0], 100, index=M.MEASURE_TTC[1])
-        return True
-    except Exception:
-        return False
+    except Exception as e:
+        return False, f"font unreadable: {e}"
+    return True, ""
 
 
 def ok(name):
@@ -82,7 +102,7 @@ def run(args, out):
 def golden_cases(tmp, update, font):
     for name, args, needs_font in CASES:
         if needs_font and not font:
-            skip(name, "needs Avenir Next Heavy")
+            skip(name, SKIP_REASON)
             continue
         out = tmp / f"{name}.ass"
         r = run(args, out)
@@ -102,7 +122,7 @@ def golden_cases(tmp, update, font):
 def width_checks(tmp, font):
     """The documented silent failure: an over-long line wraps instead of erroring."""
     if not font:
-        skip("line-widths-fit-frame", "needs Avenir Next Heavy"); return
+        skip("line-widths-fit-frame", SKIP_REASON); return
     worst = None
     for name, args, _ in CASES:
         layout = args[args.index("--layout") + 1]
@@ -162,7 +182,7 @@ def probability_optional(tmp):
 def sidecar_check(tmp, font):
     """caption_text and spoken_text must diverge exactly at the visible corrections."""
     if not font:
-        skip("sidecar records the dispositions", "needs Avenir Next Heavy"); return
+        skip("sidecar records the dispositions", SKIP_REASON); return
     side = tmp / "s.captions.json"
     r = run(["--layout", "vertical", "--tone", "hlg"] + CORRECTIONS
             + ["--sidecar", str(side), "--source", "sample.MOV"], tmp / "s.ass")
@@ -186,7 +206,24 @@ def main():
                     help="rewrite goldens; review the diff before committing")
     args = ap.parse_args()
 
-    font = have_font()
+    font, why = metrics_status()
+
+    # The one condition that must never be a skip. The font is here, so these
+    # cases can run; only the library is missing, which is the exact state that
+    # breaks visible corrections in make_ass.py. Skipping would hide the bug
+    # behind a green run.
+    if not font and why == "pillow":
+        print("FAIL  glyph metrics unavailable\n"
+              f"      {M.MEASURE_TTC[0]} is present, but Pillow is not "
+              "importable, so the\n"
+              "      correction cases cannot run. That is a broken install, "
+              "not an unsupported\n"
+              "      platform, and skipping it would drop coverage of the code "
+              "a missing Pillow\n"
+              "      breaks. Run the suite through uv:\n"
+              "        uv run --with Pillow python tests/run_tests.py")
+        return 1
+
     import tempfile
     with tempfile.TemporaryDirectory() as td:
         tmp = pathlib.Path(td)
@@ -202,7 +239,7 @@ def main():
     if args.update:
         print("\ngoldens rewritten.")
         return 0
-    scope = "full" if font else "partial (no Avenir Next Heavy: font-metric cases skipped)"
+    scope = "full" if font else f"partial ({SKIP_REASON}: font-metric cases skipped)"
     print(f"\n{len(PASS)} passed, {len(FAIL)} failed, {len(SKIP)} skipped — {scope}")
     return 1 if FAIL else 0
 
