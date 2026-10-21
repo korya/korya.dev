@@ -1,0 +1,20 @@
+---
+/**
+ * An inline note: a marker in the flow of a sentence that reveals a short aside
+ * in place, on hover, keyboard focus, or tap. No footnote list, no jump.
+ *
+ * Styles live in `src/styles/global.css` (`.note`), not here, because posts are
+ * plain markdown and cannot import a component. Markdown writes the same markup
+ * by hand; this component exists so `.astro` pages do not have to.
+ *
+ *   <Note marker="1">incl. video recording 😅</Note>
+ */
+interface Props {
+  /** What the reader sees in the text. A number, or a symbol like * or †. */
+  marker?: string;
+}
+
+const { marker = '1' } = Astro.props;
+---
+
+<button class="note" type="button"><span class="note-marker" aria-hidden="true">{marker}</span><span class="note-body"><slot /></span></button>

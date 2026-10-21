@@ -22,7 +22,7 @@ Before that I spent a decade at Planitar. I joined as the first engineer and lef
 
 This is my personal blog containing my thoughts and some fragments of thoughts on tech topics.
 
-The idea behind this blog is to reflect and structure the information in my head. Writing is one of the best ways to achieve that.
+The idea behind this blog is to reflect and structure the information in my head. Writing is one of the best ways to achieve that (incl. video recording 😅).
 
 I will be glad if you find it useful or even better, inspiring.
 

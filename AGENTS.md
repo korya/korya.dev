@@ -65,6 +65,36 @@ Two skills automate the flow: `widen-vertical-video` (portrait recording → 16:
 for YouTube) and `create-video-post` (YouTube link → scaffolded post with a
 cleaned transcript).
 
+## Inline notes
+
+A note reveals a short aside in place, on hover, keyboard focus, or tap. There is no
+footnote list and no jump, so the reader never loses their place. Styles live in
+`.note` in `src/styles/global.css`, which `BaseLayout` loads, so the same markup works
+on an `.astro` page and inside a post.
+
+In `.astro`: `<Note>the aside</Note>` (`src/components/Note.astro`, `marker` prop
+defaults to `1`). In markdown, write the HTML the component emits:
+
+```html
+<button class="note" type="button"><span class="note-marker" aria-hidden="true">1</span><span class="note-body">the aside</span></button>
+```
+
+Posts already embed raw HTML for the video iframe and the transcript `<details>`, so
+this is nothing new for the pipeline; it survives the markdown renderer untouched.
+
+Two details are load-bearing and look like they could be simplified:
+
+**It must be a `<button>`, not a `<span>` or `<sup>`.** Touch devices have no hover, and
+a tap only produces `:focus` on something focusable. A span marker is invisible to every
+phone reader. The button also earns a keyboard stop for free, and `:focus` is used rather
+than `:focus-visible` because a tap usually does not match the latter.
+
+**The body hides with `opacity`, never `visibility: hidden` or `display: none`.** Those
+drop it from the accessibility tree, and since the marker is `aria-hidden`, the button
+would be left with no accessible name at all: a screen reader announcing a bare "button".
+With opacity the aside is always the button's name, so it is readable without anyone
+having to find the hover.
+
 ## Keep sitemap freshness dependencies complete
 
 `scripts/sitemap-lastmod.mjs` maps every canonical page to the tracked files

@@ -216,3 +216,102 @@ h3:hover .heading-anchor,
     padding: 0;
   }
 }
+
+/* Inline notes -------------------------------------------------------------
+   A marker in the flow of a sentence that reveals a short aside in place, with
+   no footnote list and no jump. Used on /about and available to posts, which
+   already embed raw HTML (the video iframe, the transcript <details>).
+
+   Markup, identical in .astro and in markdown:
+
+     <button class="note" type="button">
+       <span class="note-marker" aria-hidden="true">1</span>
+       <span class="note-body">the aside</span>
+     </button>
+
+   It is a <button> rather than a <span> on purpose. A span is not focusable, so
+   tapping it does nothing: on touch there is no hover, and `:focus` is the only
+   event a tap produces. Making the marker a button is what gets phones working
+   without a line of JavaScript, and it earns a keyboard stop for free.
+
+   The aside sits inside the button, so the button's accessible name *is* the
+   note. That avoids an id on every note, which would be friction in markdown,
+   at the cost of a slightly odd name announced to screen readers. aria-hidden
+   on the marker keeps the bare number out of that name. */
+.note {
+  position: relative;
+  display: inline;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: var(--color-accent);
+  cursor: help;
+}
+
+.note-marker {
+  font-size: 0.7em;
+  vertical-align: super;
+  line-height: 0;
+  padding-inline: 0.1em 0.05em;
+  font-variant-numeric: tabular-nums;
+}
+
+.note:hover .note-marker,
+.note:focus-visible .note-marker {
+  color: var(--color-accent-hover);
+}
+
+.note:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.note-body {
+  position: absolute;
+  bottom: calc(100% + 0.6em);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  width: max-content;
+  /* Never wider than the viewport on a phone, never a single long line on a
+     desktop paragraph. */
+  max-width: min(22rem, 75vw);
+  padding: 0.5rem 0.7rem;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-bg-elevated);
+  box-shadow: 0 4px 14px rgb(0 0 0 / 0.14);
+  color: var(--color-text);
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.45;
+  text-align: left;
+  white-space: normal;
+  cursor: auto;
+  /* Hidden with opacity, never `visibility: hidden` or `display: none`. Both of
+     those drop the element from the accessibility tree, which would leave the
+     button with no accessible name at rest -- a screen reader announcing a bare
+     "button". With opacity the note text is always the button's name, so the
+     aside is readable without anyone having to discover the hover. */
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 120ms ease;
+}
+
+/* `:focus`, not `:focus-visible`: a tap focuses the button but usually does not
+   match :focus-visible, so gating on it would hide the note from touch users --
+   the exact group a hover-only note already fails. */
+.note:hover .note-body,
+.note:focus .note-body {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .note-body {
+    transition: none;
+  }
+}
